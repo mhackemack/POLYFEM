@@ -31,11 +31,11 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.fluxMoments = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
-data.Neutronics.Transport.QuadType = 'TriGLC';
-data.Neutronics.Transport.SnLevels = 2;
-data.Neutronics.Transport.PolarLevels = 8;
-data.Neutronics.Transport.AzimuthalLevels = 8;
+data.Neutronics.Transport.AngleAggregation = 'all';
+data.Neutronics.Transport.QuadType = 'LS';
+data.Neutronics.Transport.SnLevels = 4;
+data.Neutronics.Transport.PolarLevels = 4;
+data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
@@ -57,7 +57,7 @@ data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 data.Neutronics.Transport.ExtSource = [1.0];
 % Boundary Conditions
-data.Neutronics.Transport.BCFlags = [glob.Reflecting];
+data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 data.Neutronics.Transport.BCVals  = [0.0];
 % data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentBeam];
 % data.Neutronics.Transport.BCVals = [0.0, 1.0];
@@ -70,16 +70,16 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-10;
-data.solver.relativeTolerance = 1e-10;
+data.solver.absoluteTolerance = 1e-8;
+data.solver.relativeTolerance = 1e-8;
 data.solver.maxIterations = 10000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 3;
-L = 1; ncells = 2;
+data.problem.Dimension = 2;
+L = 1; ncells = 10;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n4_a0.9';
@@ -107,8 +107,8 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
-geometry = CartesianGeometry(3,x,y,z);
+geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D(linspace(0,L,ncells+1));
 % geometry.extrude_mesh_2D_to_3D([0,1/3,2/3,1]);
