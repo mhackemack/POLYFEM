@@ -3,7 +3,7 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Diffusion_MMS/Gauss_2D';
-data.problem.Name = 'AMR_cart_Irr=1_rtol=5.0';
+data.problem.Name = 'AMR_cart_PWLD_Irr=2_rtol=5.0';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -12,16 +12,16 @@ data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 14;
+data.problem.refinementLevels = 15;
 data.problem.refinementTolerance = 0.5;
-data.problem.AMRIrregularity = 1;
+data.problem.AMRIrregularity = 2;
 data.problem.projectSolution = 0;
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Diffusion';
-data.Neutronics.FEMType = 'CFEM';
+data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'MAXENT';
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -51,7 +51,7 @@ data.Neutronics.Diffusion.ExtSource{1} = @rhs_forcing_func_gauss2;
 data.Neutronics.Diffusion.ExactSolution{1} = @mms_exact_solution_gauss2;
 % Boundary Conditions
 data.Neutronics.Diffusion.BCFlags = [glob.Function];
-data.Neutronics.Diffusion.BCVals{1,1} = data.Neutronics.Diffusion.ExactSolution{1};
+data.Neutronics.Diffusion.BCVals{1,1} = @mms_exact_solution_gauss2;
 
 % Solver Input Parameters
 % -----------------------

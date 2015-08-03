@@ -284,7 +284,8 @@ for f=1:nf
             end
             qx_s{f} = [qx_s{f};tqq];
             qw_s{f} = [qw_s{f};side_areas(tside)*rqw_s];
-            bvals_s{f} = [bvals_s{f};tbs];
+            tznv = zeros(nrqx_s, nv); tznv(:,fv) = tbs;
+            bvals_s{f} = [bvals_s{f};tznv];
             bgrads_s{f} = [bgrads_s{f};tgs];
         end
         % end quadrature generation

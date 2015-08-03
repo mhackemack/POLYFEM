@@ -103,17 +103,17 @@ data.problem.Dimension = 2;
 % load(strcat(glob.geom_path,gname,'.mat'));
 
 
-[x,y]=meshgrid(linspace(0,L,n+1),linspace(0,L,n+1));
-x=x(:);y=y(:);
-tri = delaunayTriangulation(x,y);
-geometry = GeneralGeometry(2, 'Delaunay', tri);
+% [x,y]=meshgrid(linspace(0,L,n+1),linspace(0,L,n+1));
+% x=x(:);y=y(:);
+% tri = delaunayTriangulation(x,y);
+% geometry = GeneralGeometry(2, 'Delaunay', tri);
 
 x=linspace(0,L,n+1);
 y=linspace(0,L,n+1);
 z=linspace(0,L,n+1);
 % y=linspace(0,100,(n-1)/10+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D([0,.25*L,.5*L,.75*L,L]);

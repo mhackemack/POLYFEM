@@ -187,6 +187,10 @@ for f=1:nf
             end
         end
     end
+    % Modify boundary values
+    tbms = bms{f};
+    bms{f} = zeros(nqx, ntot);
+    bms{f}(:,fv) = tbms;
 end
 % Process Output Structures
 % ------------------------------------------------------------------------------

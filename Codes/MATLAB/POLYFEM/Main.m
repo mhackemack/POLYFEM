@@ -28,7 +28,7 @@ global glob
 glob = get_globals('Office');
 % Specify User-Specific Input Folder Location
 % -------------------------------------------
-inp = 'Diffusion';
+inp = 'Diffusion_MMS';
 % inp = 'Transport';
 % Populate path with additional folders
 % -------------------------------------
