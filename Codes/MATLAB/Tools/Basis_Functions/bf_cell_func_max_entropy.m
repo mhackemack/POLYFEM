@@ -176,7 +176,7 @@ end
 % surface matrices
 for f=1:nf
     nqx = length(qw_s{f});
-    fv = faces{f};
+    fv = f_dofs{f};
     for q=1:nqx
         bt = bms{f}(q,:);
         MM{f} = MM{f} + qw_s{f}(q) * (bt'*bt);

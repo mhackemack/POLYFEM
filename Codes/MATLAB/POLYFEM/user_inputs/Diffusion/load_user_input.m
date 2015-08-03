@@ -11,7 +11,7 @@ data.problem.refinementLevels = 0;
 data.problem.refinementTolerance = 0.5;
 data.problem.refinementType = 1;
 data.problem.refinementSplits = 1;
-data.problem.projectSolution = 1;
+data.problem.projectSolution = 0;
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
 
@@ -21,8 +21,8 @@ data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'random';
 data.Neutronics.transportMethod = 'Diffusion';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWLD';
-data.Neutronics.FEMDegree = 1;
+data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Diffusion Properties
@@ -57,6 +57,7 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+L = 1; n=4;
 data.problem.Dimension = 2;
 % gname = 'random_poly_mesh_L1_n2_a0.9';
 % gname = 'random_poly_mesh_L1_n4_a0.9';
@@ -86,7 +87,7 @@ data.problem.Dimension = 2;
 % gname = 'smooth_quad_mesh_L1_nc7_emb7_a0.15';
 % gname = 'smooth_poly_mesh_L1_n2_a0.15';
 % gname = 'smooth_poly_mesh_L1_n4_a0.15';
-gname = 'smooth_poly_mesh_L1_n8_a0.15';
+% gname = 'smooth_poly_mesh_L1_n8_a0.15';
 % gname = 'smooth_poly_mesh_L1_n16_a0.15';
 % gname = 'smooth_poly_mesh_L1_n32_a0.15'; % this one
 % gname = 'z_mesh_quad_L1_n5_a0.05';
@@ -99,26 +100,26 @@ gname = 'smooth_poly_mesh_L1_n8_a0.15';
 % gname = 'z_mesh_poly_L1_n40_a0.05';        % this one
 % gname = 'z_mesh_poly_L1_n80_a0.05';
 % gname = 'misha_quad_L1_n4';
-load(strcat(glob.geom_path,gname,'.mat'));
+% load(strcat(glob.geom_path,gname,'.mat'));
 
-n=5;
-% [x,y]=meshgrid(linspace(0,1,n),linspace(0,1,n));
-% x=x(:);y=y(:);
-% tri = delaunayTriangulation(x,y);
-% geometry = GeneralGeometry(2, 'Delaunay', tri);
 
-x=linspace(0,1,n);
-y=linspace(0,1,n);
-z=linspace(0,1,n);
+[x,y]=meshgrid(linspace(0,L,n+1),linspace(0,L,n+1));
+x=x(:);y=y(:);
+tri = delaunayTriangulation(x,y);
+geometry = GeneralGeometry(2, 'Delaunay', tri);
+
+x=linspace(0,L,n+1);
+y=linspace(0,L,n+1);
+z=linspace(0,L,n+1);
 % y=linspace(0,100,(n-1)/10+1);
 % geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
-% geometry.extrude_mesh_2D_to_3D([0,.25,.5,.75,1]);
+% geometry.extrude_mesh_2D_to_3D([0,.25*L,.5*L,.75*L,L]);
 
-geometry.set_face_flag_on_surface(2,[0,0;0,1]);
-geometry.set_face_flag_on_surface(3,[1,0;1,1]);
+geometry.set_face_flag_on_surface(2,[0,0;0,L]);
+geometry.set_face_flag_on_surface(3,[L,0;L,L]);
 % geometry.set_face_flag_on_surface(2,[0,0;0,100]);
 % geometry.set_face_flag_on_surface(3,[100,0;100,100]);
 % geometry.set_face_flag_on_surface(2,[0,0,0;1,0,0;1,0,1;0,0,1]);
