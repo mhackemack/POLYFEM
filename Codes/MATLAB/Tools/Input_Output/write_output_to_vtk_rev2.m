@@ -1,4 +1,4 @@
-function write_output_to_vtk_rev1 (filename, data, mesh, DoF, sol, sol_name)
+function write_output_to_vtk_rev2 (filename, data, mesh, DoF, sol, sol_name)
 % Quick Error Checking
 % --------------------
 if nargin < 4, error('Bad input parameters.'); end
@@ -284,13 +284,13 @@ else
     out = DoF.TotalDoFs;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function print_mesh_header()
-dim = mesh.Dimension;
-refbool = data.problem.refineMesh;
+function fid = generate_mesh_file()
 [y, m, d, h, mi, ~] = datevec(now);
+str_mesh = sprintf('%s_mesh.vtk',filename);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function print_solution_header()
-dim = mesh.Dimension;
-refbool = data.problem.refineMesh;
+function fid = generate_solution_file()
 [y, m, d, h, mi, ~] = datevec(now);
+str_sol = sprintf('%s_solution.vtk',filename);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
