@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Fourier Analysis Script - Search Method
+%   Title:          Fourier Energy Analysis Script - Search Method
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
