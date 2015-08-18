@@ -23,8 +23,8 @@ data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWLD';
-data.Neutronics.FEMDegree = 1;
+data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
@@ -47,7 +47,7 @@ data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
-txs = 1; c = 0.9999;
+txs = 10; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 data.Neutronics.Transport.TotalXS = [txs];
 data.Neutronics.Transport.AbsorbXS = (1-c)*data.Neutronics.Transport.TotalXS;
@@ -70,8 +70,8 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-10;
-data.solver.relativeTolerance = 1e-10;
+data.solver.absoluteTolerance = 1e-8;
+data.solver.relativeTolerance = 1e-8;
 data.solver.maxIterations = 10000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
@@ -79,7 +79,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 16; ncells = 8;
+L = 1; ncells = 6;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n4_a0.9';
@@ -91,11 +91,11 @@ L = 16; ncells = 8;
 % load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
-% tx = linspace(0,L,ncells+1);
-% [x,y]=meshgrid(tx,tx);
-% x=x(:);y=y(:);
-% tri = delaunayTriangulation(x,y);
-% geometry = GeneralGeometry(2, 'Delaunay', tri);
+tx = linspace(0,L,ncells+1);
+[x,y]=meshgrid(tx,tx);
+x=x(:);y=y(:);
+tri = delaunayTriangulation(x,y);
+geometry = GeneralGeometry(2, 'Delaunay', tri);
 
 % tx = linspace(0,L,ncells+1);
 % [x,y,z]=meshgrid(tx,tx,tx);
@@ -107,7 +107,7 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D(linspace(0,L,ncells+1));
