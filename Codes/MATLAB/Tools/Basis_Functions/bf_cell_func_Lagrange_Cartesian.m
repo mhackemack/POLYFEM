@@ -81,10 +81,10 @@ end
 zs = ones(nq_S, 1);
 % Compute Jacobian
 % ----------------
-[J,invJ,detJ] = evaluate_numerical_jacobian(dim, verts, rqx_V, ord);
-JS = cell(nf,1); invJS = cell(nf,1); detJS = cell(nf,1);
+[J,invJ] = evaluate_numerical_jacobian(dim, verts, rqx_V);
+JS = cell(nf,1); invJS = cell(nf,1);
 for f=1:nf
-    [JS{f},invJS{f},detJS{f}] = evaluate_numerical_jacobian(dim, verts, trqx_S{f}, ord);
+    [JS{f},invJS{f}] = evaluate_numerical_jacobian(dim, verts, trqx_S{f});
 end
 % Compute Real Space Quadrature and Basis Values/Gradients
 % --------------------------------------------------------
@@ -119,7 +119,6 @@ for f=1:nf
         
     end
 end
-
 % Build Matrices
 % --------------
 % Volume Matrices
@@ -239,9 +238,9 @@ else
     
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [J,invJ,detJ] = evaluate_numerical_jacobian(dim, verts, x, ord)
+function [J,invJ] = evaluate_numerical_jacobian(dim, verts, x)
 n = size(x,1);
-J = cell(n,1); invJ = cell(n,1); detJ = cell(n,1);
+J = cell(n,1); invJ = cell(n,1);
 % Evaluate Jacobian
 if dim == 2
     db = eval_quad_grads_for_jac(1, x);
@@ -249,8 +248,8 @@ if dim == 2
         JJ = [db(:,1,i)'*verts(:,1), db(:,2,i)'*verts(:,1);...
                   db(:,1,i)'*verts(:,2), db(:,2,i)'*verts(:,2)];
         J{i} = JJ;
-        detJ{i} = JJ(1,1)*JJ(2,2)-JJ(2,1)*JJ(1,2);
-        invJ{i} = [JJ(2,2),-JJ(1,2);-JJ(2,1),JJ(1,1)]/detJ{i};
+        detJ = JJ(1,1)*JJ(2,2)-JJ(2,1)*JJ(1,2);
+        invJ{i} = [JJ(2,2),-JJ(1,2);-JJ(2,1),JJ(1,1)]/detJ;
     end
 elseif dim == 3
     db = eval_hex_grads_for_jac(1, x);
@@ -259,7 +258,7 @@ elseif dim == 3
                   db(:,1,i)'*verts(:,2), db(:,2,i)'*verts(:,2), db(:,3,i)'*verts(:,2);...
                   db(:,1,i)'*verts(:,3), db(:,2,i)'*verts(:,3), db(:,3,i)'*verts(:,3)];
         J{i} = JJ;
-        detJ{i} = JJ(1,1)*(JJ(3,3)*JJ(2,2)-JJ(3,2)*JJ(2,3)) - JJ(2,1)*(JJ(3,3)*JJ(1,2)-JJ(3,2)*JJ(1,3)) + JJ(3,1)*(JJ(2,3)*JJ(1,2)-JJ(2,2)*JJ(1,3));
+        detJ = JJ(1,1)*(JJ(3,3)*JJ(2,2)-JJ(3,2)*JJ(2,3)) - JJ(2,1)*(JJ(3,3)*JJ(1,2)-JJ(3,2)*JJ(1,3)) + JJ(3,1)*(JJ(2,3)*JJ(1,2)-JJ(2,2)*JJ(1,3));
         invJ{i} = [(JJ(3,3)*JJ(2,2)-JJ(3,2)*JJ(2,3)),-(JJ(3,3)*JJ(1,2)-JJ(3,2)*JJ(1,3)), (JJ(2,3)*JJ(1,2)-JJ(2,2)*JJ(1,3));...
                -(JJ(3,3)*JJ(2,1)-JJ(3,1)*JJ(2,3)), (JJ(3,3)*JJ(1,1)-JJ(3,1)*JJ(1,3)),-(JJ(2,3)*JJ(1,1)-JJ(2,1)*JJ(1,3));...
                 (JJ(3,2)*JJ(2,1)-JJ(3,1)*JJ(2,2)),-(JJ(3,2)*JJ(1,1)-JJ(3,1)*JJ(1,2)), (JJ(2,2)*JJ(1,1)-JJ(2,1)*JJ(1,2))]/detJ;
@@ -284,20 +283,6 @@ function out = eval_quad_grads_for_jac(deg, xx)
 n = size(xx,1); out = zeros((deg+1)^2,2,n);
 for i=1:n
     s = xx(i,1); t = xx(i,2);
-    if deg == 1
-        out(:,:,i) = [t-1,s-1;1-t,-s;t,s;-t,1-s];
-    elseif deg == 2
-        out(:,:,i) = [  8*s*t*t-12*s*t+4*s-6*t*t+9*t-3,    8*s*s*t-6*s*s-12*s*t+9*s+4*t-3;...
-                 8*s*t*t-12*s*t+4*s-2*t*t+3*t-1,    8*s*s*t-6*s*s-4*s*t+3*s;...
-                 8*s*t*t-4*s*t-2*t*t+t,             8*s*s*t-2*s*s-4*s*t+s;...
-                 8*s*t*t-4*s*t-6*t*t+3*t,           8*s*s*t-2*s*s-12*s*t+3*s+4*t-1;...
-               -16*s*t*t+24*s*t-8*s+8*t*t-12*t+4, -16*s*s*t+12*s*s+16*s*t-12*s;...
-               -16*s*t*t+16*s*t+4*t*t-4*t,        -16*s*s*t+8*s*s+8*s*t-4*s;...
-               -16*s*t*t+8*s*t+8*t*t-4*t,         -16*s*s*t+4*s*s+16*s*t-4*s;...
-               -16*s*t*t+16*s*t+12*t*t-12*t,      -16*s*s*t+8*s*s+24*s*t-12*s-8*t+4;...
-                32*s*t*t-32*s*t-16*t*t+16*t,       32*s*s*t-16*s*s-32*s*t+16*s];
-    elseif deg == 3
-
-    end
+    out(:,:,i) = [t-1,s-1;1-t,-s;t,s;-t,1-s];
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

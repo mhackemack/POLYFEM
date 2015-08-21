@@ -8,12 +8,12 @@ data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 1;
+data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 8;
-data.problem.refinementTolerance = 0.5;
+data.problem.refinementLevels = 4;
+data.problem.refinementTolerance = 0.0;
 data.problem.AMRIrregularity = 3;
 data.problem.projectSolution = 0;
 % Neutronics Data
@@ -22,8 +22,8 @@ data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWLD';
-data.Neutronics.FEMDegree = 1;
+data.Neutronics.SpatialMethod = 'SERENDIPITY';
+data.Neutronics.FEMDegree = 3;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
 % ------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1)
 data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties
 data.Neutronics.Transport.fluxMoments = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'single';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set, not needed otherwise
@@ -84,17 +84,17 @@ data.solver.kyrlovSubspace = [];
 data.problem.Dimension = 2;
 L = 1; ncells = 4;
 
-xx=linspace(0,L,ncells+1);
-[x,y]=meshgrid(xx,xx);
-x=x(:);y=y(:);
-tri = delaunayTriangulation(x,y);
-geometry = GeneralGeometry(2, 'Delaunay', tri);
+% xx=linspace(0,L,ncells+1);
+% [x,y]=meshgrid(xx,xx);
+% x=x(:);y=y(:);
+% tri = delaunayTriangulation(x,y);
+% geometry = GeneralGeometry(2, 'Delaunay', tri);
 
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

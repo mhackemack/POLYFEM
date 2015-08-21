@@ -405,8 +405,13 @@ if obj.DoFType == 1
         center_cell_num = 0;
     end
 else
-    center_cell_bool = false;
-    center_cell_num = 0;
+    if strcmp(mesh.MeshType,'Quadrilateral') && obj.Degree == 4
+        center_cell_bool = true;
+        center_cell_num = 1;
+    else
+        center_cell_bool = false;
+        center_cell_num = 0;
+    end
 end
 % Determine maximum degrees of freedom and allocate memory
 % --------------------------------------------------------
@@ -513,7 +518,7 @@ if obj.FEMType == 1
         end
         if center_cell_num == 1
             ddd = [ddd,totvf+i];
-        else
+        elseif center_cell_num == 4
             
         end
         obj.ConnectivityArray{i} = [obj.ConnectivityArray{i}, ddd];
@@ -541,8 +546,39 @@ elseif obj.FEMType == 2
             nodes = [nodes;mesh.FaceCenter(cf,:)];
             ftemp_nodes = mesh.FaceCenter(cf,:);
         end
+        if obj.Degree == 3
+            if nv == 3
+                dv12 = nodes(2,:) - nodes(1,:);
+                dv23 = nodes(3,:) - nodes(2,:);
+                dv31 = nodes(1,:) - nodes(3,:);
+                nodes = [nodes;nodes(1,:)+dv12/3;nodes(1,:)+dv12*2/3];
+                nodes = [nodes;nodes(2,:)+dv23/3;nodes(2,:)+dv23*2/3];
+                nodes = [nodes;nodes(3,:)+dv31/3;nodes(3,:)+dv31*2/3];
+            elseif nv == 4
+                dv12 = nodes(2,:) - nodes(1,:);
+                dv23 = nodes(3,:) - nodes(2,:);
+                dv34 = nodes(4,:) - nodes(3,:);
+                dv41 = nodes(1,:) - nodes(4,:);
+                nodes = [nodes;nodes(1,:)+dv12/3;nodes(1,:)+dv12*2/3];
+                nodes = [nodes;nodes(2,:)+dv23/3;nodes(2,:)+dv23*2/3];
+                nodes = [nodes;nodes(3,:)+dv34/3;nodes(3,:)+dv34*2/3];
+                nodes = [nodes;nodes(4,:)+dv41/3;nodes(4,:)+dv41*2/3];
+            else
+                for j=1:nf
+                    dx = diff(nodes([j,mod(j,nf)+1],:));
+                    nodes = [nodes;nodes(j,:)+dx/3;nodes(j,:)+dx*2/3];
+                end
+            end 
+        end
         if center_cell_num == 1
             nodes = [nodes;mesh.CellCenter(i,:)];
+        elseif center_cell_num == 4
+            dv510 = nodes(10,:) - nodes(5,:);
+            dv69  = nodes(9,:) - nodes(6,:);
+            nodes = [nodes;nodes(5,:) + dv510/3];
+            nodes = [nodes;nodes(6,:) + dv69/3];
+            nodes = [nodes;nodes(6,:) + dv69*2/3];
+            nodes = [nodes;nodes(5,:) + dv510*2/3];
         end
         for f=1:nf
             ff = cf(f);
@@ -569,7 +605,8 @@ elseif obj.FEMType == 2
                 ind = [ind, nv+f];
                 iind = ind + nd;
             elseif obj.Degree == 3
-                
+                ind = [ind, nv+2*(f-1)+[1,2]];
+                iind = ind + nd;
             end
             if fcccs(ff) == 0, fcccs(ff) = i; end
             % assign cell/face nodes
@@ -579,9 +616,6 @@ elseif obj.FEMType == 2
         end
         obj.ConnectivityArray{i} = nd+1:nd+ncd;
         obj.NodeLocations(nd+1:nd+ncd,:) = nodes;
-%         for j=1:length(cv)
-%             obj.VertexNodes{cv(j)} = [obj.VertexNodes{cv(j)},nd+j];
-%         end
         nd = nd + ncd;
     end
     for f=1:obj.TotalFaces
@@ -633,10 +667,15 @@ for f=1:obj.TotalFaces
         end
         % Fix face node ordering
         if fff(2) == ncverts && fff(1) == 1
-            obj.FaceCellNodes{f,i} = [ff(end:-1:1),obj.FaceCellNodes{f,i}(end:-1:nfverts+1)];
+            obj.FaceCellNodes{f,i} = [ff(end:-1:1),obj.FaceCellNodes{f,i}(nfverts+1:end)];
         elseif ff(1) ~= fcnodes(1)
-            obj.FaceCellNodes{f,i} = [ff,obj.FaceCellNodes{f,i}(end:-1:nfverts+1)];
+            obj.FaceCellNodes{f,i} = [ff,obj.FaceCellNodes{f,i}(nfverts+1:end)];
         end
+%         if fff(2) == ncverts && fff(1) == 1
+%             obj.FaceCellNodes{f,i} = [ff(end:-1:1),obj.FaceCellNodes{f,i}(end:-1:nfverts+1)];
+%         elseif ff(1) ~= fcnodes(1)
+%             obj.FaceCellNodes{f,i} = [ff,obj.FaceCellNodes{f,i}(end:-1:nfverts+1)];
+%         end
         % Assign conforming face node ordering
         nnf = length(obj.FaceCellNodes{f,i});
         obj.ConformingFaceNodes{f,i} = [obj.FaceCellNodes{f,i}(nfverts:-1:1), obj.FaceCellNodes{f,i}(end:-1:nfverts+1)];
