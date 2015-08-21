@@ -20,9 +20,9 @@ data.problem.saveSolution = 0;
 data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'random';
 data.Neutronics.transportMethod = 'Diffusion';
-data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MAXENT';
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.FEMType = 'CFEM';
+data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Diffusion Properties
@@ -30,34 +30,37 @@ data.Neutronics.numberEnergyGroups = 1;
 data.Neutroncis.IP_Constant = 4;
 data.Neutronics.Diffusion.MMS = false;
 % Physical Properties
+ep = 1e-2;
 data.Neutronics.Diffusion.ScatteringXS = zeros(1,1,1);
-% data.Neutronics.Diffusion.DiffXS = [1/3];
-% data.Neutronics.Diffusion.TotalXS = [1];
-data.Neutronics.Diffusion.DiffXS = [2];
-data.Neutronics.Diffusion.TotalXS = [0];
-data.Neutronics.Diffusion.AbsorbXS = [0];
-data.Neutronics.Diffusion.ScatteringXS(1,:,:) = [0.0];
+data.Neutronics.Diffusion.DiffXS = ep/3;
+data.Neutronics.Diffusion.TotalXS = 1/ep;
+data.Neutronics.Diffusion.AbsorbXS = ep;
+data.Neutronics.Diffusion.ScatteringXS(1,:,:) = 1/ep - ep;
+% data.Neutronics.Diffusion.DiffXS = [2];
+% data.Neutronics.Diffusion.TotalXS = [0];
+% data.Neutronics.Diffusion.AbsorbXS = [0];
+% data.Neutronics.Diffusion.ScatteringXS(1,:,:) = [0.0];
 data.Neutronics.Diffusion.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Diffusion.FissSpec = [0.0];
-data.Neutronics.Diffusion.ExtSource = [0.0];
+data.Neutronics.Diffusion.ExtSource = ep;
 % Boundary Conditions
-% data.Neutronics.Diffusion.BCFlags = [glob.Dirichlet];
-% data.Neutronics.Diffusion.BCVals = [0.0];
-data.Neutronics.Diffusion.BCFlags = [glob.Neumann; glob.Robin; glob.Robin];
-data.Neutronics.Diffusion.BCVals = [0.0;0.0;9.0];
+data.Neutronics.Diffusion.BCFlags = [glob.Dirichlet];
+data.Neutronics.Diffusion.BCVals = [0.0];
+% data.Neutronics.Diffusion.BCFlags = [glob.Neumann; glob.Robin; glob.Robin];
+% data.Neutronics.Diffusion.BCVals = [0.0;0.0;9.0];
 
 % Solver Input Parameters
 % -----------------------
-data.solver.absoluteTolerance = 1e-12;
-data.solver.relativeTolerance = 1e-10;
-data.solver.maxIterations = 2000;
+data.solver.absoluteTolerance = 1e-6;
+data.solver.relativeTolerance = 1e-6;
+data.solver.maxIterations = 10000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-L = 1; n=4;
+L = 1; n=20;
 data.problem.Dimension = 2;
 % gname = 'random_poly_mesh_L1_n2_a0.9';
 % gname = 'random_poly_mesh_L1_n4_a0.9';
@@ -118,8 +121,8 @@ geometry = CartesianGeometry(2,x,y);
 
 % geometry.extrude_mesh_2D_to_3D([0,.25*L,.5*L,.75*L,L]);
 
-geometry.set_face_flag_on_surface(2,[0,0;0,L]);
-geometry.set_face_flag_on_surface(3,[L,0;L,L]);
+% geometry.set_face_flag_on_surface(2,[0,0;0,L]);
+% geometry.set_face_flag_on_surface(3,[L,0;L,L]);
 % geometry.set_face_flag_on_surface(2,[0,0;0,100]);
 % geometry.set_face_flag_on_surface(3,[100,0;100,100]);
 % geometry.set_face_flag_on_surface(2,[0,0,0;1,0,0;1,0,1;0,0,1]);

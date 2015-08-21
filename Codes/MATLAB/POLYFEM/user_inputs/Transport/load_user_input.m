@@ -23,7 +23,7 @@ data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LAGRANGE';
+data.Neutronics.SpatialMethod = 'MAXENT';
 data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 
@@ -47,7 +47,7 @@ data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
-ep = 1e-5;
+ep = 1e-2;
 % txs = 1; c = 0.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 data.Neutronics.Transport.TotalXS = 1/ep;
@@ -75,8 +75,8 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-8;
-data.solver.relativeTolerance = 1e-8;
+data.solver.absoluteTolerance = 1e-7;
+data.solver.relativeTolerance = 1e-7;
 data.solver.maxIterations = 10000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
@@ -84,7 +84,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 20;
+L = 1; ncells = 10;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n4_a0.9';
@@ -92,8 +92,8 @@ L = 1; ncells = 20;
 % gname = 'z_mesh_quad_L1_n20_a0.15';
 % gname = 'z_mesh_poly_L1_n20_a0.05';
 % gname = 'smooth_quad_mesh_L1_nc5_emb6_a0.15';
-% gname = 'smooth_poly_mesh_L1_n4_a0.15';
-% load(strcat(glob.geom_path,gname,'.mat'));
+gname = 'smooth_poly_mesh_L1_n4_a0.15';
+load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
 % tx = linspace(0,L,ncells+1);
@@ -112,7 +112,7 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D(linspace(0,L,ncells+1));
