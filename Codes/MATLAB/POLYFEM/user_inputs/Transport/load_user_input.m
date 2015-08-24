@@ -21,10 +21,11 @@ data.problem.projectSolution = 1;
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'zero';
+data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MAXENT';
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.SpatialMethod = 'WACHSPRESS';
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
@@ -47,7 +48,7 @@ data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
-ep = 1e-2;
+ep = 1e-5;
 % txs = 1; c = 0.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 data.Neutronics.Transport.TotalXS = 1/ep;
@@ -69,7 +70,7 @@ data.Neutronics.Transport.BCVals  = [0.0];
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 0;
+data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
 
@@ -87,12 +88,12 @@ data.problem.Dimension = 2;
 L = 1; ncells = 10;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
-% gname = 'random_poly_mesh_L1_n4_a0.9';
+gname = 'random_poly_mesh_L1_n4_a0.9';
 % gname = 'shestakov_poly_mesh_L1_nc4_a0.25';
-% gname = 'z_mesh_quad_L1_n20_a0.15';
+gname = 'z_mesh_quad_L1_n9_a0.15';
 % gname = 'z_mesh_poly_L1_n20_a0.05';
 % gname = 'smooth_quad_mesh_L1_nc5_emb6_a0.15';
-gname = 'smooth_poly_mesh_L1_n4_a0.15';
+% gname = 'smooth_poly_mesh_L1_n4_a0.15';
 load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
@@ -114,6 +115,8 @@ z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
+
+% geometry.turn_2D_mesh_to_traps(.0001);
 
 % geometry.extrude_mesh_2D_to_3D(linspace(0,L,ncells+1));
 % geometry.extrude_mesh_2D_to_3D([0,1/3,2/3,1]);
@@ -350,4 +353,14 @@ geometry.set_cell_matIDs_inside_domain(5, [6,8]);
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 data.Neutronics.Transport.BCVals  = [0.0];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = asymptotic_limit_func(x)
+dim = size(x,2);
+if dim == 1
+    out = 0.2*cos(pi*x(:,1));
+elseif dim == 2
+    out = 0.2*cos(pi*x(:,1)).*cos(pi*x(:,2));
+elseif dim == 3
+    out = 0.2*cos(pi*x(:,1)).*cos(pi*x(:,2)).*cos(pi*x(:,3));
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -337,6 +337,8 @@ for i=1:mf
                 sol.flux{i,j} = zeros(ndof,1);
             elseif strcmp(ndat.StartingSolution, 'one')
                 sol.flux{i,j} = ones(ndof,1);
+            elseif strcmp(ndat.StartingSolution, 'function')
+                sol.flux{i,j} = ndat.StartingSolutionFunction{i,j}(DoF.NodeLocations);
             else
                 sol.flux{i,j} = rand(ndof,1);
             end

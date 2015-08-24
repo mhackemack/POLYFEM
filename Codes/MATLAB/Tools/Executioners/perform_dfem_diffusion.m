@@ -73,11 +73,11 @@ rev_str = [];
 % Loop through cells
 for tcell=1:mesh.TotalCells
     % Print Current Cell Information
-    if glob.print_info
-        msg = sprintf('   -> Building Cell: %d of %d',tcell,mesh.TotalCells);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
-    end
+%     if glob.print_info
+%         msg = sprintf('   -> Building Cell: %d of %d',tcell,mesh.TotalCells);
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
+%     end
     
     cnodes = DoF.ConnectivityArray{tcell}; ncnodes = length(cnodes);
     matID = mesh.MatID(tcell);
@@ -108,11 +108,11 @@ end
 % Loop through faces
 for f=1:mesh.TotalFaces
     % Print Current Face Information
-    if glob.print_info
-        msg = sprintf('   -> Building Face: %d of %d',f,mesh.TotalFaces);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
-    end
+%     if glob.print_info
+%         msg = sprintf('   -> Building Face: %d of %d',f,mesh.TotalFaces);
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
+%     end
     
     fflag = mesh.FaceID(f);
     fcells = mesh.FaceCells(f,:);
@@ -205,7 +205,7 @@ for f=1:mesh.TotalFaces
     end
 end
 L = sparse(L);
-if glob.print_info, fprintf(rev_str); end
+% if glob.print_info, fprintf(rev_str); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [L,rhs] = get_sparse_matrices(x, ndat, mesh, DoF, FE)
 global glob
@@ -223,11 +223,11 @@ rev_str = [];
 % Loop through cells
 for tcell=1:mesh.TotalCells
     % Print Current Cell Information
-    if glob.print_info
-        msg = sprintf('   -> Building Cell: %d of %d',tcell,mesh.TotalCells);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
-    end
+%     if glob.print_info
+%         msg = sprintf('   -> Building Cell: %d of %d',tcell,mesh.TotalCells);
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
+%     end
     
     cnodes = DoF.ConnectivityArray{tcell}; ncnodes = length(cnodes);
     onesnodes = ones(ncnodes,1);
@@ -263,11 +263,11 @@ end
 % Loop through faces
 for f=1:mesh.TotalFaces
     % Print Current Face Information
-    if glob.print_info
-        msg = sprintf('   -> Building Face: %d of %d',f,mesh.TotalFaces);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
-    end
+%     if glob.print_info
+%         msg = sprintf('   -> Building Face: %d of %d',f,mesh.TotalFaces);
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
+%     end
     
     fflag = mesh.FaceID(f);
     fcells = mesh.FaceCells(f,:);
@@ -382,7 +382,7 @@ for f=1:mesh.TotalFaces
     end
 end
 L = sparse(I,J,TMAT,ndof,ndof);
-if glob.print_info, fprintf(rev_str); end
+% if glob.print_info, fprintf(rev_str); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function rhs = get_rhs(x, ndat, mesh, DoF, FE)
 global glob
@@ -397,11 +397,11 @@ rev_str = [];
 % Loop through cells
 for tcell=1:mesh.TotalCells
     % Print Current Cell Information
-    if glob.print_info
-        msg = sprintf('   -> Building Cell: %d of %d',tcell,mesh.TotalCells);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
-    end 
+%     if glob.print_info
+%         msg = sprintf('   -> Building Cell: %d of %d',tcell,mesh.TotalCells);
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
+%     end 
     
     cnodes = DoF.ConnectivityArray{tcell}; ncnodes = length(cnodes);
     matID = mesh.MatID(tcell);
@@ -431,11 +431,11 @@ end
 % Loop through faces
 for f=1:mesh.TotalFaces
     % Print Current Face Information
-    if glob.print_info
-        msg = sprintf('   -> Building Face: %d of %d',f,mesh.TotalFaces);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
-    end
+%     if glob.print_info
+%         msg = sprintf('   -> Building Face: %d of %d',f,mesh.TotalFaces);
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
+%     end
     
     fflag = mesh.FaceID(f);
     fcells = mesh.FaceCells(f,:);
@@ -478,7 +478,7 @@ for f=1:mesh.TotalFaces
         end
     end
 end
-if glob.print_info, fprintf(rev_str); end
+% if glob.print_info, fprintf(rev_str); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_Ax(x, ndat, mesh, DoF, FE)
 global glob

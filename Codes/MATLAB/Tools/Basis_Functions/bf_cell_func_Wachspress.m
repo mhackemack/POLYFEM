@@ -33,7 +33,7 @@ order = varargin{4};
 v_flags = varargin{5};
 s_flags = varargin{6};
 q_bool = varargin{7};
-q_ord = ord+2;
+q_ord = order+2;
 if nargin > 7
     if ~isempty(varargin{8}),q_ord = varargin{8};end
 end

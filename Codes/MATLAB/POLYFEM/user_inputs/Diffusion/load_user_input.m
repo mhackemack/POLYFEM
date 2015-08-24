@@ -18,9 +18,10 @@ data.problem.saveSolution = 0;
 % Neutronics Data
 % ---------------
 data.Neutronics.PowerLevel = 1.0;
-data.Neutronics.StartingSolution = 'random';
+data.Neutronics.StartingSolution = 'function';
+data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Diffusion';
-data.Neutronics.FEMType = 'CFEM';
+data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -30,7 +31,7 @@ data.Neutronics.numberEnergyGroups = 1;
 data.Neutroncis.IP_Constant = 4;
 data.Neutronics.Diffusion.MMS = false;
 % Physical Properties
-ep = 1e-2;
+ep = 1e-3;
 data.Neutronics.Diffusion.ScatteringXS = zeros(1,1,1);
 data.Neutronics.Diffusion.DiffXS = ep/3;
 data.Neutronics.Diffusion.TotalXS = 1/ep;
@@ -54,7 +55,7 @@ data.Neutronics.Diffusion.BCVals = [0.0];
 % -----------------------
 data.solver.absoluteTolerance = 1e-6;
 data.solver.relativeTolerance = 1e-6;
-data.solver.maxIterations = 10000;
+data.solver.maxIterations = 50000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
@@ -89,7 +90,7 @@ data.problem.Dimension = 2;
 % gname = 'smooth_quad_mesh_L1_nc7_emb6_a0.15';
 % gname = 'smooth_quad_mesh_L1_nc7_emb7_a0.15';
 % gname = 'smooth_poly_mesh_L1_n2_a0.15';
-% gname = 'smooth_poly_mesh_L1_n4_a0.15';
+gname = 'smooth_poly_mesh_L1_n4_a0.15';
 % gname = 'smooth_poly_mesh_L1_n8_a0.15';
 % gname = 'smooth_poly_mesh_L1_n16_a0.15';
 % gname = 'smooth_poly_mesh_L1_n32_a0.15'; % this one
@@ -103,7 +104,7 @@ data.problem.Dimension = 2;
 % gname = 'z_mesh_poly_L1_n40_a0.05';        % this one
 % gname = 'z_mesh_poly_L1_n80_a0.05';
 % gname = 'misha_quad_L1_n4';
-% load(strcat(glob.geom_path,gname,'.mat'));
+load(strcat(glob.geom_path,gname,'.mat'));
 
 
 % [x,y]=meshgrid(linspace(0,L,n+1),linspace(0,L,n+1));
@@ -116,7 +117,7 @@ y=linspace(0,L,n+1);
 z=linspace(0,L,n+1);
 % y=linspace(0,100,(n-1)/10+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D([0,.25*L,.5*L,.75*L,L]);
@@ -128,5 +129,15 @@ geometry = CartesianGeometry(2,x,y);
 % geometry.set_face_flag_on_surface(2,[0,0,0;1,0,0;1,0,1;0,0,1]);
 % geometry.set_face_flag_on_surface(3,[0,1,0;1,1,0;1,1,1;0,1,1]);
 
-
-
+% Function Handles
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = asymptotic_limit_func(x)
+dim = size(x,2);
+if dim == 1
+    out = 0.2*cos(pi*x(:,1));
+elseif dim == 2
+    out = 0.2*cos(pi*x(:,1)).*cos(pi*x(:,2));
+elseif dim == 3
+    out = 0.2*cos(pi*x(:,1)).*cos(pi*x(:,2)).*cos(pi*x(:,3));
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
