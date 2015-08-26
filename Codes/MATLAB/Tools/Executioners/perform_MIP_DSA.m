@@ -125,13 +125,13 @@ for f=1:mesh.TotalFaces
             % Gradient Terms
             % -------------------------------------------------------------
             % (+,+)
-%             L(gcnodes2,gcnodes2) = L(gcnodes2,gcnodes2) + 0.5*D(2)*(G2 + G2');
+            L(gcnodes2,gcnodes2) = L(gcnodes2,gcnodes2) + 0.5*D(2)*(G2 + G2');
             % (-,-)
-%             L(gcnodes1,gcnodes1) = L(gcnodes1,gcnodes1) - 0.5*D(1)*(G1 + G1');
+            L(gcnodes1,gcnodes1) = L(gcnodes1,gcnodes1) - 0.5*D(1)*(G1 + G1');
             % (+,-)
-%             L(gcnodes2,gcnodes1) = L(gcnodes2,gcnodes1) + 0.5*(D(1)*CG1' - D(2)*CG2);
+            L(gcnodes2,gcnodes1) = L(gcnodes2,gcnodes1) + 0.5*(D(1)*CG1' - D(2)*CG2);
             % (-,+)
-%             L(gcnodes1,gcnodes2) = L(gcnodes1,gcnodes2) - 0.5*(D(2)*CG2' - D(1)*CG1);
+            L(gcnodes1,gcnodes2) = L(gcnodes1,gcnodes2) - 0.5*(D(2)*CG2' - D(1)*CG1);
         end
     % Boundary Face
     else
@@ -154,10 +154,6 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
-%             elseif  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
-%                     ndat.Transport.BCFlags(fflag) == glob.Periodic
-%                 Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
-%                 rhs(gfnodes) = rhs(gfnodes) + M*Jin;
             end
         end
     end
