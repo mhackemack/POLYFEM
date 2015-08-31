@@ -15,7 +15,7 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% clear; clc; close all; format long e
+clear; clc; close all; format long e
 % Set all user input information necessary
 % ------------------------------------------------------------------------------
 data.file_name = 'XSFiles/pdt-119g-graphite_cnat.cx';
@@ -26,8 +26,8 @@ data.scatt_enums = 2500;        % scattering kernels
 data.enums_1G = [1099,1,2,4];   % 1G XS numbers
 % ------------------------------------------------------------------------------
 % Begin program execution
-% print_XSR_heading();
-% f_out = xs_parse_file(data.file_name);
+print_XSR_heading();
+f_out = xs_parse_file(data.file_name);
 xs_data = xs_strip_data(data, f_out);
-% xs_output_data(data, xs_data);
+xs_output_data(data, xs_data);
 % ------------------------------------------------------------------------------

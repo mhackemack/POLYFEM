@@ -11,6 +11,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function f_out = xs_parse_file(fname)
 
+disp('Parsing XS File.')
+
 f_out = []; k = 1;
 fid = fopen(fname);
 tline = fgetl(fid);

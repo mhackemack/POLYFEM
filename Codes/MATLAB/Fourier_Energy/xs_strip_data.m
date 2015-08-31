@@ -10,16 +10,19 @@
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = xs_strip_data(data, f_in)
+disp('Retrieving XS Data.')
 out.e_bounds = get_group_boundaries(data,f_in);
 out.mats = get_struct_array(data); counter = 1;
 % Loop through and get 1G data
 for i=1:length(data.enums_1G)
+    disp([' -> Stripping MT ',num2str(data.enums_1G(i))])
     out.mats(counter).MT = data.enums_1G(i);
     out.mats(counter).mat = get_1G_data(data, data.enums_1G(i), f_in);
     counter = counter + 1;
 end
 % Loop through and get scattering data
 for i=1:length(data.scatt_enums)
+    disp([' -> Stripping MT ',num2str(data.scatt_enums(i))])
     out.mats(counter).MT = data.scatt_enums(i);
     out.mats(counter).mat = zeros(data.num_groups,data.num_groups,data.iscat+1);
     for j=0:data.iscat
