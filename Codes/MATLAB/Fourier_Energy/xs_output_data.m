@@ -10,6 +10,9 @@
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function xs_output_data(data, xs_data)
+disp('Outputting Energy Bounds.')
+mat = xs_data.e_bounds;
+save([data.out_dir,'/Energy_Bounds.mat'],'mat');
 disp('Outputting XS Files.')
 full_dir = [data.out_dir,'/MT_'];
 for i=1:length(xs_data.mats)
