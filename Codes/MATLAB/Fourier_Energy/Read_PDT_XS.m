@@ -18,9 +18,9 @@
 clear; clc; close all; format long e
 % Set all user input information necessary
 % ------------------------------------------------------------------------------
-data.file_name = 'XSFiles/pdt-119g-graphite_cnat.cx';
-data.out_dir = 'inputs/graphite_119G';
-data.num_groups = 119;          % removes some parsing burden
+data.file_name = 'XSFiles/pdt-epri-69g_cgraphite.cx';
+data.out_dir = 'inputs/graphite_69G';
+data.num_groups = 69;           % removes some parsing burden
 data.iscat = 8;                 % make sure this one is correct
 data.scatt_enums = 2500;        % scattering kernels
 data.enums_1G = [1099,1,2,4];   % 1G XS numbers
