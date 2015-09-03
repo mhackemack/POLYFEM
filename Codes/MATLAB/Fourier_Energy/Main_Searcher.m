@@ -29,7 +29,7 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Specify User-Specific Input Folder Location
 % -------------------------------------------
-inp = 'graphite_119G';
+inp = 'graphite_69G';
 % Populate path with additional folders
 % -------------------------------------
 addpath(['inputs/',inp]); % This one must be last to properly switch input files
