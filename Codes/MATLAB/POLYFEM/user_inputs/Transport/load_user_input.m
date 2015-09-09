@@ -34,7 +34,7 @@ data.Neutronics.numberEnergyGroups = 1;
 data.Neutronics.Transport.fluxMoments = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 4;
+data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-5;
-txs = 100; c = 0.9999;
+txs = 10; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -84,8 +84,8 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 3;
-L = 1e6; ncells = 1;
+data.problem.Dimension = 2;
+L = 16; ncells = 32;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n4_a0.9';
@@ -113,8 +113,8 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
-geometry = CartesianGeometry(3,x,y,z);
+geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
 
