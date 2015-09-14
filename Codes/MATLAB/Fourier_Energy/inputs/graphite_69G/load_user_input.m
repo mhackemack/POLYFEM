@@ -14,25 +14,28 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = load_user_input()
+% Input/Output Information
+% ------------------------------------------------------------------------------
+data.IO.OutputDirectory = 'graphite_69G';
 % Get Cross Section Data
 % ------------------------------------------------------------------------------
 % Total XS
 load('MT_1.mat');
-data.TotalXS = mat;
+data.XS.TotalXS = mat;
 % Scattering XS
 load('MT_2500.mat');
-data.ScatteringXS = mat;
+data.XS.ScatteringXS = mat;
 % Energy Bounds
 load('EnergyBounds.mat');
-data.EnergyBounds = mat;
+data.XS.EnergyBounds = mat;
 % Define Quadrature Set
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.fluxMoments = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
-data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 8;
-data.Neutronics.Transport.PolarLevels = 4;
-data.Neutronics.Transport.AzimuthalLevels = 4;
+data.Quad.fluxMoments = 0;
+data.Quad.AngleAggregation = 'auto';
+data.Quad.QuadType = 'LS';
+data.Quad.SnLevels = 8;
+data.Quad.PolarLevels = 4;
+data.Quad.AzimuthalLevels = 4;
 % Define Energy and Iteration Structure
 % ------------------------------------------------------------------------------
 
