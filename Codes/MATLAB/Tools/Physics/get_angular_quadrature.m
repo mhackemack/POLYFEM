@@ -12,29 +12,29 @@
 function data = get_angular_quadrature(data)
 % Get Angular Quadrature Data
 % ---------------------------
-dim = data.problem.Dimension;
-AQName = data.Neutronics.Transport.QuadType;
+dim = data.Dimension;
+AQName = data.QuadType;
 % Get Single Octant Data
 % ----------------------
 if strcmpi(AQName, 'Manual')
-    x = data.Neutronics.Transport.QuadAngles; nx = size(x,1);
+    x = data.QuadAngles; nx = size(x,1);
     x = [x,zeros(nx,3-dim)];
-    w = data.Neutronics.Transport.QuadWeights;
+    w = data.QuadWeights;
 else
     if dim == 1
         [x,w] = lgwt(data.Neutronics.Transport.SnLevels,-1,1);
         w = w*2;
     else
         if strcmp(AQName, 'LDFE')
-            [x,w] = get_LDFE_quad(dim, data.Neutronics.Transport.SnLevels);
+            [x,w] = get_LDFE_quad(dim, data.SnLevels);
         elseif strcmp(AQName, 'GLC')
-            [x,w] = get_GLC_quad(dim, data.Neutronics.Transport.SnLevels);
+            [x,w] = get_GLC_quad(dim, data.SnLevels);
         elseif strcmp(AQName, 'PGLC')
-            [x,w] = get_PGLC_quad(dim, data.Neutronics.Transport.PolarLevels, data.Neutronics.Transport.AzimuthalLevels);
+            [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels);
         elseif strcmp(AQName, 'LS')
             [x,w] = get_LS_quad(dim, data.Neutronics.Transport.SnLevels);
         elseif strcmp(AQName, 'TriGLC')
-            [x,w] = get_TriGLC_quad(dim, data.Neutronics.Transport.PolarLevels, data.Neutronics.Transport.AzimuthalLevels);
+            [x,w] = get_TriGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels);
         else
             error('Cannot determine angular quadrature type.')
         end
@@ -57,23 +57,22 @@ else
     [x, w, opp_ind] = deploy_all_octants(dim,x,w);
 end
 w = (w /sum(w))*a_norm;
-[nMtot, Sn, Kn] = compute_harmonics(dim, x, data.Neutronics.Transport.fluxMoments);
+[nMtot, Sn, Kn] = compute_harmonics(dim, x, data.fluxMoments);
 x = x(:,1:dim);
 d2m = compute_d2m(nMtot, w, Sn);
 m2d = compute_m2d(dim, length(w), Sn, Kn, a_norm);
 % Attach all matrices/vectors to data structures
 % ----------------------------------------------
-data.Neutronics.Transport.AngQuadNorm = a_norm;
-data.Neutronics.Transport.NumberAngularDirections = length(w);
-data.Neutronics.Transport.AngularDirections = x;
-data.Neutronics.Transport.AngularWeights = w;
-data.Neutronics.Transport.Opposite_Angular_Indices = opp_ind;
-data.Neutronics.Transport.discrete_to_moment = d2m;
-data.Neutronics.Transport.moment_to_discrete = m2d;
-data.Neutronics.TotalFluxMoments = nMtot;
-data.Neutronics.Transport.TotalFluxMoments = nMtot;
-data.Neutronics.Transport.SphericalHarmonics = Sn;
-data.Neutronics.Transport.MomentOrders = Kn;
+data.AngQuadNorm = a_norm;
+data.NumberAngularDirections = length(w);
+data.AngularDirections = x;
+data.AngularWeights = w;
+data.Opposite_Angular_Indices = opp_ind;
+data.discrete_to_moment = d2m;
+data.moment_to_discrete = m2d;
+data.TotalFluxMoments = nMtot;
+data.SphericalHarmonics = Sn;
+data.MomentOrders = Kn;
 
 return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

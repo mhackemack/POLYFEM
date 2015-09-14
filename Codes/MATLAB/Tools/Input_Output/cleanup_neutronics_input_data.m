@@ -27,6 +27,7 @@ if strcmp(data.Neutronics.transportMethod, 'Diffusion')
     if ~isfield(data.Neutronics, 'Diffusion')
         error('No "Diffusion" structure specified.')
     end
+    data.Neutronics.Diffusion.Dimension = data.problem.Dimension;
     data.Neutronics.Diffusion.fluxMoments = 0;
     nm = data.problem.NumberMaterials;
     ng = data.Neutronics.numberEnergyGroups;
@@ -89,6 +90,7 @@ if strcmp(data.Neutronics.transportMethod, 'Diffusion')
 % Transport 
 % ------------------------------------------------------------------------------
 elseif strcmp(data.Neutronics.transportMethod, 'Transport')
+    data.Neutronics.Transport.Dimension = data.problem.Dimension;
     if ~isfield(data.Neutronics, 'Transport')
         error('No "Transport" structure specified.')
     end
@@ -163,7 +165,8 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
             data.Neutronics.Transport.AzimuthalLevels = 1;
         end
     end
-    data = get_angular_quadrature(data);
+    data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport);
+    data.Neutronics.TotalFluxMoments = data.Neutronics.Transport.TotalFluxMoments;
     % Check DSA Inputs
     % ----------------
     if ~isfield(data.Neutronics.Transport, 'performDSA')
