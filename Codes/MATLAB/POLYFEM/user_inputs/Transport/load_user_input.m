@@ -33,7 +33,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % Flux/Angle Properties
 data.Neutronics.Transport.fluxMoments = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
-data.Neutronics.Transport.QuadType = 'LS';
+data.Neutronics.Transport.QuadType = 'PGLC';
 data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -85,7 +85,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 16; ncells = 32;
+L = 10; ncells = 8;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n4_a0.9';

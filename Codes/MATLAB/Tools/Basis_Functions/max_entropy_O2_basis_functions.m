@@ -44,11 +44,7 @@ h = get_max_diamter( verts ); h0 = eye(dim)/h;
 scaled_verts = (h0*verts')'; qx = (h0*qx')';
 rva = get_vertex_differences( scaled_verts, qx );
 [ca, dca, qa] = get_constraint_matrix(scaled_verts, rva, qx);
-[ef, efder] = get_face_functions( scaled_verts, nverts, qx, dim, faces );
-
-% rva = get_vertex_differences( verts, qx );
-% [ca, dca, qa] = get_constraint_matrix(verts, rva, qx);
-% [ef, efder] = get_face_functions( verts, nverts, qx, dim, faces );
+[ef, efder] = get_face_functions( nverts, qx, dim, rva );
 [pf, pfder] = get_prior_functions( rva, dim, ef, efder, nverts );
 dpx = get_number_lagrange_points( dim, order ); dpxz = zeros(dpx, 1);
 % Perform all Newton Iterations
@@ -81,10 +77,8 @@ for q=1:nqx
     lam(q,:) = xx';
     [pm, pp] = get_entropy_functions( xx, pf, ca, q );
     pm_full(q,:) = pm; pp_full(q,:) = pp;
-    bout(q,:) = pp - pm; %bout(q,bout(q,:) < 1e-13) = 0;
-%     pm_full(q,:) = pm_full(q,:) / sum(bout(q,:));
-%     pp_full(q,:) = pp_full(q,:) / sum(bout(q,:));
-    bout(q,:) = bout(q,:) / sum(bout(q,:));
+    bout(q,:) = pp - pm;
+%     bout(q,:) = bout(q,:) / sum(bout(q,:));
 end
 
 % Create Basis Function Gradients
@@ -125,25 +119,23 @@ for q=1:nqx
     for i=1:nv
         an = nv + i;
         ii = [i,mod(i,nv)+1];
-%         fc = mean(verts(ii,:));
         fc = (verts(ii(1),:) + verts(ii(2),:))/2;
         rv(an,:,q) = fc - qx(q,:);
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [ef, efder] = get_face_functions(verts, nverts, qx, dim, faces)
+function [ef, efder] = get_face_functions(nverts, qx, dim, rva)
 nqx = size(qx, 1);
-rv = verts(1:nverts,:);
 ef = zeros(nqx, nverts);
 efder = zeros(nverts, dim, nqx);
 for q=1:nqx
-    drv = [rv(:,1) - qx(q,1), rv(:,2) - qx(q,2)];
     for i=1:nverts
         ii = [i, mod(i,nverts)+1];
-        norm1 = norm(drv(ii(1),:));
-        norm2 = norm(drv(ii(2),:));
-        ef(q,i) =  norm1 + norm2 - norm(verts(ii(2),:) - verts(ii(1),:));
-        efder(i,:,q) = -drv(ii(1),:)/norm1 - drv(ii(2),:)/norm2;
+        dv1 = rva(ii(1),:,q); norm1 = norm(dv1);
+        dv2 = rva(ii(2),:,q); norm2 = norm(dv2);
+        dv3 = rva(ii(2),:,q) - rva(ii(1),:,q); norm3 = norm(dv3);
+        ef(q,i) = norm1 + norm2 - norm3;
+        efder(i,:,q) = -dv1/norm1 - dv2/norm2;
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,6 +162,8 @@ for q=1:nqx
         ca(6,i,q) = trv(i,1)*trv(i,2);
         ca(4,an,q) = trv(an,1)*trv(an,1) - xba(1)*xba(1)/4;
         ca(5,an,q) = trv(an,2)*trv(an,2) - xba(2)*xba(2)/4;
+%         ca(4,an,q) = trv(an,1)*trv(an,1) - xba(1)*xba(1)/4;
+%         ca(5,an,q) = trv(an,2)*trv(an,2) - xba(2)*xba(2)/4;
         ca(6,an,q) = trv(an,1)*trv(an,2) - xba(1)*xba(2)/4;
     end
 end
@@ -215,14 +209,9 @@ for q=1:nx
         temp_dw(ain,:) = -w(q,ain)^2 * tefder(i,:);
     end
     % Form true prior weight function gradients
-%     twder = wder(:,:,q);
     twder = sumw * temp_dw;
     for i=1:nt
         twder(i,:) = twder(i,:) - w(q,i)*ot*temp_dw;
-%         twder(i,:) = sumw * temp_dw(i,:);
-%         for j=1:nt
-%             twder(i,:) = twder(i,:) - w(q,i) * temp_dw(j,:);
-%         end
     end
     w(q,:) = w(q,:) / sumw;
     wder(:,:,q) = twder / sumw^2;

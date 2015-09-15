@@ -32,7 +32,7 @@ else
         elseif strcmp(AQName, 'PGLC')
             [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels);
         elseif strcmp(AQName, 'LS')
-            [x,w] = get_LS_quad(dim, data.Neutronics.Transport.SnLevels);
+            [x,w] = get_LS_quad(dim, data.SnLevels);
         elseif strcmp(AQName, 'TriGLC')
             [x,w] = get_TriGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels);
         else
