@@ -13,10 +13,10 @@ data.problem.saveVTKSolution = 0;
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 0;
 data.problem.refinementLevels = 8;
-data.problem.refinementTolerance = 0.3;
-data.problem.AMRIrregularity = 3;
+data.problem.refinementTolerance = 0.5;
+data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 1;
-
+data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
@@ -33,8 +33,8 @@ data.Neutronics.numberEnergyGroups = 1;
 % Flux/Angle Properties
 data.Neutronics.Transport.fluxMoments = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
-data.Neutronics.Transport.QuadType = 'PGLC';
-data.Neutronics.Transport.SnLevels = 8;
+data.Neutronics.Transport.QuadType = 'LS';
+data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-5;
-txs = 10; c = 0.9999;
+txs = 1; c = 0.5;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -85,7 +85,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 10; ncells = 8;
+L = 1; ncells = 4;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n4_a0.9';

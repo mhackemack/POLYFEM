@@ -16,6 +16,7 @@ data.problem.refinementLevels = 15;
 data.problem.refinementTolerance = 0.5;
 data.problem.AMRIrregularity = 2;
 data.problem.projectSolution = 0;
+data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems

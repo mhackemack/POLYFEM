@@ -12,18 +12,19 @@ data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 4;
-data.problem.refinementTolerance = 0.0;
-data.problem.AMRIrregularity = 3;
+data.problem.refinementLevels = 8;
+data.problem.refinementTolerance = 0.5;
+data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
+data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'SERENDIPITY';
-data.Neutronics.FEMDegree = 3;
+data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
 % ------------------------------------------------------------------------------

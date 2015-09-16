@@ -42,29 +42,6 @@ function write_2D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
 
 fid2 = generate_solution_file(str_sol);
 
-% Write Mesh Output
-% -----------------
-% print vertex information
-% dim = mesh.Dimension;
-% fprintf(fid1,'POINTS %d float\n',mesh.TotalVertices);
-% fprintf(fid1,'%f %f %f \n',[mesh.Vertices zeros(mesh.TotalVertices,3-dim)]');
-% % print cell information
-% ntotdofs = get_total_dof(DoF);
-% fprintf(fid1,'CELLS %d %d \n',mesh.TotalCells,mesh.TotalCells+ntotdofs);
-% for c=1:mesh.TotalCells
-%     cvs = mesh.CellVerts{c};
-%     ncvs = length(cvs);
-%     fprintf(fid1,' %d ',ncvs);
-%     for k=1:ncvs
-%         fprintf(fid1,'%d ',cvs(k)-1);
-%     end
-%     fprintf(fid1,' \n');
-% end
-% fprintf(fid1,' \n');
-% % print cell types
-% fprintf(fid1,'CELL_TYPES %d\n',mesh.TotalCells);
-% fprintf(fid1,'%d\n',7*ones(mesh.TotalCells,1));
-
 % Write Solution Output
 % ---------------------
 if isempty(sol), return; end

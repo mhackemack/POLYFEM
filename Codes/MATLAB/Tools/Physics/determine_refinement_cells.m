@@ -29,7 +29,7 @@ clear x
 if strcmp(data.Neutronics.transportMethod,'Diffusion')
     diff_bool = true;
     D = data.Neutronics.Diffusion.DiffXS;
-else
+elseif strcmp(data.Neutronics.transportMethod,'Transport')
     D = ones(data.problem.NumberMaterials,ny);
     diff_bool = false;
 end
@@ -95,7 +95,6 @@ if DoF.FEMType == 1
                 err(c) = err(c) + sqrt(mesh.OrthogonalProjection(f,2)/24*face_diff(f));
             end
         end
-%         err(c) = abs(err(c)) / abs(mesh.CellSurfaceArea(c));
     end
 elseif DoF.FEMType == 2
     % Loop through cells in mesh - estimate error for each cell
@@ -124,11 +123,22 @@ elseif DoF.FEMType == 2
     end
 end
 % Normal error estimates and set refinement flags
-maxerr = max(err);
-err = err / maxerr;
-% Loop through cells in mesh
-for c=1:mesh.TotalCells
-    if err(c) >= data.problem.refinementTolerance
-        mesh.set_refinement_flag(c);
+err = err / max(err);
+% Switch based on cell refinement type
+if data.problem.refinementType == 0
+    % Loop through cells in mesh
+    for c=1:mesh.TotalCells
+        if err(c) >= data.problem.refinementTolerance
+            mesh.set_refinement_flag(c);
+        end
+    end
+elseif data.problem.refinementType == 1
+    % Sort cell errors
+    [~,ind] = sort(err,1,'descend');
+    cell_list = (1:mesh.TotalCells)';
+    cell_list = cell_list(ind);
+    num = round((1-data.problem.refinementTolerance)*mesh.TotalCells);
+    for c=1:num
+        mesh.set_refinement_flag(cell_list(c));
     end
 end

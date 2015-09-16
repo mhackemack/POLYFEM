@@ -136,6 +136,9 @@ if data.problem.refineMesh
     if data.problem.refinementTolerance > 1 && abs(data.problem.refinementTolerance - 1) > 1e-13
         error('Refinement tolerance needs to be between 0 and 1.');
     end
+    if ~isfield(data.problem, 'refinementType')
+        error('Need to specify a refinement type.')
+    end
 end
 % ------------------------------------------------------------------------------
 % Process AMR Data Structures - THIS ONE IS LAST!!!!!!!

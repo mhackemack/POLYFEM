@@ -11,6 +11,7 @@ data.problem.refinementLevels = 0;
 data.problem.refinementTolerance = 0.5;
 data.problem.refinementType = 1;
 data.problem.refinementSplits = 1;
+data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 data.problem.projectSolution = 0;
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
