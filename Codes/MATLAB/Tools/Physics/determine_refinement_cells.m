@@ -137,7 +137,7 @@ elseif data.problem.refinementType == 1
     [~,ind] = sort(err,1,'descend');
     cell_list = (1:mesh.TotalCells)';
     cell_list = cell_list(ind);
-    num = round((1-data.problem.refinementTolerance)*mesh.TotalCells);
+    num = round((data.problem.refinementTolerance)*mesh.TotalCells);
     for c=1:num
         mesh.set_refinement_flag(cell_list(c));
     end

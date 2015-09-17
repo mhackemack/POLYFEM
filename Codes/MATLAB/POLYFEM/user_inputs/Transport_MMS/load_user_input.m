@@ -12,8 +12,8 @@ data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 8;
-data.problem.refinementTolerance = 0.5;
+data.problem.refinementLevels = 10;
+data.problem.refinementTolerance = 0.3;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
 data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c

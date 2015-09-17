@@ -25,8 +25,10 @@ str_sol = sprintf('%s_solution.vtk',filename);
 % Switch function call based on problem dimensionality
 if dim == 1
     write_1D_output_to_vtk(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
-elseif dim == 2
-    write_2D_output_to_vtk(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
+elseif dim == 2 && DoF.Degree == 1
+    write_2D_output_to_vtk_linear(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
+elseif dim == 2 && DoF.Degree > 1
+    write_2D_output_to_vtk_higher(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
 elseif dim==3
     write_3D_output_to_vtk(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
 end
@@ -35,15 +37,13 @@ end
 %   Auxilliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function write_1D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
-
-
+warning('1D write to .vtk file not currently supported.')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function write_2D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
-
+function write_2D_output_to_vtk_linear(mesh,DoF,sol,sol_name,~,str_sol)
+% Open solution file
 fid2 = generate_solution_file(str_sol);
-
-% Write Solution Output
-% ---------------------
+% Error check solution and name spaces
+% ------------------------------------
 if isempty(sol), return; end
 if ~iscell(sol_name)
     sol_name = {sol_name};
@@ -66,7 +66,7 @@ else
 end
 % print vertex information
 fprintf(fid2,'POINTS %d float \n',DoF.TotalDoFs);
-fprintf(fid2,'%f %f %f \n',[DoF.NodeLocations zeros(DoF.TotalDoFs,3-dim)]');
+fprintf(fid2,'%f %f %f \n',[DoF.NodeLocations zeros(DoF.TotalDoFs,3-mesh.Dimension)]');
 % print cell information
 fprintf(fid2,'CELLS %d %d \n',DoF.TotalCells,DoF.TotalCells+ntotdofs);
 for c=1:DoF.TotalCells
@@ -92,14 +92,68 @@ for s=1:length(sol_name)
     fprintf(fid2,'%f\n',ssol);
     fprintf(fid2, ' \n');
 end
-
 fclose(fid2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function write_3D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
+function write_2D_output_to_vtk_higher(mesh,DoF,sol,sol_name,~,str_sol)
+% Open solution file
+fid = generate_solution_file(str_sol);
+% Error check solution and name spaces
+% ------------------------------------
+if isempty(sol), return; end
+if ~iscell(sol_name)
+    sol_name = {sol_name};
+end
+if length(sol_name) > 1 && length(sol) > 1 && iscell(sol)
+    if length(sol_name) ~= length(sol)
+        error('Length of sol structure does not equal length of sol_name structure.')
+    end
+elseif length(sol_name) == 1
+    if ~iscell(sol)
+        tsol = sol; clear sol;
+        sol{1} = tsol;
+    end
+    if ~iscell(sol_name)
+        tsol_name = sol_name; clear sol_name;
+        sol_name{1} = tsol_name;
+    end
+else
+    error('Solution structures are weird...')
+end
+% Determine total number of usable spatial DoFs
+% ---------------------------------------------
+tot_dofs = 0; dofs_used = []; cell_dofs_used = cell(mesh.TotalCells,1);
+for c=1:mesh.TotalCells
+    tdofs = DoF.ConnectivityArray{c};
+    nv = length(mesh.CellVerts{c});
+    tot_dofs = tot_dofs + DoF.Degree*nv;
+    td = [];
+    for i=1:nv
+        fn = DoF.CellFaceNodes{c}{i};
+        td = [td,tdofs(i),fn(3:end)];
+    end
+    dofs_used = [dofs_used,td];
+    cell_dofs_used{c} = td;
+end
+% Print DoF Information
+% ---------------------
+fprintf(fid,'POINTS %d float \n',tot_dofs);
+fprintf(fid,'%f %f %f \n',[DoF.NodeLocations(dofs_used,:) zeros(tot_dofs,3-mesh.Dimension)]');
+% Print Cell Information
+% ----------------------
+fprintf(fid,'CELLS %d %d \n',DoF.TotalCells,DoF.TotalCells+tot_dofs);
+for c=1:mesh.TotalCells
+    
+end
+fprintf(fid,'CELL_TYPES %d\n',DoF.TotalCells);
+fprintf(fid,'%d\n',7*ones(DoF.TotalCells,1));
+% Print Solution Information
+% --------------------------
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function write_3D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
+% Generate output files
 fid1 = generate_mesh_file(str_mesh);
 fid2 = generate_solution_file(str_sol);
-
 % Write Mesh Output
 % -----------------
 % Get some geometry info
