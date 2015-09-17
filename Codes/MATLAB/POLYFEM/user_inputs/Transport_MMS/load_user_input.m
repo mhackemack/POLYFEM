@@ -11,7 +11,7 @@ data.problem.saveSolution = 0;
 data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 1;
+data.problem.refineMesh = 0;
 data.problem.refinementLevels = 5;
 data.problem.refinementTolerance = 0.3;
 data.problem.AMRIrregularity = 1;
@@ -84,6 +84,9 @@ data.solver.kyrlovSubspace = [];
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
 L = 1; ncells = 4;
+gname = 'z_mesh_poly_L1_n40_a0.05';
+% gname = 'smooth_poly_mesh_L1_n32_a0.15';
+load(strcat(glob.geom_path,gname,'.mat'));
 
 % xx=linspace(0,L,ncells+1);
 % [x,y]=meshgrid(xx,xx);
@@ -95,7 +98,7 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
