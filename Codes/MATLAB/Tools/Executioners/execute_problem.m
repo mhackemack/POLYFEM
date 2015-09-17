@@ -59,7 +59,7 @@ if data.problem.saveVTKSolution
         sol_flux{i} = sol.flux{i,1};
         sol_name{i} = ['flux_g',num2str(i)];
     end
-    write_output_to_vtk_rev1(f_name, data, geometry, DoF, sol_flux, sol_name);
+    write_output_to_vtk_rev2(f_name, data, geometry, DoF, sol_flux, sol_name);
 end
 % ------------------------------------------------------------------------------
 % Perform Mesh Refinement Calculations
@@ -115,7 +115,7 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
                 sol_flux{i} = sol{r}.flux{i,1};
                 sol_name{i} = ['flux_g',num2str(i)];
             end
-            write_output_to_vtk_rev1(f_name, data, geometry, DoF, sol_flux, sol_name);
+            write_output_to_vtk_rev2(f_name, data, geometry, DoF, sol_flux, sol_name);
         end
     end
 end

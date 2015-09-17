@@ -24,13 +24,13 @@ str_sol = sprintf('%s_solution.vtk',filename);
 
 % Switch function call based on problem dimensionality
 if dim == 1
-    write_1D_output_to_vtk(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
+    write_1D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol);
 elseif dim == 2 && DoF.Degree == 1
-    write_2D_output_to_vtk_linear(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
+    write_2D_output_to_vtk_linear(mesh,DoF,sol,sol_name,str_mesh,str_sol);
 elseif dim == 2 && DoF.Degree > 1
-    write_2D_output_to_vtk_higher(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
+    write_2D_output_to_vtk_higher(mesh,DoF,sol,sol_name,str_mesh,str_sol);
 elseif dim==3
-    write_3D_output_to_vtk(fid1,fid2,mesh,DoF,sol,sol_name,str_mesh,str_sol);
+    write_3D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -141,14 +141,31 @@ fprintf(fid,'%f %f %f \n',[DoF.NodeLocations(dofs_used,:) zeros(tot_dofs,3-mesh.
 % Print Cell Information
 % ----------------------
 fprintf(fid,'CELLS %d %d \n',DoF.TotalCells,DoF.TotalCells+tot_dofs);
+d_count = 0;
 for c=1:mesh.TotalCells
-    
+    td = cell_dofs_used{c}; ntd = length(td);
+    fprintf(fid,' %d ',ntd);
+    for k=1:ntd
+        fprintf(fid,'%d ',d_count);
+        d_count = d_count + 1;
+    end
+    fprintf(fid,' \n');
 end
+fprintf(fid,' \n');
 fprintf(fid,'CELL_TYPES %d\n',DoF.TotalCells);
 fprintf(fid,'%d\n',7*ones(DoF.TotalCells,1));
 % Print Solution Information
 % --------------------------
-
+fprintf(fid,'POINT_DATA %d %d \n',tot_dofs);
+for s=1:length(sol_name)
+    s_name = sol_name{s};
+    ssol = sol{s};
+    fprintf(fid,'SCALARS %s double \n',s_name);
+    fprintf(fid,'LOOKUP_TABLE   default \n');
+    fprintf(fid,'%f\n',ssol(dofs_used));
+    fprintf(fid, ' \n');
+end
+fclose(fid);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function write_3D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
 % Generate output files

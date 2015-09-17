@@ -8,11 +8,11 @@ data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 0;
+data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 10;
+data.problem.refinementLevels = 5;
 data.problem.refinementTolerance = 0.3;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
