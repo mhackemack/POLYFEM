@@ -84,7 +84,9 @@ data.solver.kyrlovSubspace = [];
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
 L = 1; ncells = 4;
-gname = 'z_mesh_poly_L1_n40_a0.05';
+gname = 'random_poly_mesh_L1_n32_a0.9';
+% gname = 'shestakov_poly_mesh_L1_nc5_a0.15';
+% gname = 'z_mesh_poly_L1_n40_a0.05';
 % gname = 'smooth_poly_mesh_L1_n32_a0.15';
 load(strcat(glob.geom_path,gname,'.mat'));
 
