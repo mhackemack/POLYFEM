@@ -44,6 +44,15 @@ for c=1:mesh.TotalCells
             cnqg = cnodes + g_offset(g) + q_offset(q);
             L(cnqg,cnqg) = L(cnqg,cnqg) + ndat.TotalXS(cmat,g)*M + GG;
         end
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        for qq=1:na
+            sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
+            ccc = cnodes + q_offset(qq);
+            L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
+        end
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
 end
 
@@ -91,18 +100,6 @@ for f=1:mesh.TotalFaces
                 for g=1:ng
                     fnqg = fnodes + g_offset(g) + q_offset(q);
                     L(fnqg,fnqg) = L(fnqg,fnqg) - M*fdot;
-%                     % Only apply additional boundary terms to reflecting boundaries
-%                     if tflag == glob.Reflecting
-%                         opp_dir = ndat.ReflectingBoundaryAngles{f}(tq);
-%                         for qq=1:na
-%                             tqq = angs(q);
-%                             if opp_dir == tqq
-%                                 fnqqg = fnodes + g_offset(g) + q_offset(qq);
-%                                 L(fnqg,fnqqg) = L(fnqg,fnqqg) + fdot*M;
-%                                 break
-%                             end
-%                         end
-%                     end
                 end
             end
         end
@@ -153,6 +150,19 @@ for c=1:mesh.TotalCells
             J = [J;cols(:)];
             TMAT = [TMAT;tmat(:)];
         end
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        for qq=1:na
+            tq = angs(qq);
+            ccc = cnodes + q_offset(qq);
+            cols2 = onesnodes*ccc;
+            I = [I;rows(:)];
+            J = [J;cols2(:)];
+            tmat = -ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(tq)*M*ndat.moment_to_discrete(tq);
+            TMAT = [TMAT;tmat(:)];
+        end
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
 end
 % Loop through faces
@@ -209,24 +219,23 @@ for f=1:mesh.TotalFaces
                     cols = onesnodes*fnqg; rows = (onesnodes*fnqg)'; tmat = -fdot*M;
                     I = [I;rows(:)]; J = [J;cols(:)]; TMAT = [TMAT;tmat(:)];
                     % Only apply additional boundary terms to reflecting boundaries
-                    if tflag == glob.Reflecting
-                        opp_dir = ndat.ReflectingBoundaryAngles{f}(tq);
-                        for qq=1:na
-                            tqq = angs(q);
-                            if opp_dir == tqq
-                                fnqqg = fnodes + g_offset(g) + q_offset(qq);
-                                cols2 = (onesnodes*fnqqg)'; tmat = fdot*M;
-                                I = [I;rows(:)]; J = [J;cols2(:)]; TMAT = [TMAT;tmat(:)];
-                                break
-                            end
-                        end
-                    end
+%                     if tflag == glob.Reflecting
+%                         opp_dir = ndat.ReflectingBoundaryAngles{f}(tq);
+%                         for qq=1:na
+%                             tqq = angs(q);
+%                             if opp_dir == tqq
+%                                 fnqqg = fnodes + g_offset(g) + q_offset(qq);
+%                                 cols2 = (onesnodes*fnqqg)'; tmat = fdot*M;
+%                                 I = [I;rows(:)]; J = [J;cols2(:)]; TMAT = [TMAT;tmat(:)];
+%                                 break
+%                             end
+%                         end
+%                     end
                 end
             end
         end
     end
 end
-
 L = sparse(I,J,TMAT,ntot,ntot);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = cell_dot(dim, vec1, vec2)

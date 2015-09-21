@@ -20,16 +20,16 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format long e
+clc; %close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ---------------------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 % Specify User-Specific Input Folder Location
 % -------------------------------------------
 % inp = 'Diffusion';
-inp = 'Transport_MMS';
+inp = 'Transport';
 % Populate path with additional folders
 % -------------------------------------
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files

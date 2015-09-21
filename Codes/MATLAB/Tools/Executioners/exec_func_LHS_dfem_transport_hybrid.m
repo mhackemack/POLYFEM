@@ -69,18 +69,6 @@ for ff=1:mesh.TotalBoundaryFaces
             for g=1:ng
                 fnqg = fnodes + g_offset(g) + q_offset(q);
                 L(fnqg,fnqg) = L(fnqg,fnqg) - M*fdot;
-%                 % Only apply additional boundary terms to reflecting boundaries
-%                 if tflag == glob.Reflecting
-%                     opp_dir = ndat.ReflectingBoundaryAngles{f}(tq);
-%                     for qq=1:na
-%                         tqq = angs(q);
-%                         if opp_dir == tqq
-%                             fnqqg = fnodes + g_offset(g) + q_offset(qq);
-%                             L(fnqg,fnqqg) = L(fnqg,fnqqg) + fdot*M;
-%                             break
-%                         end
-%                     end
-%                 end
             end
         end
     end
