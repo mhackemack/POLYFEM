@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'WACHSPRESS';
+data.Neutronics.SpatialMethod = 'MAXENT';
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
@@ -85,23 +85,23 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 20;
+L = 1; ncells = 8;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
-% gname = 'random_poly_mesh_L1_n4_a0.9';
+gname = 'random_poly_mesh_L1_n16_a0.9';
 % gname = 'shestakov_poly_mesh_L1_nc4_a0.25';
 % gname = 'z_mesh_quad_L1_n9_a0.15';
 % gname = 'z_mesh_poly_L1_n20_a0.05';
 % gname = 'smooth_quad_mesh_L1_nc5_emb6_a0.15';
 % gname = 'smooth_poly_mesh_L1_n8_a0.15';
-% load(strcat(glob.geom_path,gname,'.mat'));
+load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
-tx = linspace(0,L,ncells+1);
-[x,y]=meshgrid(tx,tx);
-x=x(:);y=y(:);
-tri = delaunayTriangulation(x,y);
-geometry = GeneralGeometry(2, 'Delaunay', tri);
+% tx = linspace(0,L,ncells+1);
+% [x,y]=meshgrid(tx,tx);
+% x=x(:);y=y(:);
+% tri = delaunayTriangulation(x,y);
+% geometry = GeneralGeometry(2, 'Delaunay', tri);
 
 % tx = linspace(0,L,ncells+1);
 % [x,y,z]=meshgrid(tx,tx,tx);
@@ -113,7 +113,7 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
