@@ -97,11 +97,11 @@ L = 1; ncells = 20;
 % load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
-% tx = linspace(0,L,ncells+1);
-% [x,y]=meshgrid(tx,tx);
-% x=x(:);y=y(:);
-% tri = delaunayTriangulation(x,y);
-% geometry = GeneralGeometry(2, 'Delaunay', tri);
+tx = linspace(0,L,ncells+1);
+[x,y]=meshgrid(tx,tx);
+x=x(:);y=y(:);
+tri = delaunayTriangulation(x,y);
+geometry = GeneralGeometry(2, 'Delaunay', tri);
 
 % tx = linspace(0,L,ncells+1);
 % [x,y,z]=meshgrid(tx,tx,tx);
