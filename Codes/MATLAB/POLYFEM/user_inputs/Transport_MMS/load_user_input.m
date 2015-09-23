@@ -8,15 +8,15 @@ data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 1;
+data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 0;
 data.problem.refinementLevels = 5;
-data.problem.refinementTolerance = 0.3;
+data.problem.refinementTolerance = 0.0;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
-data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
+data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
@@ -58,8 +58,8 @@ data.Neutronics.Transport.ScatteringXS(1,:,:) = [0.0];
 data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
-data.Neutronics.Transport.ExtSource{1,1} = @rhs_func_gauss_iso;
-data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_gauss_iso;
+data.Neutronics.Transport.ExtSource{1,1} = @rhs_func_quad_iso;
+data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_quad_iso;
 % Boundary Conditions
 % data.Neutronics.Transport.BCFlags = [glob.Function];
 % data.Neutronics.Transport.BCVals{1,1} = @ang_sol_func_quad_patch;
@@ -84,8 +84,8 @@ data.solver.kyrlovSubspace = [];
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
 L = 1; ncells = 4;
-gname = 'random_poly_mesh_L1_n32_a0.9';
-% gname = 'shestakov_poly_mesh_L1_nc5_a0.15';
+% gname = 'random_poly_mesh_L1_n8_a0.9';
+gname = 'shestakov_poly_mesh_L1_nc5_a0.15';
 % gname = 'z_mesh_poly_L1_n40_a0.05';
 % gname = 'smooth_poly_mesh_L1_n32_a0.15';
 load(strcat(glob.geom_path,gname,'.mat'));
@@ -105,6 +105,26 @@ y=linspace(0,L,ncells+1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   MMS Function Listings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = rhs_func_quad_iso(xx, dir)
+x = xx(:,1); y = xx(:,2);
+Lx = 1; Ly = 1;
+Omegax = dir(1); Omegay = dir(2);
+sigma_t = 1.0;
+out = -Omegay.*(1.0./Lx.^2.*1.0./Ly.^2.*x.*y.*(Lx-x).*1.0e2-1.0./Lx.^2.*1.0./...
+    Ly.^2.*x.*(Lx-x).*(Ly-y).*1.0e2)-Omegax.*(1.0./Lx.^2.*1.0./Ly.^2.*x.*y.*...
+    (Ly-y).*1.0e2-1.0./Lx.^2.*1.0./Ly.^2.*y.*(Lx-x).*(Ly-y).*1.0e2)+1.0./Lx.^2.*...
+    1.0./Ly.^2.*sigma_t.*x.*y.*(Lx-x).*(Ly-y).*1.0e2;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = ang_sol_func_quad_iso(xx, ~)
+x = xx(:,1); y = xx(:,2);
+Lx = 1; Ly = 1;
+out = 1.0./Lx.^2.*1.0./Ly.^2.*x.*y.*(Lx-x).*(Ly-y).*1.0e2;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = sol_func_quad_iso(xx, ~)
+x = xx(:,1); y = xx(:,2);
+Lx = 1; Ly = 1;
+out = 1.0./Lx.^2.*1.0./Ly.^2.*x.*y.*pi.*(Lx-x).*(Ly-y).*2.0e2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = rhs_func_gauss_iso(xx, dir)
 x = xx(:,1); y = xx(:,2);

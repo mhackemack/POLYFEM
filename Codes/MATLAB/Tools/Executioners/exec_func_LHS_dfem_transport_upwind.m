@@ -46,11 +46,11 @@ for c=1:mesh.TotalCells
         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        for qq=1:na
-            sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
-            ccc = cnodes + q_offset(qq);
-            L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
-        end
+%         for qq=1:na
+%             sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
+%             ccc = cnodes + q_offset(qq);
+%             L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
+%         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
@@ -89,7 +89,6 @@ for f=1:mesh.TotalFaces
     else
         fnorm = mesh.FaceNormal(f,:);
         fnodes = DoF.FaceCellNodes{f,1};
-        tflag = ndat.BCFlags(fflag);
         M = FE.FaceMassMatrix{f,1};
         % Loop through angles
         for q=1:na
@@ -152,15 +151,15 @@ for c=1:mesh.TotalCells
         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        for qq=1:na
-            tq = angs(qq);
-            ccc = cnodes + q_offset(qq);
-            cols2 = onesnodes*ccc;
-            I = [I;rows(:)];
-            J = [J;cols2(:)];
-            tmat = -ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(tq)*M*ndat.moment_to_discrete(tq);
-            TMAT = [TMAT;tmat(:)];
-        end
+%         for qq=1:na
+%             tq = angs(qq);
+%             ccc = cnodes + q_offset(qq);
+%             cols2 = onesnodes*ccc;
+%             I = [I;rows(:)];
+%             J = [J;cols2(:)];
+%             tmat = -ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(tq)*M*ndat.moment_to_discrete(tq);
+%             TMAT = [TMAT;tmat(:)];
+%         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
@@ -206,7 +205,6 @@ for f=1:mesh.TotalFaces
         fnorm = mesh.FaceNormal(f,:);
         fnodes = DoF.FaceCellNodes{f,1};
         onesnodes = ones(length(fnodes),1);
-        tflag = ndat.BCFlags(fflag);
         M = FE.FaceMassMatrix{f,1};
         % Loop through angles
         for q=1:na
@@ -218,19 +216,6 @@ for f=1:mesh.TotalFaces
                     fnqg = fnodes + g_offset(g) + q_offset(q);
                     cols = onesnodes*fnqg; rows = (onesnodes*fnqg)'; tmat = -fdot*M;
                     I = [I;rows(:)]; J = [J;cols(:)]; TMAT = [TMAT;tmat(:)];
-                    % Only apply additional boundary terms to reflecting boundaries
-%                     if tflag == glob.Reflecting
-%                         opp_dir = ndat.ReflectingBoundaryAngles{f}(tq);
-%                         for qq=1:na
-%                             tqq = angs(q);
-%                             if opp_dir == tqq
-%                                 fnqqg = fnodes + g_offset(g) + q_offset(qq);
-%                                 cols2 = (onesnodes*fnqqg)'; tmat = fdot*M;
-%                                 I = [I;rows(:)]; J = [J;cols2(:)]; TMAT = [TMAT;tmat(:)];
-%                                 break
-%                             end
-%                         end
-%                     end
                 end
             end
         end
