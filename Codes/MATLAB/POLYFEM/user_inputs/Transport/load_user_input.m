@@ -70,7 +70,7 @@ data.Neutronics.Transport.BCVals  = [0.0];
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 0;
+data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
 
@@ -85,7 +85,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 3;
-L = 100; ncells = 1;
+L = 100; ncells = 4;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
