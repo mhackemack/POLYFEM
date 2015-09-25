@@ -22,7 +22,7 @@ if strcmpi(AQName, 'Manual')
     w = data.QuadWeights;
 else
     if dim == 1
-        [x,w] = lgwt(data.Neutronics.Transport.SnLevels,-1,1);
+        [x,w] = lgwt(data.SnLevels,-1,1);
         w = w*2;
     else
         if strcmp(AQName, 'LDFE')

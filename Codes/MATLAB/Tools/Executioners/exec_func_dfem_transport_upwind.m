@@ -28,7 +28,7 @@ for m=1:nas
     end
     % Collect Matrix and RHS and compute angular fluxes
     L = exec_func_LHS_dfem_transport_upwind(ndat, mesh, DoF, FE, ang_sets{m}, groups);
-    rhs = exec_func_RHS_dfem_transport_upwind(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
+    rhs = exec_func_RHS_dfem_transport(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
     y = L\rhs;
     % Postprocess angular flux solutions
     flux_out = add_to_flux(y, ndat, DoF, ang_sets{m}, groups, flux_out);
@@ -44,7 +44,6 @@ if ndat.Transport.performDSA
         fprintf([rev_str,msg]);
         rev_str = repmat(sprintf('\b'), 1, length(msg));
     end
-    
     [flux_out, A] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, flux_out, x, A);
 end
 % Set Outputs
@@ -180,10 +179,8 @@ elseif strcmp(ndat.Transport.DSAType, 'IP')
 elseif strcmp(ndat.Transport.DSAType, 'M4S')
     [x0, A] = perform_M4S_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 end
-
 % Add DSA correction
 for g=1:ndat.numberEnergyGroups
     x{g,1} = x{g,1} + x0{g};
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

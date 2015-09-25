@@ -1,15 +1,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Execution Functor - RHS LDFEM Transport (upwind)
+%   Title:          Solve Linear Iteration
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2014
+%   Year:           2015
 %   
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function rhs = exec_func_RHS_dfem_transport_upwind_LD(x, data, mesh, DoF, FE, angs, groups)
-% Process Input Space
-% -------------------
-global glob
+%
+%   Note(s):        
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [data, sol] = solve_linear_iteration_diffusion(data,mesh,DoF,FE,sol,sol_func)

@@ -55,3 +55,10 @@ out.Reflecting = 2;
 out.IncidentIsotropic = 3;
 out.IncidentCurrent = 4;
 out.IncidentBeam = 5;
+% Acceleration Types
+% ------------------
+out.Accel_WGS_DSA = 1;
+out.Accel_WGS_TSA = 2;
+out.Accel_AGS_TG  = 3;
+out.Accel_AGS_TTG = 4;
+out.Accel_Fission = 5;

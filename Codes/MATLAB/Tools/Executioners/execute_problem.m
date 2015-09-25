@@ -262,32 +262,6 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function fcall = get_solution_function_handle(data)
-ftype = lower(data.Neutronics.FEMType);
-ttype = lower(data.Neutronics.transportMethod);
-if strcmp(ttype, 'diffusion')
-    if strcmp(ftype, 'dfem')
-        fcall = @perform_dfem_diffusion;
-    elseif strcmp(ftype, 'cfem')
-        fcall = @perform_cfem_diffusion;
-    end
-elseif strcmp(ttype, 'transport')
-    if strcmp(ftype, 'dfem')
-        tt = data.Neutronics.Transport.transportType;
-        if strcmp(tt, 'upwind')
-            if data.Neutronics.Transport.performSweeps
-                fcall = @exec_func_dfem_transport_sweep;
-            else
-                fcall = @exec_func_dfem_transport_upwind;
-            end
-        elseif strcmp(tt, 'hybrid')
-            fcall = @exec_func_dfem_transport_hybrid;
-        end
-    elseif strcmp(ftype, 'cfem')
-        fcall = @perform_cfem_transport;
-    end
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = prepare_problem_execution(data, mesh)
 % Prepares Angle Angregation and Sweep Orderings if necessary
 if strcmp(data.Neutronics.transportMethod, 'Transport')

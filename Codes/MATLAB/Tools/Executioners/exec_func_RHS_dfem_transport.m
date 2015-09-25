@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Execution Functor - RHS DFEM Transport (hybrid)
+%   Title:          Execution Functor - RHS DFEM Transport (upwind)
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function rhs = exec_func_RHS_dfem_transport_hybrid(x, data, mesh, DoF, FE, angs, groups)
+function rhs = exec_func_RHS_dfem_transport(x, data, mesh, DoF, FE, angs, groups)
 % Process Input Space
 % -------------------
 global glob
@@ -50,6 +50,8 @@ for c=1:mesh.TotalCells
             else
                 tvec = ndat.ExtSource(cmat,grp)*m2d(1,tq) * F;
             end
+            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % Loop through energy groups again
             for gg=1:ng
                 ggrp = groups(gg);
@@ -63,6 +65,8 @@ for c=1:mesh.TotalCells
                     tvec = tvec + sxs*M*x{ggrp,m}(cnodes);
                 end
             end
+            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % Apply local matrix contribution
             rhs(cnqg) = rhs(cnqg) + tvec;
         end
@@ -81,6 +85,7 @@ for ff=1:mesh.TotalBoundaryFaces
         fdot = fnorm*angdirs(:,tq);
         if fdot > 0, continue; end
         M = FE.FaceMassMatrix{f,1};
+        F = FE.FaceFunctionMatrix{f,1};
         % Loop through energy groups
         for g=1:ng
             grp = groups(g);
@@ -98,11 +103,11 @@ for ff=1:mesh.TotalBoundaryFaces
                 case(glob.IncidentCurrent)
 
                 case(glob.IncidentBeam)
-                    beam_val = ndat.BeamFluxes{f}(angNum, grp);
+                    beam_val = ndat.BeamFluxes{f}(tq, grp);
                     rhs(cnqg) = rhs(cnqg) - (fdot*beam_val/angNorm)*F;
                 case(glob.Function)
                     fxn = DoF.NodeLocations(fnodes,:);
-                    fvals = ndat.Transport.BCVals{fflag,grp}(fxn,angdirs(:,tq));
+                    fvals = ndat.BCVals{fflag,grp}(fxn,angdirs(:,tq));
                     rhs(cnqg) = rhs(cnqg) - fdot * M * fvals;
             end
         end
