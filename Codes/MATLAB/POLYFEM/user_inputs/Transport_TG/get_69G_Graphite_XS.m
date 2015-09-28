@@ -14,27 +14,29 @@
 %   Notes:   
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = get_69G_Graphite_XS( data )
+function data = get_69G_Graphite_XS( data, ord )
 % Set Some Information
 % --------------------
 data.problem.NumberMaterials = 1;
-data.Neutronics.numberEnergyGroups = 69;
+data.Groups.NumberEnergyGroups = 69;
+data.Groups.FastGroups = 1:28;
+data.Groups.ThermalGroups = 29:69;
 % Neutronics Transport Cross-Sections
 % -----------------------------------
 % Allocate Cross-Sections
 nm = data.problem.NumberMaterials;
-ng = data.Neutronics.numberEnergyGroups;
-nf = data.Neutronics.Transport.fluxMoments + 1;
-data.Neutronics.Transport.TotalXS = zeros(nm, ng);
-data.Neutronics.Transport.AbsorbXS = zeros(nm, ng);
-data.Neutronics.Transport.FissionXS = zeros(nm, ng);
-data.Neutronics.Transport.NuBar = zeros(nm, ng);
-data.Neutronics.Transport.FissSpec = zeros(nm, ng);
-data.Neutronics.Transport.ExtSource = zeros(nm, ng);
-data.Neutronics.Transport.ScatteringXS = zeros(nm,ng,ng,nf);
+ng = data.Groups.NumberEnergyGroups;
+nf = ord + 1;
+data.XS(1).TotalXS = zeros(nm, ng);
+data.XS(1).AbsorbXS = zeros(nm, ng);
+data.XS(1).FissionXS = zeros(nm, ng);
+data.XS(1).NuBar = zeros(nm, ng);
+data.XS(1).FissSpec = zeros(nm, ng);
+data.XS(1).ExtSource = zeros(nm, ng);
+data.XS(1).ScatteringXS = zeros(nm,ng,ng,nf);
 % Get Total Cross Sections
-load('69G_graphite/MT_1.mat');
-data.Neutronics.Transport.TotalXS(1,:) = mat; clear mat;
+load('user_inputs/Transport_TG/69G_graphite/MT_1.mat');
+data.XS(1).TotalXS(1,:) = mat; clear mat;
 % Get Scattering Cross Sections
-load('69G_graphite/MT_1.mat');
-data.Neutronics.Transport.TotalXS(1,:,:,1:nf) = mat(:,:,1:nf); clear mat;
+load('user_inputs/Transport_TG/69G_graphite/MT_2500.mat');
+data.XS(1).ScatteringXS(1,:,:,1:nf) = mat(:,:,1:nf); clear mat;

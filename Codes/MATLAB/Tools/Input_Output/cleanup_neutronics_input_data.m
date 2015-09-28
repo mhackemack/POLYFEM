@@ -94,7 +94,7 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
     if ~isfield(data.Neutronics, 'Transport')
         error('No "Transport" structure specified.')
     end
-    if ~isfield(data.Neutronics.Transport, 'fluxMoments')
+    if ~isfield(data.Neutronics.Transport, 'PnOrder')
         error('Number of flux moment levels not specified.')
     end
     if ~isfield(data.Neutronics.Transport, 'performSweeps')
@@ -165,7 +165,7 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
             data.Neutronics.Transport.AzimuthalLevels = 1;
         end
     end
-    data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport);
+    data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport, data.Neutronics.Transport.Dimension);
     data.Neutronics.TotalFluxMoments = data.Neutronics.Transport.TotalFluxMoments;
     % Check DSA Inputs
     % ----------------

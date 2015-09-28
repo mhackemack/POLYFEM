@@ -9,10 +9,9 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = get_angular_quadrature(data)
+function data = get_angular_quadrature(data, dim)
 % Get Angular Quadrature Data
 % ---------------------------
-dim = data.Dimension;
 AQName = data.QuadType;
 % Get Single Octant Data
 % ----------------------
@@ -57,10 +56,10 @@ else
     [x, w, opp_ind] = deploy_all_octants(dim,x,w);
 end
 w = (w /sum(w))*a_norm;
-[nMtot, Sn, Kn] = compute_harmonics(dim, x, data.fluxMoments);
+[nMtot, Sn, Kn] = compute_harmonics(dim, x, data.PnOrder);
 x = x(:,1:dim);
 d2m = compute_d2m(nMtot, w, Sn);
-m2d = compute_m2d(dim, length(w), Sn, Kn, a_norm);
+m2d = compute_m2d(length(w), Sn, Kn, a_norm);
 % Attach all matrices/vectors to data structures
 % ----------------------------------------------
 data.AngQuadNorm = a_norm;
@@ -362,7 +361,7 @@ for m=1:nM
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function m2d = compute_m2d(dim, nA, Sn, Kn, an)
+function m2d = compute_m2d(nA, Sn, Kn, an)
 nM = size(Kn,1);
 m2d = zeros(nM,nA);
 for m=1:nM

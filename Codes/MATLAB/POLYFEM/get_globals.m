@@ -61,10 +61,12 @@ out.Accel_WGS_DSA = 1;
 out.Accel_WGS_TSA = 2;
 out.Accel_AGS_TG  = 3;
 out.Accel_AGS_TTG = 4;
-out.Accel_Fission = 5;
+out.Accel_Fission_DSA = 5;
 % Acceleration Discretizations
 % ----------------------------
 out.Accel_DSA_MIP = 1;
 out.Accel_DSA_IP  = 2;
 out.Accel_DSA_DCF = 3;
 out.Accel_DSA_M4S = 4;
+out.Accel_TSA_DFEM = 5;
+out.Accel_TSA_CFEM = 6;

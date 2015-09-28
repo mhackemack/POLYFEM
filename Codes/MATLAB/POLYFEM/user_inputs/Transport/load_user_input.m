@@ -11,7 +11,7 @@ data.problem.saveSolution = 0;
 data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 1;
+data.problem.refineMesh = 0;
 data.problem.refinementLevels = 24;
 data.problem.refinementTolerance = 0.5;
 data.problem.AMRIrregularity = 1;
@@ -31,7 +31,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
-data.Neutronics.Transport.fluxMoments = 0;
+data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
@@ -70,7 +70,7 @@ data.Neutronics.Transport.BCVals  = [0.0];
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 1;
+data.Neutronics.Transport.performDSA = 0;
 data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
 
@@ -112,7 +112,7 @@ L = 1; ncells = 10;
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
-% geometry = CartesianGeometry(1,x);
+geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
@@ -133,7 +133,7 @@ z=linspace(0,L,ncells+1);
 % [data, geometry] = get_Yaqi_2D( data, 2, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
-[data, geometry] = get_Reed_1D( data, 2 );
+% [data, geometry] = get_Reed_1D( data, 2 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EIR-2 Benchmark Overwrite

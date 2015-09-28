@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = exec_func_dfem_transport_upwind_Rev1(data, mesh, DoF, FE, x, groups)
+function varargout = exec_func_dfem_transport_upwind_Rev1(data,xsid,qid,groups,mesh,DoF,FE)
 global glob
 % Setup Solution Space
 % ------------------------------------------------------------------------------
@@ -48,9 +48,9 @@ if data.Fluxes.HasReflectingBoundary || data.Fluxes.HasPeriodicBoundary
     data.Fluxes.ReflectingFluxesOld = data.Fluxes.ReflectingFluxes;
     data.Fluxes.PeriodicFluxesOld = data.Fluxes.PeriodicFluxes;
 end
-data.Fluxes.OutgoingCurrentsOld = data.Fluxes.OutgoingCurrents;
-data.Fluxes.IncomingCurrentsOld = data.Fluxes.IncomingCurrents;
-data = zero_partial_currents(data, mesh, DoF);
+% data.Fluxes.OutgoingCurrentsOld = data.Fluxes.OutgoingCurrents;
+% data.Fluxes.IncomingCurrentsOld = data.Fluxes.IncomingCurrents;
+% data = zero_partial_currents(data, mesh, DoF);
 % Set zero flux moments
 ndof = DoF.TotalDoFs;
 flux_out = cell(data.Groups.numberEnergyGroups, data.Fluxes.TotalFluxMoments);
