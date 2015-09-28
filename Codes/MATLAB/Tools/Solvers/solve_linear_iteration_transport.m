@@ -17,7 +17,7 @@ function [data, sol] = solve_linear_iteration_transport(data,mesh,DoF,FE,sol)
 % Get Iteration Information and Function Handles
 % ------------------------------------------------------------------------------
 num_gs = data.Neutronics.NumGroupSets;
-inv_func = get_transport_function_handle(data);
+inv_func = get_solution_function_handle(data);
 ags_maxits = data.solver.AGSMaxIterations;
 wgs_maxits = data.solver.WGSMaxIterations;
 ags_rel_tol = data.solver.AGSRelativeTolerance;
@@ -25,10 +25,10 @@ wgs_rel_tol = data.solver.WGSRelativeTolerance;
 ags_abs_tol = data.solver.AGSAbsoluteTolerance;
 wgs_abs_tol = data.solver.WGSAbsoluteTolerance;
 ags_gs_upscatter = data.Neutronics.GroupSetUpscattering;
-wgs_accel_bools = data.Neutronics.Transport.WGSAccelerationBools;
-ags_accel_bools = data.Neutronics.Transport.AGSAccelerationBools;
-wgs_accel_types = data.Neutronics.Transport.WGSAccelerationBools;
-ags_accel_types = data.Neutronics.Transport.AGSAccelerationBools;
+wgs_accel_bools = data.Neutronics.Transport.WGSAccelerationBool;
+ags_accel_bools = data.Neutronics.Transport.AGSAccelerationBool;
+wgs_accel_resid = data.Neutronics.Transport.WGSAccelerationResidual;
+ags_accel_resid = data.Neutronics.Transport.AGSAccelerationResidual;
 % Build some data solution structures
 % ------------------------------------------------------------------------------
 DSA_Matrix = [];
@@ -36,7 +36,7 @@ AGS_OldPhi = [];
 WGS_OldPhi = [];
 % Perform Scattering Kernel Convergence
 % ------------------------------------------------------------------------------
-gs_converged = false(num_gs,1);
+gs_converged = false(num_gs, 1);
 for m=1:ags_maxits
     % Loop through all group sets
     for gs=1:num_gs
@@ -70,22 +70,6 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxialary Function Calls
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function inv_func = get_transport_function_handle(data)
-ftype = data.Neutronics.FEMType;
-if strcmpi(ftype, 'dfem')
-    if strcmp(data.Neutronics.Transport.transportType, 'upwind')
-        if data.Neutronics.Transport.performSweeps
-            inv_func = @exec_func_dfem_transport_sweep;
-        else
-            inv_func = @exec_func_dfem_transport_upwind;
-        end
-    elseif strcmp(data.Neutronics.Transport.transportType, 'hybrid')
-        inv_func = @exec_func_dfem_transport_hybrid;
-    end
-elseif strcmpi(ftype, 'cfem')
-    inv_func = @exec_func_cfem_transport;
-end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [data,sol] = apply_transport_preconditioner
 
