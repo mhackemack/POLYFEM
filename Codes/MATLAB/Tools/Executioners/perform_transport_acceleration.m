@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = perform_transport_acceleration(data,accel_id,mesh,DoF,FE,src,A)
+function varargout = perform_transport_acceleration(data,accel_id,mesh,DoF,FE,A)
 % Retrieve some data information
 % ------------------------------
 global glob
@@ -21,17 +21,11 @@ xsid   = data.Acceleration.Info(accel_id).XSID;
 % Perform DSA Preconditioning
 if is_dsa
     % Get DSA system matrix if not set
-    if isempty(A)
-        A = a_handle(data,accel_id,xsid,mesh,DoF,FE);
-    end
+    if isempty(A), A = a_handle(data,accel_id,xsid,mesh,DoF,FE); end
     % Compute error and apply correction based on DSA type
-    dx = A\src;
     if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG
-        evec = data.Acceleration.Info(accel_id).ErrorShape;
-        % Loop through energy groups
-        for g=1:length(groups)
-            data.Fluxes.Phi{g,1} = data.Fluxes.Phi{g,1} + evec(g)*dx;
-        end
+        dx = A\data.Acceleration.Residual{accel_id};
+        data = update_DSA_solutions(data, accel_id, mesh, DoF, dx);
     elseif a_type == glob.Accel_Fission_DSA
         
     end
@@ -41,9 +35,8 @@ else
 end
 % Apply acceleration outputs
 varargout{1} = data;
-if is_dsa && nargout > 1
-    varargout{2} = A;
-end
+varargout{2} = A;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Auxialiary Function Calls
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,4 +68,21 @@ elseif  accel_type == glob.Accel_WGS_TSA || ...
         a_handle = @exec_func_CFEM_TSA;
     end
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = update_DSA_solutions(data, accel_id, mesh, DoF, dx)
+eshape = data.Acceleration.Info(accel_id).ErrorShape;
+grps = data.Acceleration.Info(accel_id).Groups; ngrps = length(grps);
+% Loop through Cells
+for c=1:mesh.TotalCells
+    mat = mesh.MatID(c);
+    tvec = eshape(mat,:);
+    cn = DoF.ConnectivityArray{c};
+    % Loop through Energy Groups
+    for g=1:ngrps
+        data.Fluxes.Phi{grps(g),1}(cn) = data.Fluxes.Phi{grps(g),1}(cn) + tvec(g)*dx(cn);
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = update_TSA_solutions(data, accel_id, mesh, DoF, dx)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

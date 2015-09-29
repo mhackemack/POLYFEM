@@ -112,12 +112,14 @@ nm = data.problem.NumberMaterials;
 grps = data.Groups.ThermalGroups; ngrps = length(grps);
 txs = data.XS(1).TotalXS(:,grps);
 sxs = data.XS(1).ScatteringXS(:,grps,grps,1);
+data.Acceleration.Info(1).ErrorShape = zeros(nm,ngrps);
 % Generate Eigenshape for energy collaps
 y = cell(nm,1);
 for m=1:nm
     A = (diag(txs(m,:)) - tril(squeeze(sxs(m,:,:))))\triu(squeeze(sxs(m,:,:)),1);
     [y{m},~,~] = power_method(A,ones(ngrps,1),2000,1e-15);
     y{m} = y{m} / sum(y{m});
+    data.Acceleration.Info(1).ErrorShape(m,:) = y{m};
 end
 % Populate Acceleration XS
 for m=1:nm

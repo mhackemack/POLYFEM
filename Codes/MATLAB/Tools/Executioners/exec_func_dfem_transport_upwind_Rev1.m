@@ -9,14 +9,14 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = exec_func_dfem_transport_upwind_Rev1(data,xsid,qid,groups,mesh,DoF,FE)
+function varargout = exec_func_dfem_transport_upwind_Rev1(data,xsid,qid,groups,mesh,DoF,FE,src)
 global glob
 % Setup Solution Space
 % ------------------------------------------------------------------------------
 [data, flux_out] = setup_solution_space(data, mesh, DoF);
 % Loop through Angle Sets
 % ------------------------------------------------------------------------------
-ang_sets = data.Quadrature.AngleSets; nas = length(ang_sets);
+ang_sets = data.Quadrature(qid).AngleSets; nas = length(ang_sets);
 rev_str = [];
 for m=1:nas
     % Print Angle Set Iteration
@@ -43,14 +43,11 @@ if glob.print_info, fprintf(rev_str); end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data, flux_out] = setup_solution_space(data, mesh, DoF)
+function [data, flux_out] = setup_solution_space(data, DoF)
 if data.Fluxes.HasReflectingBoundary || data.Fluxes.HasPeriodicBoundary
     data.Fluxes.ReflectingFluxesOld = data.Fluxes.ReflectingFluxes;
     data.Fluxes.PeriodicFluxesOld = data.Fluxes.PeriodicFluxes;
 end
-% data.Fluxes.OutgoingCurrentsOld = data.Fluxes.OutgoingCurrents;
-% data.Fluxes.IncomingCurrentsOld = data.Fluxes.IncomingCurrents;
-% data = zero_partial_currents(data, mesh, DoF);
 % Set zero flux moments
 ndof = DoF.TotalDoFs;
 flux_out = cell(data.Groups.numberEnergyGroups, data.Fluxes.TotalFluxMoments);
@@ -103,46 +100,5 @@ for f=1:mesh.TotalBoundaryFaces
             end
         end
     end
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = compute_partial_boundary_currents(x, data, mesh, DoF, angs, groups)
-ndof = DoF.TotalDoFs;
-ng = length(groups);
-na = length(angs);
-q_offset = (1:na)*ndof - ndof;
-g_offset = (1:ng)*ndof*na - ndof*na;
-for f=1:mesh.TotalBoundaryFaces
-    ff = mesh.BoundaryFaces(f);
-    fnorm = mesh.FaceNormal(ff,:)';
-    fnodes = DoF.FaceCellNodes{ff,1};
-    for q=1:na
-        tq = angs(q);
-        adir = data.Quadrature.AngularDirections(tq,:);
-        afdot = adir * fnorm;
-        wt = data.Quadrature.AngularWeights(tq);
-        for g=1:ng
-            fnqg = fnodes + g_offset(g) + q_offset(q);
-            if afdot > 0
-                tv = data.Fluxes.OutgoingCurrents{ff};
-                tv(:,g) = tv(:,g) + wt * afdot * x(fnqg);
-                data.Fluxes.OutgoingCurrents{ff}(:,g) = tv(:,g);
-            elseif afdot < 0
-                tv = data.Fluxes.IncomingCurrents{ff};
-                tv(:,g) = tv(:,g) + wt * afdot * x(fnqg);
-                data.Fluxes.IncomingCurrents{ff}(:,g) = tv(:,g);
-            end
-        end
-    end
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = zero_partial_currents(data, mesh, DoF)
-ng = data.Groups.numberEnergyGroups;
-data.Fluxes.OutgoingCurrents = cell(mesh.TotalFaces, 1);
-data.Fluxes.IncomingCurrents = cell(mesh.TotalFaces, 1);
-for f=1:mesh.TotalBoundaryFaces
-    ff = mesh.BoundaryFaces(f);
-    fdn = length(DoF.FaceCellNodes{ff,1});
-    data.Fluxes.OutgoingCurrents{ff} = zeros(fdn,ng);
-    data.Fluxes.IncomingCurrents{ff} = zeros(fdn,ng);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -55,7 +55,7 @@ for m=1:ags_maxits
         % Iterate within a group set
         for it=1:wgs_maxits(gs)
             % Perform within-group jacobi iteration
-            [data, gsx] = inv_func(data,trans_xsid,trans_qid,grps,mesh,DoF,FE,src);
+            data = inv_func(data,trans_xsid,trans_qid,grps,mesh,DoF,FE,src);
             % Gather Acceleration Residual if necessary
             if wgs_accel_resid(gs)
                 
@@ -69,7 +69,7 @@ for m=1:ags_maxits
                 end
                 % Perform Acceleration Here
                 
-                [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,src,DSA_Matrix);
+                [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
             end
             % Check convergence criteria
             [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,2);

@@ -100,7 +100,7 @@ if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
             sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux);
         end
         % Save off output objects if necessary
-        if data.problem.saveSolution
+        if data.problem.SaveSolution
             save([f_name,'_data',o_str,'.mat'], 'data');
             save([f_name,'_geometry',o_str,'.mat'], 'geometry');
             save([f_name,'_DoF',o_str,'.mat'], 'DoF');
@@ -111,7 +111,7 @@ if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
             sol = tsol;
         end
         % Save off solution to VTK output for viewing in Visit/Paraview
-        if data.problem.saveVTKSolution
+        if data.problem.SaveVTKSolution
             f_name = ['outputs/',data.problem.Path,'/',data.problem.Name];
             sol_flux = cell(data.Neutronics.numberEnergyGroups,1);
             sol_name = cell(data.Neutronics.numberEnergyGroups,1);
