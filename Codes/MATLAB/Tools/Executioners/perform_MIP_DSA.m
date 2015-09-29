@@ -292,10 +292,6 @@ for f=1:mesh.TotalFaces
                 tcmat = -0.5*D*(G + G'); tfmat = kp*M;
                 I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
                 I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tfmat(:)];
-%             elseif  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
-%                     ndat.Transport.BCFlags(fflag) == glob.Periodic
-%                 Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
-%                 rhs(gfnodes) = rhs(gfnodes) + M*Jin;
             end
         end
     end
@@ -303,12 +299,9 @@ end
 L = sparse(I,J,TMAT,ndof,ndof);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function rhs = get_rhs(x, ndat, mesh, DoF, FE)
-global glob
-dim = mesh.Dimension;
 ndg = DoF.TotalDoFs;
 ng = ndat.numberEnergyGroups;
 ndof = ng*ndg;
-C_IP = ndat.IP_Constant;
 % Allocate Memory
 rhs = zeros(ndof,1);
 % Loop through cells

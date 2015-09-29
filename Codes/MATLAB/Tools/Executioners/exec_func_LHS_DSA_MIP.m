@@ -11,7 +11,7 @@
 %                   prior to this function call.
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function A = exec_func_MIP_DSA(data,accel_id,xsid,mesh,DoF,FE)
+function A = exec_func_LHS_DSA_MIP(data,accel_id,xsid,mesh,DoF,FE)
 global glob
 % Retrieve MIP DSA System Matrix
 if DoF.TotalDoFs < glob.maxMatrix
@@ -21,11 +21,7 @@ else
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%                              Function Listing
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Function Listing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function L = get_global_matrices(XS, Accel, mesh, DoF, FE)
 global glob

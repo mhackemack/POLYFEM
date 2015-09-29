@@ -35,9 +35,10 @@ ags_accel_id    = data.Acceleration.AGSAccelerationID;
 % ------------------------------------------------------------------------------
 trans_xsid = 1; % always 1 for the Transport cross sections
 trans_qid = 1; % always 1 for the Transport Quadrature Set
-ActiveAccelID = 0;
-DSA_Matrix    = [];
-AGS_OldPhi    = [];
+ActiveAccelID   = 0;
+ActiveAccelInfo = [];
+DSA_Matrix      = [];
+AGS_OldPhi      = [];
 % Perform Scattering Kernel Convergence
 % ------------------------------------------------------------------------------
 gs_converged = false(num_gs, 1);
@@ -46,7 +47,7 @@ for m=1:ags_maxits
     for gs=1:num_gs
         % Skip if group set is already converged
         if gs_converged(gs), continue; end
-        % Set convergence booleans
+        % Set WGS convergence booleans
         wgs_rel_converged = false;
         wgs_abs_converged = false;
         % Get some additional group set information
@@ -55,6 +56,7 @@ for m=1:ags_maxits
         % Iterate within a group set
         for it=1:wgs_maxits(gs)
             % Perform within-group jacobi iteration
+            src = rhs_func(data,trans_xsid,trans_qid,grps,mesh,DoF,FE);
             data = inv_func(data,trans_xsid,trans_qid,grps,mesh,DoF,FE,src);
             % Gather Acceleration Residual if necessary
             if wgs_accel_resid(gs)
@@ -66,16 +68,22 @@ for m=1:ags_maxits
                 if ActiveAccelID ~= wid
                     DSA_Matrix = [];
                     ActiveAccelID = wid;
+                    ActiveAccelInfo = data.Acceleration.Info(wid);
                 end
                 % Perform Acceleration Here
-                
+                data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE);
                 [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
+                data.Acceleration.Residual{ActiveAccelID} = [];
             end
-            % Check convergence criteria
+            % Retreive convergence criteria
             [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,2);
             [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,inf);
+            if err_L2 / norm_L2 < wgs_rel_tol(gs), wgs_rel_converged = true; else wgs_rel_converged = false; end
+            if err_inf < wgs_abs_tol(gs), wgs_abs_converged = true; else wgs_abs_converged = false; end
             % Update Solution Vectors
             data = set_old_fluxes(data,grps,1:data.Quadrature(trans_qid).TotalFluxMoments);
+            % Exit if convergence is met
+            if wgs_rel_converged && wgs_abs_converged, break; end
         end
         % Determine if current group set is now converged
         if ~ags_gs_upscatter(gs)
@@ -92,12 +100,22 @@ for m=1:ags_maxits
         if ActiveAccelID ~= ags_accel_id
             DSA_Matrix = [];
             ActiveAccelID = ags_accel_id;
+            ActiveAccelInfo = data.Acceleration.Info(ags_accel_id);
         end
+        % Perform Acceleration Here
+        data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE);
+        [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
+        data.Acceleration.Residual{ActiveAccelID} = [];
     end
     % Perform error tolerance checks
-    
+    [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,grps,1,2);
+    [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,grps,1,inf);
+    if err_L2 / norm_L2 < ags_rel_tol, ags_rel_converged = true; else ags_rel_converged = false; end
+    if err_inf < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
     % Update Solution Vectors
     AGS_OldPhi = data.Fluxes.Phi;
+    % Exit if convergence is met
+    if ags_rel_converged && ags_abs_converged, break; end
 end
 % 
 % ------------------------------------------------------------------------------

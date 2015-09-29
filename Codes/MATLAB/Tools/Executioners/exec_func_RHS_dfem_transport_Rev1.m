@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function rhs = exec_func_RHS_dfem_transport_Rev1(x, data, mesh, DoF, FE, angs, groups)
+function rhs = exec_func_RHS_dfem_transport_Rev1()
 % Process Input Space
 % -------------------
 global glob
@@ -51,23 +51,6 @@ for c=1:mesh.TotalCells
             else
                 tvec = xs.ExtSource(cmat,grp)*mquad.moment_to_discrete(1,tq)*F;
             end
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-            % Loop through energy groups again
-            for gg=1:ng
-                ggrp = groups(gg);
-                % apply fission term
-                fxs = xs.FissSpec(cmat,grp)/keff*xs.FissionXS(cmat,ggrp)*xs.NuBar(cmat,ggrp);
-                tvec = tvec + fxs*M*x{ggrp,1}(cnodes);
-                % Add scattering contribution
-                for m=1:fluxes.TotalFluxMoments
-                    k = fluxes.MomentOrders(m,1) + 1;
-                    sxs = xs.ScatteringXS(cmat,ggrp,grp,k)*mquad.moment_to_discrete(m,tq);
-                    tvec = tvec + sxs*M*x{ggrp,m}(cnodes);
-                end
-            end
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % Apply local matrix contribution
             rhs(cnqg) = rhs(cnqg) + tvec;
         end

@@ -11,7 +11,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = perform_transport_acceleration(data,accel_id,mesh,DoF,FE,A)
 % Retrieve some data information
-% ------------------------------
+% ------------------------------------------------------------------------------
 global glob
 a_type = data.Acceleration.Info(accel_id).AccelerationType;
 groups = data.Acceleration.Info(accel_id).Groups;
@@ -19,6 +19,7 @@ mom    = data.Acceleration.Info(accel_id).Moments;
 xsid   = data.Acceleration.Info(accel_id).XSID;
 [a_handle, is_dsa] = get_accel_function_handle(data.Acceleration.Info(accel_id));
 % Perform DSA Preconditioning
+% ------------------------------------------------------------------------------
 if is_dsa
     % Get DSA system matrix if not set
     if isempty(A), A = a_handle(data,accel_id,xsid,mesh,DoF,FE); end
@@ -30,10 +31,12 @@ if is_dsa
         
     end
 % Perform TSA Preconditioning
+% ------------------------------------------------------------------------------
 else
     % nothing yet - this will be a relatively quick fix at a later date...
 end
 % Apply acceleration outputs
+% ------------------------------------------------------------------------------
 varargout{1} = data;
 varargout{2} = A;
 
@@ -51,13 +54,13 @@ if      accel_type == glob.Accel_WGS_DSA || ...
     is_dsa = true;
     % Switch between diffusion discretizations
     if accel_disc == glob.Accel_DSA_MIP
-        a_handle = @exec_func_MIP_DSA;
+        a_handle = @exec_func_LHS_DSA_MIP;
     elseif accel_disc == glob.Accel_DSA_IP
-        a_handle = @exec_func_IP_DSA;
+        a_handle = @exec_func_LHS_DSA_IP;
     elseif accel_disc == glob.Accel_DSA_DCF
-        a_handle = @exec_func_DCF_DSA;
+        a_handle = @exec_func_LHS_DSA_DCF;
     elseif accel_disc == glob.Accel_DSA_M4S
-        a_handle = @exec_func_M4S_DSA;
+        a_handle = @exec_func_LHS_DSA_M4S;
     end
 elseif  accel_type == glob.Accel_WGS_TSA || ...
         accel_type == glob.Accel_AGS_TTG
