@@ -9,17 +9,20 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function src = SetFissionSource_Diffusion(data,xsid,groups,flux,mesh,DoF,FE,keff)
+function src = SetFissionSource_Diffusion(XS,groups,gin,flux,mesh,DoF,FE,keff)
 % Get some preliminary information
 % ------------------------------------------------------------------------------
-if nargin < 8 || isempty(keff), keff = 1.0; end
-ngroups = length(groups);
-ntotg = data.Groups.NumberEnergyGroups;
-XS = data.XS(xsid);
+if nargin < 9 || isempty(keff), keff = 1.0; end
+ngroups = length(groups); ngin = length(gin);
 fxs = XS.NuBar*XS.FissionXS/keff;
 % Allocate memory space
 % ------------------------------------------------------------------------------
 src = cell(ngroups,1);
+for g=1:ngroups
+    src{g} = zeros(DoF.TotalDoFs,1);
+end
+% Exit with vectors of zeros if there is no inscattering
+if ngin == 0 || isempty(fxs), return; end
 % Loop through spatial cells and build source
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
@@ -28,13 +31,12 @@ for c=1:mesh.TotalCells
     M    = FE.CellMassMatrix{c};
     % Double loop through energy groups
     for g=1:ngroups
-        grp = groups(g);
-        chi = XS.FissSpec(cmat,grp);
+        chi = XS.FissSpec(cmat,groups(g));
         gvec = zeros(ncn,1);
-        for gg=1:ntotg
-            gvec = gvec + chi*fxs(cmat,gg)*M*flux{gg}(cn);
+        for gg=1:ngin
+            gvec = gvec + chi*fxs(cmat,ngin(gg))*flux{ngin(gg)}(cn);
         end
-        src{g}(cn) = src{g}(cn) + gvec;
+        src{g}(cn) = src{g}(cn) + M*gvec;
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

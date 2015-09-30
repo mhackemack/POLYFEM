@@ -13,11 +13,15 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = solve_linear_iteration_transport(data,mesh,DoF,FE)
+function data = solve_linear_iteration_transport(data,trans_xsid,trans_qid,mesh,DoF,FE)
+% Get Some GroupSet Information
+% ------------------------------------------------------------------------------
+num_gs = data.Groups.NumberGroupSets; 
+all_groups = 1:data.Groups.NumberEnergyGroups;
+tot_moments = data.Quadrature(trans_qid).TotalFluxMoments;
 % Get Iteration Information and Function Handles
 % ------------------------------------------------------------------------------
-num_gs = data.Groups.NumberGroupSets;
-[inv_func, rhs_func] = get_solution_function_handle(data);
+inv_func = get_solution_function_handle(data);
 ags_maxits = data.solver.AGSMaxIterations;
 wgs_maxits = data.solver.WGSMaxIterations;
 ags_rel_tol = data.solver.AGSRelativeTolerance;
@@ -33,8 +37,6 @@ wgs_accel_ids   = data.Acceleration.WGSAccelerationID;
 ags_accel_id    = data.Acceleration.AGSAccelerationID;
 % Build some data solution structures
 % ------------------------------------------------------------------------------
-trans_xsid = 1; % always 1 for the Transport cross sections
-trans_qid = 1; % always 1 for the Transport Quadrature Set
 ActiveAccelID   = 0;
 ActiveAccelInfo = [];
 DSA_Matrix      = [];
@@ -53,10 +55,22 @@ for m=1:ags_maxits
         % Get some additional group set information
         wid  = wgs_accel_ids(gs);
         grps = data.Groups.GroupSet{gs};
+        % Build Into-Group-Set Scattering
+        in_grps = all_groups; in_grps(grps) = [];
+        s_src = SetScatteringSource_Transport(data.XS(trans_xsid),data.Quadrature(trans_qid),grps,in_grps,data.Fluxes.Phi,mesh,DoF,FE);
+        for g=1:length(grps)
+            for k=1:tot_moments
+                data.Sources.InScatteringSource{grps(g),k} = s_src{g,k};
+            end
+        end
         % Iterate within a group set
         for it=1:wgs_maxits(gs)
+            % Update Solution Vectors
+            data = set_old_fluxes(data,grps,1:data.Quadrature(trans_qid).TotalFluxMoments);
+            % Build Within-Group-Set Scattering
+            s_src = SetScatteringSource_Transport(data.XS(trans_xsid),data.Quadrature(trans_qid),grps,grps,data.Fluxes.Phi,mesh,DoF,FE);
+            data.Sources.WithinScatteringSource = s_src;
             % Perform within-group jacobi iteration
-            src = rhs_func(data,trans_xsid,trans_qid,grps,mesh,DoF,FE);
             data = inv_func(data,trans_xsid,trans_qid,grps,mesh,DoF,FE,src);
             % Gather Acceleration Residual if necessary
             if wgs_accel_resid(gs)
@@ -80,8 +94,6 @@ for m=1:ags_maxits
             [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,inf);
             if err_L2 / norm_L2 < wgs_rel_tol(gs), wgs_rel_converged = true; else wgs_rel_converged = false; end
             if err_inf < wgs_abs_tol(gs), wgs_abs_converged = true; else wgs_abs_converged = false; end
-            % Update Solution Vectors
-            data = set_old_fluxes(data,grps,1:data.Quadrature(trans_qid).TotalFluxMoments);
             % Exit if convergence is met
             if wgs_rel_converged && wgs_abs_converged, break; end
         end
@@ -124,13 +136,13 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxialary Function Calls
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = set_old_fluxes(data,groups,mom)
-ng = length(groups);
+function data = set_old_fluxes(data, grps, mom)
+ng = length(grps);
 nm = length(mom);
 % Loop through energy groups and moments to update fluxes
 for g=1:ng
     for m=1:nm
-        data.Fluxes.PhiOld{g,m} = data.Fluxes.Phi{g,m};
+        data.Fluxes.PhiOld{grps(g),mom(m)} = data.Fluxes.Phi{grps(g),mom(m)};
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -45,15 +45,6 @@ for c=1:mesh.TotalCells
             cnqg = cnodes + g_offset(g) + q_offset(q);
             L(cnqg,cnqg) = L(cnqg,cnqg) + xs.TotalXS(cmat,g)*M + GG;
         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-%         for qq=1:na
-%             sxs = xs.ScatteringXS(cmat,1,1,1)*mquad.discrete_to_moment(qq);
-%             ccc = cnodes + q_offset(qq);
-%             L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*mquad.moment_to_discrete(tq);
-%         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
 end
 
@@ -151,19 +142,6 @@ for c=1:mesh.TotalCells
             J = [J;cols(:)];
             TMAT = [TMAT;tmat(:)];
         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-%         for qq=1:na
-%             tq = angs(qq);
-%             ccc = cnodes + q_offset(qq);
-%             cols2 = onesnodes*ccc;
-%             I = [I;rows(:)];
-%             J = [J;cols2(:)];
-%             tmat = -xs.ScatteringXS(cmat,1,1,1)*mquad.discrete_to_moment(tq)*M*mquad.moment_to_discrete(tq);
-%             TMAT = [TMAT;tmat(:)];
-%         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
 end
 % Loop through faces

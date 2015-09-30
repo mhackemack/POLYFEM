@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Set Fission Transport Source
+%   Title:          Set Scattering Diffusion Source
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -9,20 +9,18 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function src = SetFissionSource_Transport(XS,mquad,groups,gin,flux,mesh,DoF,FE,keff)
+function src = SetScatteringSource_Diffusion(XS,groups,gin,flux,mesh,DoF,FE)
 % Get some preliminary information
 % ------------------------------------------------------------------------------
-if nargin < 10 || isempty(keff), keff = 1.0; end
 ngroups = length(groups); ngin = length(gin);
-fxs = XS.NuBar*XS.FissionXS/keff/mquad.AngQuadNorm;
 % Allocate memory space
 % ------------------------------------------------------------------------------
 src = cell(ngroups,1);
 for g=1:ngroups
-    src{g} = zeros(DoF.TotalDoFs,1);
+    src{g,1} = zeros(DoF.TotalDoFs,1);
 end
 % Exit with vectors of zeros if there is no inscattering
-if ngin == 0 || isempty(fxs), return; end
+if ngin == 0, return; end
 % Loop through spatial cells and build source
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
@@ -31,12 +29,13 @@ for c=1:mesh.TotalCells
     M    = FE.CellMassMatrix{c};
     % Double loop through energy groups
     for g=1:ngroups
-        chi = XS.FissSpec(cmat,groups(g));
+        grp = groups(g);
         gvec = zeros(ncn,1);
         for gg=1:ngin
-            gvec = gvec + chi*fxs(cmat,ngin(gg))*flux{ngin(gg),1}(cn);
+            ggrp = gin(gg);
+            gvec = gvec + XS.ScatteringXS(cmat,grp,ggrp)*flux{ggrp,m}(cn);
         end
-        src{g,1}(cn) = src{g,1}(cn) + M*gvec;
+        src{g,m}(cn) = src{g,m}(cn) + M*gvec;
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

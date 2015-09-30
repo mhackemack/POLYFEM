@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Set Fission Transport Source
+%   Title:          Set Scattering Transport Source
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -9,34 +9,38 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function src = SetFissionSource_Transport(XS,mquad,groups,gin,flux,mesh,DoF,FE,keff)
+function src = SetScatteringSource_Transport(XS,mquad,groups,gin,flux,mesh,DoF,FE)
 % Get some preliminary information
 % ------------------------------------------------------------------------------
-if nargin < 10 || isempty(keff), keff = 1.0; end
 ngroups = length(groups); ngin = length(gin);
-fxs = XS.NuBar*XS.FissionXS/keff/mquad.AngQuadNorm;
 % Allocate memory space
 % ------------------------------------------------------------------------------
-src = cell(ngroups,1);
+src = cell(ngroups,mquad.TotalFluxMoments);
 for g=1:ngroups
-    src{g} = zeros(DoF.TotalDoFs,1);
+    for m=1:mquad.TotalFluxMoments
+        src{g,m} = zeros(DoF.TotalDoFs,1);
+    end
 end
 % Exit with vectors of zeros if there is no inscattering
-if ngin == 0 || isempty(fxs), return; end
+if ngin == 0, return; end
 % Loop through spatial cells and build source
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
     cmat = mesh.MatID(c);
     cn   = DoF.ConnectivityArray{c}; ncn = length(cn);
     M    = FE.CellMassMatrix{c};
-    % Double loop through energy groups
-    for g=1:ngroups
-        chi = XS.FissSpec(cmat,groups(g));
-        gvec = zeros(ncn,1);
-        for gg=1:ngin
-            gvec = gvec + chi*fxs(cmat,ngin(gg))*flux{ngin(gg),1}(cn);
+    for m=1:mquad.TotalFluxMoments
+        k = mquad.MomentOrders(m,1) + 1;
+        % Double loop through energy groups
+        for g=1:ngroups
+            grp = groups(g);
+            gvec = zeros(ncn,1);
+            for gg=1:ngin
+                ggrp = gin(gg);
+                gvec = gvec + XS.ScatteringXS(cmat,grp,ggrp,k)*flux{ggrp,m}(cn);
+            end
+            src{g,m}(cn) = src{g,m}(cn) + M*gvec;
         end
-        src{g,1}(cn) = src{g,1}(cn) + M*gvec;
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
