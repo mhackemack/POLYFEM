@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Set Total DFEM
+%   Title:          Set Total Transport Source
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
