@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1; c = 0.0;
+txs = 1; c = 0.5;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -84,7 +84,7 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
+data.problem.Dimension = 3;
 L = 1; ncells = 10;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
@@ -112,9 +112,9 @@ L = 1; ncells = 10;
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
+% geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
-% geometry = CartesianGeometry(3,x,y,z);
+geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
 
