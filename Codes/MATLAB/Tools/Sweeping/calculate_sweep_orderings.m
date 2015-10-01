@@ -17,12 +17,7 @@ if glob.print_info
 end
 % Process some input information
 % ------------------------------
-dim = mesh.Dimension;
-if dim == 1
-    data = calculate_ND_sweep_orderings(data, mesh);
-else
-    data = calculate_ND_sweep_orderings(data, mesh);
-end
+data = calculate_ND_sweep_orderings(data, mesh);
 if glob.print_info
     disp(['-> Total Sweep Ordering Time:  ',num2str(toc(t))])
     disp(' ')

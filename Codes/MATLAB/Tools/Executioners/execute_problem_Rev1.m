@@ -30,99 +30,99 @@ DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.pr
 FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
 % Allocate Solution Space - gets reallocated after a mesh refinement
 data = prepare_problem_execution(data, geometry);
-[data, sol] = solution_allocation(data, geometry, DoF);
+data = solution_allocation(data, geometry, DoF);
 % Solve the neutronics problem (either source-driven or k-eigenvalue)
-[data, sol] = pcall(data, geometry, DoF, FE, sol);
-sol.CellVertexNumbers = geometry.CellVertexNumbers;
+data = pcall(data, geometry, DoF, FE);
+% sol.CellVertexNumbers = geometry.CellVertexNumbers;
 % Calculate MMS Error if necessary
-if mms
-    sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux);
-end
+% if mms
+%     sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux);
+% end
 % Plot solution for viewer to see
-if data.IO.PlotSolution
-    glob.plot_counter = glob.plot_counter + 1;
-    figure(glob.plot_counter)
-    plot_solution(geometry,DoF,FE,sol.flux)
-end
+% if data.IO.PlotSolution
+%     glob.plot_counter = glob.plot_counter + 1;
+%     figure(glob.plot_counter)
+%     plot_solution(geometry,DoF,FE,sol.flux)
+% end
 % Save off output objects if necessary
-if data.IO.SaveSolution
-    f_name = ['outputs/',data.IO.Path,'/',data.IO.Name];
-    o_str = '_0';
-    save([f_name,'_data',o_str,'.mat'], 'data');
-    save([f_name,'_geometry',o_str,'.mat'], 'geometry');
-    save([f_name,'_DoF',o_str,'.mat'], 'DoF');
-    save([f_name,'_FE',o_str,'.mat'], 'FE');
-    save([f_name,'_sol',o_str,'.mat'], 'sol');
-end
+% if data.IO.SaveSolution
+%     f_name = ['outputs/',data.IO.Path,'/',data.IO.Name];
+%     o_str = '_0';
+%     save([f_name,'_data',o_str,'.mat'], 'data');
+%     save([f_name,'_geometry',o_str,'.mat'], 'geometry');
+%     save([f_name,'_DoF',o_str,'.mat'], 'DoF');
+%     save([f_name,'_FE',o_str,'.mat'], 'FE');
+%     save([f_name,'_sol',o_str,'.mat'], 'sol');
+% end
 % Save off solution to VTK output for viewing in Visit/Paraview
-if data.IO.SaveVTKSolution
-    f_name = ['outputs/',data.IO.Path,'/',data.IO.Name];
-    sol_flux = cell(data.Groups.NumberEnergyGroups,1);
-    sol_name = cell(data.Groups.NumberEnergyGroups,1);
-    for i=1:data.Groups.NumberEnergyGroups
-        sol_flux{i} = sol.flux{i,1};
-        sol_name{i} = ['flux_g',num2str(i)];
-    end
-    write_output_to_vtk_rev2(f_name, data, geometry, DoF, sol_flux, sol_name);
-end
+% if data.IO.SaveVTKSolution
+%     f_name = ['outputs/',data.IO.Path,'/',data.IO.Name];
+%     sol_flux = cell(data.Groups.NumberEnergyGroups,1);
+%     sol_name = cell(data.Groups.NumberEnergyGroups,1);
+%     for i=1:data.Groups.NumberEnergyGroups
+%         sol_flux{i} = sol.flux{i,1};
+%         sol_name{i} = ['flux_g',num2str(i)];
+%     end
+%     write_output_to_vtk_rev2(f_name, data, geometry, DoF, sol_flux, sol_name);
+% end
 % ------------------------------------------------------------------------------
 % Perform Mesh Refinement Calculations
 % ------------------------------------------------------------------------------
-if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
-    % Retrieve some quick info first
-    tsol = sol; clear sol;
-    sol{1} = tsol;
-    % Loop through refinement levels
-    for iter=1:data.AMR.RefinementLevels
-        o_str = ['_',num2str(iter)];
-        r = iter + 1;
-        % Save old objects for flux interpolation if necessary
-        if data.AMR.ProjectSolution
-            data0 = data;
-            DoF0  = DoF;
-        end
-        % Form new mesh/DoFHandler/FEHandler
-        refine_problem_mesh(data, geometry, DoF, FE, sol{r-1}.flux); % This works because of pass-by-reference
-        DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.problem.DoFType);
-        FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
-        data = prepare_problem_execution(data, geometry);
-        [data, sol{r}] = solution_allocation(data, geometry, DoF);
-        % Interpolate flux solutions to next refinement level
-        if data.problem.projectSolution
-            [data,sol{r}.flux] = interpolate_ref_flux(data0,data,geometry,DoF0,DoF,sol{r-1}.flux,sol{r}.flux);
-        end
-        % Compute new flux solution
-        [data, tsol] = pcall(data, geometry, DoF, FE, sol{r});
-        sol{r} = tsol;
-        sol{r}.CellVertexNumbers = geometry.CellVertexNumbers;
-        % Calculate MMS Error if necessary
-        if mms
-            sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux);
-        end
-        % Save off output objects if necessary
-        if data.problem.SaveSolution
-            save([f_name,'_data',o_str,'.mat'], 'data');
-            save([f_name,'_geometry',o_str,'.mat'], 'geometry');
-            save([f_name,'_DoF',o_str,'.mat'], 'DoF');
-            save([f_name,'_FE',o_str,'.mat'], 'FE');
-            % Solution Vector
-            tsol = sol; sol = tsol{end};
-            save([f_name,'_sol',o_str,'.mat'], 'sol');
-            sol = tsol;
-        end
-        % Save off solution to VTK output for viewing in Visit/Paraview
-        if data.problem.SaveVTKSolution
-            f_name = ['outputs/',data.problem.Path,'/',data.problem.Name];
-            sol_flux = cell(data.Neutronics.numberEnergyGroups,1);
-            sol_name = cell(data.Neutronics.numberEnergyGroups,1);
-            for i=1:data.Neutronics.numberEnergyGroups
-                sol_flux{i} = sol{r}.flux{i,1};
-                sol_name{i} = ['flux_g',num2str(i)];
-            end
-            write_output_to_vtk_rev2(f_name, data, geometry, DoF, sol_flux, sol_name);
-        end
-    end
-end
+% if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
+%     % Retrieve some quick info first
+%     tsol = sol; clear sol;
+%     sol{1} = tsol;
+%     % Loop through refinement levels
+%     for iter=1:data.AMR.RefinementLevels
+%         o_str = ['_',num2str(iter)];
+%         r = iter + 1;
+%         % Save old objects for flux interpolation if necessary
+%         if data.AMR.ProjectSolution
+%             data0 = data;
+%             DoF0  = DoF;
+%         end
+%         % Form new mesh/DoFHandler/FEHandler
+%         refine_problem_mesh(data, geometry, DoF, FE, sol{r-1}.flux); % This works because of pass-by-reference
+%         DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.problem.DoFType);
+%         FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
+%         data = prepare_problem_execution(data, geometry);
+%         [data, sol{r}] = solution_allocation(data, geometry, DoF);
+%         % Interpolate flux solutions to next refinement level
+%         if data.problem.projectSolution
+%             [data,sol{r}.flux] = interpolate_ref_flux(data0,data,geometry,DoF0,DoF,sol{r-1}.flux,sol{r}.flux);
+%         end
+%         % Compute new flux solution
+%         [data, tsol] = pcall(data, geometry, DoF, FE, sol{r});
+%         sol{r} = tsol;
+%         sol{r}.CellVertexNumbers = geometry.CellVertexNumbers;
+%         % Calculate MMS Error if necessary
+%         if mms
+%             sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux);
+%         end
+%         % Save off output objects if necessary
+%         if data.problem.SaveSolution
+%             save([f_name,'_data',o_str,'.mat'], 'data');
+%             save([f_name,'_geometry',o_str,'.mat'], 'geometry');
+%             save([f_name,'_DoF',o_str,'.mat'], 'DoF');
+%             save([f_name,'_FE',o_str,'.mat'], 'FE');
+%             % Solution Vector
+%             tsol = sol; sol = tsol{end};
+%             save([f_name,'_sol',o_str,'.mat'], 'sol');
+%             sol = tsol;
+%         end
+%         % Save off solution to VTK output for viewing in Visit/Paraview
+%         if data.problem.SaveVTKSolution
+%             f_name = ['outputs/',data.problem.Path,'/',data.problem.Name];
+%             sol_flux = cell(data.Neutronics.numberEnergyGroups,1);
+%             sol_name = cell(data.Neutronics.numberEnergyGroups,1);
+%             for i=1:data.Neutronics.numberEnergyGroups
+%                 sol_flux{i} = sol{r}.flux{i,1};
+%                 sol_name{i} = ['flux_g',num2str(i)];
+%             end
+%             write_output_to_vtk_rev2(f_name, data, geometry, DoF, sol_flux, sol_name);
+%         end
+%     end
+% end
 % ------------------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -263,9 +263,9 @@ function data = prepare_problem_execution(data, mesh)
 % Prepares Angle Angregation and Sweep Orderings if necessary
 if strcmp(data.problem.TransportMethod, 'Transport')
     % Reflecting Boundaries
-    if data.Transport.HasReflectingBoundary
-        data = determine_reflecting_boundaries( data, mesh );
-    end
+%     if data.Transport.HasReflectingBoundary
+%         data = determine_reflecting_boundaries( data, mesh );
+%     end
     % Determine Angle Sets
     data = determine_angle_sets(data, mesh);
     % Determine Sweep Orderings
@@ -315,53 +315,24 @@ for i=1:mf
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [keff,flux] = estimate_new_keff(flux,flux0)
-ng = size(flux,1);
-num = 0; denom = 0;
-for g=1:ng
-    num = num + norm(flux{g,1});
-    denom = denom + norm(flux0{g,1});
-end
-keff = num/denom;
-for g=1:ng
-    flux{g,1} = flux{g,1} / keff;
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = allocate_reflecting_flux(data, mesh, DoF)
-global glob
-% Set default ID information - this is true for head problems
-xsid = 1;
-qid = 1;
-% Gather more data
-mquad = data.Quadrature(qid);
-na = mquad.NumberAngularDirections;
-ng = data.Groups.NumberEnergyGroups;
-% Clear then allocate reflecting fluxes (handles mesh refinement)
-data.Fluxes.ReflectingFluxes = [];
-data.Fluxes.ReflectingFluxes = cell(DoF.TotalFaces, 1);
-for f=1:mesh.TotalBoundaryFaces
-    ff = mesh.BoundaryFaces(f);
-    fnorm = mesh.FaceNormal(ff,:);
-    nflag = data.XS(xsid).BCFlags(mesh.FaceID(ff));
-    if nflag == glob.Reflecting
-        ndf = length(DoF.FaceCellNodes{ff,1});
-        data.Fluxes.ReflectingFluxes{ff} = cell(na, 1);
-        for m=1:mquad.NumberAngularDirections
-            angDir = mquad.AngularDirections(m,:);
-            if dot(fnorm, angDir) > 0
-                data.Fluxes.ReflectingFluxes{ff}{m} = zeros(ndf, ng);
-            end
-        end
+function out = compute_global_fission_rate(phi,XS,mesh,DoF,FE)
+out = 0; ng = size(phi,1);
+fxs = XS.FissionXS.*XS.NuBar;
+% Loop through cells
+for c=1:mesh.TotalCells
+    cmat = mesh.MatID(c);
+    cn = DoF.ConnectivityArray{c}; ocn = ones(1,length(cn));
+    M = FE.CellMassMatrix{c};
+    for g=1:ng
+        out = out + fxs(cmat,g)*ocn*M*phi{g}(cn);
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [mms, deg] = get_mms_information(data)
 if data.MMS.PerformMMS
-    mms = true;
-    deg = data.MMS.QuadOrder;
+    mms = true;  deg = data.MMS.QuadOrder;
 else
-    mms = false;
-    deg = 0;
+    mms = false; deg = 0;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function refine_problem_mesh(data, mesh, DoF, FE)

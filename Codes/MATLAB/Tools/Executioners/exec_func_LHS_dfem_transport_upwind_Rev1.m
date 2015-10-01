@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function L = exec_func_LHS_dfem_transport_upwind_Rev1(data, mesh, DoF, FE, angs, groups)
+function L = exec_func_LHS_dfem_transport_upwind_Rev1(data,xsid,qid,angs,groups,mesh,DoF,FE)
 % Process Input Space
 % -------------------
 global glob
@@ -18,8 +18,7 @@ ndof = DoF.TotalDoFs;
 ng = length(groups);
 na = length(angs);
 ntot = ndof * ng * na;
-xs = data.XS;
-mquad = data.Quadrature;
+mquad = data.Quadrature(qid);
 angdirs = mquad.AngularDirections;
 q_offset = (1:na)*ndof - ndof;
 g_offset = (1:ng)*ndof*na - ndof*na;
@@ -43,7 +42,7 @@ for c=1:mesh.TotalCells
         % Loop through energy groups
         for g=1:ng
             cnqg = cnodes + g_offset(g) + q_offset(q);
-            L(cnqg,cnqg) = L(cnqg,cnqg) + xs.TotalXS(cmat,g)*M + GG;
+            L(cnqg,cnqg) = L(cnqg,cnqg) + data.XS(xsid).TotalXS(cmat,g)*M + GG;
         end
     end
 end
@@ -98,7 +97,7 @@ for f=1:mesh.TotalFaces
 end
 if ~issparse(L), L = sparse(L); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function L = get_sparse_matrix(data, mesh, DoF, FE, angs, groups)
+function L = get_sparse_matrix(data,xsid,qid,angs,groups,mesh,DoF,FE)
 % Process Input Space
 % -------------------
 global glob
@@ -107,8 +106,7 @@ ndof = DoF.TotalDoFs;
 ng = length(groups);
 na = length(angs);
 ntot = ndof * ng * na;
-xs = data.XS;
-mquad = data.Quadrature;
+mquad = data.Quadrature(qid);
 angdirs = mquad.AngularDirections;
 q_offset = (1:na)*ndof - ndof;
 g_offset = (1:ng)*ndof*na - ndof*na;
@@ -137,7 +135,7 @@ for c=1:mesh.TotalCells
             cols = onesnodes*cnqg;
             % Apply Sparse Indexing
             % ---------------------
-            tmat = xs.TotalXS(cmat,g)*M + GG;
+            tmat = data.XS(xsid).TotalXS(cmat,g)*M + GG;
             I = [I;rows(:)];
             J = [J;cols(:)];
             TMAT = [TMAT;tmat(:)];

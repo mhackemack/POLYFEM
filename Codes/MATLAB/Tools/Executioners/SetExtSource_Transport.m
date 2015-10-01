@@ -25,6 +25,8 @@ if data.MMS.PerformMMS
             src{g,m} = zeros(DoF.TotalDoFs,1);
         end
     end
+    % Exit with vectors of zeros if there is no inscattering
+    if ~XS.HasExtSource, return; end
     % Loop through cells
     for c=1:mesh.TotalCells
         cn = DoF.ConnectivityArray{c};
@@ -48,6 +50,8 @@ if ~data.MMS.PerformMMS
     for g=1:ngroups
         src{g} = zeros(DoF.TotalDoFs,1);
     end
+    % Exit with vectors of zeros if there is no inscattering
+    if ~XS.HasExtSource, return; end
     % Loop through cells
     for c=1:mesh.TotalCells
         cmat = mesh.MatID(c);

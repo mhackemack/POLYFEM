@@ -29,7 +29,7 @@ glob = get_globals('Office');
 % Specify User-Specific Input Folder Location
 % -------------------------------------------
 % inp = 'Diffusion';
-inp = 'Transport';
+inp = 'Transport_Rev1';
 % Populate path with additional folders
 % -------------------------------------
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
@@ -37,8 +37,10 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % ------------------------------------
 print_heading(now,date);
 [data, geometry] = load_user_input();
-[data, geometry] = process_input_data(data, geometry);
-data = cleanup_neutronics_input_data(data, geometry);
+[data, geometry] = process_input(data, geometry);
+% [data, geometry] = process_input_data(data, geometry);
+% data = cleanup_neutronics_input_data(data, geometry);
 % Execute Problem Suite
 % ---------------------
-[data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+[data, geometry, DoF, FE] = execute_problem_Rev1(data, geometry);
+% [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);

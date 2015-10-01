@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = exec_func_dfem_transport_upwind_Rev1(data,xsid,qid,groups,mesh,DoF,FE,src)
+function varargout = exec_func_dfem_transport_upwind_Rev1(data,xsid,qid,groups,mesh,DoF,FE)
 global glob
 % Setup Solution Space
 % ------------------------------------------------------------------------------
@@ -26,13 +26,12 @@ for m=1:nas
         rev_str = repmat(sprintf('\b'), 1, length(msg));
     end
     % Collect Matrix and RHS and compute angular fluxes
-    L = exec_func_LHS_dfem_transport_upwind_Rev1(data, mesh, DoF, FE, ang_sets{m}, groups);
-    rhs = exec_func_RHS_dfem_transport_Rev1(x, data, mesh, DoF, FE, ang_sets{m}, groups);
+    L = exec_func_LHS_dfem_transport_upwind_Rev1(data,xsid,qid,ang_sets{m},groups,mesh,DoF,FE);
+    rhs = exec_func_RHS_dfem_transport_Rev1(data,qid,ang_sets{m},groups,mesh,DoF,FE);
     y = L\rhs;
     % Postprocess angular flux solutions
-    flux_out = add_to_flux(y, data, DoF, ang_sets{m}, groups, flux_out);
-%     ndat = compute_partial_boundary_currents(y, ndat, mesh, DoF, ang_sets{m}, groups);
-    data = add_reflecting_angular_fluxes(y, data, mesh, DoF, ang_sets{m}, groups);
+    flux_out = add_to_flux(data.Quadrature(qid),ang_sets{m},groups,y,flux_out);
+    data = add_reflecting_angular_fluxes(data,qid,xsid,mesh,DoF,ang_sets{m},groups,y);
 end
 % Set Outputs
 % ------------------------------------------------------------------------------
@@ -57,8 +56,8 @@ for g=1:data.Groups.numberEnergyGroups
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function flux = add_to_flux(psi, data, DoF, angs, groups, flux)
-ndof = DoF.TotalDoFs; dofs = (1:ndof)';
+function flux = add_to_flux(mquad, angs, groups, ndof, psi, flux)
+dofs = (1:ndof)';
 ng = length(groups);
 na = length(angs);
 q_offset = (1:na)*ndof - ndof;
@@ -68,15 +67,13 @@ for q=1:na
     for g=1:ng
         grp = groups(g);
         qgdofs = dofs + g_offset(g) + q_offset(q);
-        for m=1:data.Fluxes.TotalFluxMoments
-            d2m = data.Quadrature.discrete_to_moment(m,tq);
-            flux{grp,m} = flux{grp,m} + d2m*psi(qgdofs);
+        for m=1:mquad.TotalFluxMoments
+            flux{grp,m} = flux{grp,m} + mquad.discrete_to_moment(m,tq)*psi(qgdofs);
         end
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = add_reflecting_angular_fluxes(psi, data, mesh, DoF, angs, groups)
-if ~data.Quadrature.HasReflectingBoundary, return; end
+function data = add_reflecting_angular_fluxes(data,qid,xsid,mesh,DoF,angs,groups,y)
 global glob
 ndof = DoF.TotalDoFs;
 ng = length(groups);
@@ -86,17 +83,21 @@ g_offset = (1:ng)*ndof*na - ndof*na;
 for f=1:mesh.TotalBoundaryFaces
     ff = mesh.BoundaryFaces(f);
     fflag = mesh.FaceID(ff);
-    fnorm = mesh.FaceNormal(ff,:)';
-    for q=1:na
-        tq = angs(q);
-        adir = data.Quadrature.AngularDirections(tq,:);
-        afdot = adir * fnorm;
-        if data.XS.BCFlags(fflag) == glob.Reflecting && afdot > 0
-            fnodes = DoF.FaceCellNodes{ff,1};
-            for g=1:ng
-                grp = groups(g);
-                fnqg = fnodes + g_offset(g) + q_offset(q);
-                data.Fluxes.ReflectingFluxes{ff}{tq}(:,grp) = psi(fnqg);
+    if data.XS(xsid).BCFlags(fflag) == glob.Reflecting
+        opp_dir = data.Quadrature(qid).ReflectingBoundaryAngles{f};
+        fnorm = mesh.FaceNormal(ff,:)';
+        for q=1:na
+            tq = angs(q);
+            adir = data.Quadrature(qid).AngularDirections(tq,:);
+            afdot = adir * fnorm;
+            if afdot > 0
+                opd = opp_dir(tq);
+                fnodes = DoF.FaceCellNodes{ff,1};
+                for g=1:ng
+                    grp = groups(g);
+                    fnqg = fnodes + g_offset(g) + q_offset(q);
+                    data.Fluxes.IncomingBoundaryFlux{ff}{opd,grp} = y(fnqg);
+                end
             end
         end
     end

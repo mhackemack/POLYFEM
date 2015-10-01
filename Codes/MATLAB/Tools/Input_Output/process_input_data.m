@@ -46,7 +46,7 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
 end
 % Determine DoF Type
 % ------------------------------------------------------------------------------
-if strcmp(lower(data.Neutronics.SpatialMethod), 'lagrange')
+if strcmpi(data.Neutronics.SpatialMethod, 'lagrange')
     data.Neutronics.DoFType = 1;
 else
     data.Neutronics.DoFType = 2;

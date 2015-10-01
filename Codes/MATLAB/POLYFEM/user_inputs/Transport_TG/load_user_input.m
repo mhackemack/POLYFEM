@@ -43,8 +43,8 @@ data.Transport.FluxStabilization = 2.0;
 data.Transport.CurrentStabilization = 1.0;
 % Retrieve All Physical Properties
 data = get_69G_Graphite_XS(data, data.Quadrature(1).PnOrder);
-data.XS(1).BCFlags = [glob.Vacuum]; data.XS(1).BCVals  = [0.0];
-data.XS(2).BCFlags = [glob.Vacuum]; data.XS(2).BCVals  = [0.0];
+data.XS(1).BCFlags = [glob.Vacuum]; data.XS(1).BCVals{1} = 0;
+data.XS(2).BCFlags = [glob.Vacuum]; data.XS(2).BCVals{1} = 0;
 % Construct Group Set Information
 data.Groups.NumberGroupSets = data.Groups.NumberEnergyGroups;
 data.Groups.GroupsSets = cell(data.Groups.NumberGroupSets,1);
@@ -66,13 +66,14 @@ data.Acceleration.Info(1).IP_Constant = 4;
 data.Acceleration.Info(1).Groups = data.Groups.ThermalGroups;
 data.Acceleration.Info(1).Moments = 1;
 data.Acceleration.Info(1).XSID = 2;
-
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
 data.solver.AGSMaxIterations = 5000;
 data.solver.WGSMaxIterations = [1000*ones(length(data.Groups.FastGroups),1);ones(length(data.Groups.ThermalGroups),1)];
-
-
+data.solver.AGSRelativeTolerance = 1e-8;
+data.solver.WGSRelativeTolerance = 1e-8*ones(data.Groups.NumberGroupSets,1);
+data.solver.AGSAbsoluteTolerance = 1e-8;
+data.solver.WGSAbsoluteTolerance = 1e-8*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;

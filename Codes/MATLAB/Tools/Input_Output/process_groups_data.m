@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Check Angular Quadrature
+%   Title:          Process Groups Data
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -13,9 +13,4 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = process_angular_quadrature(data)
-% Loop through all angular quadrature sets
-for q=1:length(data.Quadrature)
-    tquad(q) = get_angular_quadrature(data.Quadrature(q), data.problem.Dimension);
-end
-data.Quadrature = tquad;
+function data = process_groups_data(data)

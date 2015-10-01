@@ -237,7 +237,7 @@ function data = reorder_anglesets(data, mesh)
 if data.Neutronics.Transport.HasOpposingReflectingBoundary, return; end
 % Reorder anglesets if reflecting boundaries are present
 dim = mesh.Dimension;
-g_bounds = get_geometry_bounds(mesh);
+% g_bounds = get_geometry_bounds(mesh);
 ref_bounds = data.Neutronics.Transport.ReflectingBoundaries;
 ave_dirs = data.Neutronics.Transport.AverageAngles;
 nangsets = data.Neutronics.Transport.NumberAngleSets;
@@ -265,9 +265,9 @@ end
 data.Neutronics.Transport.AngleSets = data.Neutronics.Transport.AngleSets(ind);
 data.Neutronics.Transport.AverageAngles = data.Neutronics.Transport.AverageAngles(ind,:);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = get_geometry_bounds(mesh)
-dim = mesh.Dimension;
-out = [mesh.minX, mesh.maxX];
-if dim > 1, out = [out;[mesh.minY, mesh.maxY]]; end
-if dim > 2, out = [out;[mesh.minZ, mesh.maxZ]]; end
+% function out = get_geometry_bounds(mesh)
+% dim = mesh.Dimension;
+% out = [mesh.minX, mesh.maxX];
+% if dim > 1, out = [out;[mesh.minY, mesh.maxY]]; end
+% if dim > 2, out = [out;[mesh.minZ, mesh.maxZ]]; end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

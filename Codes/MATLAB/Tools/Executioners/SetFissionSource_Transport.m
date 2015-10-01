@@ -22,7 +22,7 @@ for g=1:ngroups
     src{g} = zeros(DoF.TotalDoFs,1);
 end
 % Exit with vectors of zeros if there is no inscattering
-if ngin == 0 || isempty(fxs), return; end
+if ngin == 0 || ~XS.HasFission, return; end
 % Loop through spatial cells and build source
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells

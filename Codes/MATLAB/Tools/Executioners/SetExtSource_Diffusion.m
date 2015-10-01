@@ -20,6 +20,8 @@ src = cell(ngroups,1);
 for g=1:ngroups
     src{g} = zeros(DoF.TotalDoFs,1);
 end
+% Exit with vectors of zeros if there is no inscattering
+if ~XS.HasExtSource, return; end
 % Build the MMS source
 % ------------------------------------------------------------------------------
 if data.MMS.PerformMMS

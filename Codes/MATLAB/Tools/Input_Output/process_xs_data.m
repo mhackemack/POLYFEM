@@ -38,16 +38,16 @@ if ~isempty(XS(i).TotalXS)
 end
 % Check Diffusion Coefficients - we will set this automatically if needed
 % ------------------------------------------------------------------------------
-if ~isempty(XS(i).DiffusionXS)
+if ~isempty(XS(i).DiffXS)
     % Check for any non-zero entries
-    if all(XS(i).DiffusionXS(:))
+    if all(XS(i).DiffXS(:))
         diff_bools(i) = true;
     else
         diff_bools(i) = false;
     end
 else
     if tot_bools(i)
-        XS(i).DiffusionXS = 1/3/XS(i).TotalXS;
+        XS(i).DiffXS = 1/3/XS(i).TotalXS;
         diff_bools(i) = true;
     else
         diff_bools(i) = false;

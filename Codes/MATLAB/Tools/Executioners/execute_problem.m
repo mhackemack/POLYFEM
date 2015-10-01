@@ -456,8 +456,7 @@ for f=1:mesh.TotalBoundaryFaces
             angDir = ndat.Transport.AngularDirections(m,:);
             fdot = dot(fnorm, angDir);
             if fdot < 0 && fdot < min_dot && abs(fdot - min_dot) > 1e-12
-                min_dot = fdot;
-                min_ind = m;
+                min_dot = fdot; min_ind = m;
             end
         end
         ndat.Transport.BeamFluxes{ff}(min_ind,:) = ndat.Transport.BCVals(fid,:);
