@@ -13,7 +13,7 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = process_diffusion_data(data)
+function data = process_diffusion_data(data, mesh)
 % Process General Diffusion Data
 % ------------------------------------------------------------------------------
 if ~isfield(data,'Diffusion'), error('Diffusion field is required.'); end

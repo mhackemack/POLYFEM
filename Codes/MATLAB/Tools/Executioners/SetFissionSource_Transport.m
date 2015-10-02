@@ -9,12 +9,12 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function src = SetFissionSource_Transport(XS,mquad,groups,gin,flux,mesh,DoF,FE,keff)
+function src = SetFissionSource_Transport(XS,groups,gin,flux,mesh,DoF,FE,keff)
 % Get some preliminary information
 % ------------------------------------------------------------------------------
 if nargin < 10 || isempty(keff), keff = 1.0; end
 ngroups = length(groups); ngin = length(gin);
-fxs = XS.NuBar*XS.FissionXS/keff/mquad.AngQuadNorm;
+fxs = XS.NuBar.*XS.FissionXS/keff;
 % Allocate memory space
 % ------------------------------------------------------------------------------
 src = cell(ngroups,1);

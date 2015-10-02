@@ -32,9 +32,9 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 4;
+data.Neutronics.Transport.SnLevels = 2;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1; c = 0.5;
+txs = 1; c = 0.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -70,7 +70,7 @@ data.Neutronics.Transport.BCVals  = [0.0];
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 0;
+data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
 
@@ -84,8 +84,8 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 3;
-L = 1; ncells = 10;
+data.problem.Dimension = 1;
+L = 1; ncells = 4;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
@@ -114,7 +114,7 @@ y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
-geometry = CartesianGeometry(3,x,y,z);
+% geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
 
@@ -133,7 +133,7 @@ geometry = CartesianGeometry(3,x,y,z);
 % [data, geometry] = get_Yaqi_2D( data, 2, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
-% [data, geometry] = get_Reed_1D( data, 2 );
+[data, geometry] = get_Reed_1D( data, 4 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EIR-2 Benchmark Overwrite

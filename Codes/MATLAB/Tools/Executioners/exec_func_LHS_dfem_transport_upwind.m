@@ -42,7 +42,7 @@ for c=1:mesh.TotalCells
         % Loop through energy groups
         for g=1:ng
             cnqg = cnodes + g_offset(g) + q_offset(q);
-            L(cnqg,cnqg) = L(cnqg,cnqg) + ndat.TotalXS(cmat,g)*M + GG;
+            L(cnqg,cnqg) = L(cnqg,cnqg) + ndat.TotalXS(cmat,groups(g))*M + GG;
         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!

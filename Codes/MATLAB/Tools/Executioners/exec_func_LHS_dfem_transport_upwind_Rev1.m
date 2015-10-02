@@ -42,7 +42,7 @@ for c=1:mesh.TotalCells
         % Loop through energy groups
         for g=1:ng
             cnqg = cnodes + g_offset(g) + q_offset(q);
-            L(cnqg,cnqg) = L(cnqg,cnqg) + data.XS(xsid).TotalXS(cmat,g)*M + GG;
+            L(cnqg,cnqg) = L(cnqg,cnqg) + data.XS(xsid).TotalXS(cmat,groups(g))*M + GG;
         end
     end
 end

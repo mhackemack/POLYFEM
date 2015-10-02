@@ -7,6 +7,8 @@ data.IO.Name = 'AMR_cart_Irr=3_rtol=0.2';
 data.IO.PlotSolution = 0;
 data.IO.SaveSolution = 0;
 data.IO.SaveVTKSolution = 0;
+data.IO.PrintIterationInfo = 1;
+data.IO.PrintConstructionInfo = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.AMR.RefineMesh = 0;
@@ -35,6 +37,7 @@ data.Quadrature(1).AzimuthalLevels = 4;
 data.Fluxes.StartingSolution = 'zero';
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Transport.PerformAcceleration = true;
+data.Transport.XSID = 1; data.Transport.QuadID = 1;
 data.Transport.TransportType = 'upwind';
 data.Transport.PerformSweeps = 0;
 data.Transport.VisualizeSweeping = 0;
@@ -43,13 +46,16 @@ data.Transport.FluxStabilization = 2.0;
 data.Transport.CurrentStabilization = 1.0;
 % Retrieve All Physical Properties
 data = get_69G_Graphite_XS(data, data.Quadrature(1).PnOrder);
-data.XS(1).BCFlags = [glob.Vacuum]; data.XS(1).BCVals{1} = 0;
-data.XS(2).BCFlags = [glob.Vacuum]; data.XS(2).BCVals{1} = 0;
+data.XS(1).ExtSource = zeros(1,data.Groups.NumberEnergyGroups);
+data.XS(1).ExtSource(1,1) = 1.0;
+data.XS(1).BCFlags = [glob.Reflecting]; data.XS(1).BCVals{1} = 0;
+data.XS(2).BCFlags = [glob.Reflecting]; data.XS(2).BCVals{1} = 0;
 % Construct Group Set Information
 data.Groups.NumberGroupSets = data.Groups.NumberEnergyGroups;
-data.Groups.GroupsSets = cell(data.Groups.NumberGroupSets,1);
+data.Groups.GroupSets = cell(data.Groups.NumberGroupSets,1);
+data.Groups.GroupSetUpscattering = [false(length(data.Groups.FastGroups),1);true(length(data.Groups.ThermalGroups),1)];
 for g=1:data.Groups.NumberGroupSets
-    data.Groups.GroupsSets{g} = g;
+    data.Groups.GroupSets{g} = g;
 end
 data = collapse_two_grid_xs(data);
 % Acceleration Properties
@@ -77,7 +83,7 @@ data.solver.WGSAbsoluteTolerance = 1e-8*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;
-L = 1; ncells = 10;
+L = 30*6.953164954422388e-02; ncells = 10;
 
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
@@ -85,6 +91,8 @@ z=linspace(0,L,ncells+1);
 geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
+
+% geometry.set_face_flag_on_surface(2,0.0);
 
 % [data, geometry] = get_Reed_1D( data, 2 );
 
@@ -124,10 +132,12 @@ for m=1:nm
 end
 % Populate Acceleration XS
 for m=1:nm
-    data.XS(2).DiffusionXS(m) = 0;
+    data.XS(2).TotalXS(m) = 0;
+    data.XS(2).DiffXS(m) = 0;
     data.XS(2).AbsorbXS(m) = 0;
     for g=1:ngrps
-        data.XS(2).DiffusionXS(m) = data.XS(2).DiffusionXS(m) + y{m}(g)/txs(m,g)/3;
+        data.XS(2).TotalXS(m) = data.XS(2).TotalXS(m) + y{m}(g)*txs(m,g);
+        data.XS(2).DiffXS(m) = data.XS(2).DiffXS(m) + y{m}(g)/txs(m,g)/3;
         data.XS(2).AbsorbXS(m) = data.XS(2).AbsorbXS(m) + y{m}(g)*txs(m,g);
         for gg=1:ngrps
             data.XS(2).AbsorbXS(m) = data.XS(2).AbsorbXS(m) - sxs(m,g,gg,1)*y{m}(gg);

@@ -17,7 +17,7 @@ function data = solve_linear_iteration_diffusion(data,mesh,DoF,FE)
 % Get Iteration Information and Function Handles
 % ------------------------------------------------------------------------------
 num_gs = data.Groups.NumberGroupSets;
-inv_func = get_solution_function_handle(data);
+inv_func = get_solution_function_handle_Rev1(data);
 ags_maxits = data.solver.AGSMaxIterations;
 wgs_maxits = data.solver.WGSMaxIterations;
 ags_rel_tol = data.solver.AGSRelativeTolerance;
@@ -41,7 +41,7 @@ for m=1:ags_maxits
         wgs_rel_converged = false;
         wgs_abs_converged = false;
         % Get some additional group set information
-        grps = data.Groups.GroupSet{gs};
+        grps = data.Groups.GroupSets{gs};
         % Iterate within a group set
         for it=1:wgs_maxits(gs)
             % Update Solution Vectors

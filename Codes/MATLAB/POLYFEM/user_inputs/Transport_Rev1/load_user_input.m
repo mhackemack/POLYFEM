@@ -28,9 +28,9 @@ data.problem.FEMDegree = 1;
 % ------------------------------------------------------------------------------
 % Quadrature Properties
 data.Quadrature(1).PnOrder = 0;
-data.Quadrature(1).AngleAggregation = 'auto';
+data.Quadrature(1).AngleAggregation = 'all';
 data.Quadrature(1).QuadType = 'LS';
-data.Quadrature(1).SnLevels = 4;
+data.Quadrature(1).SnLevels = 2;
 data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
@@ -48,17 +48,17 @@ data.Transport.CurrentStabilization = 1.0;
 % Construct Group Set Information
 data.Groups.NumberEnergyGroups = 1;
 data.Groups.NumberGroupSets = 1;
-data.Groups.GroupsSets{1} = 1;
+data.Groups.GroupSets{1} = 1;
 data.Groups.GroupSetUpscattering = false;
 % Retrieve All Physical Properties
-txs = 1; c = 0.5;
+txs = 10; c = 0.9999;
 data.XS(1).TotalXS = txs; data.XS(1).DiffXS = 1/3/txs; data.XS(1).AbsorbXS = (1-c)*txs;
 data.XS(1).FissionXS = 0; data.XS(1).NuBar = 0; data.XS(1).FissSpec = 0;
 data.XS(1).ScatteringXS = c*txs; data.XS(1).ExtSource = 1.0;
-data.XS(1).BCFlags = [glob.Vacuum]; data.XS(1).BCVals{1} = 0;
+data.XS(1).BCFlags = [glob.Reflecting]; data.XS(1).BCVals{1} = 0;
 % Acceleration Properties
 % ------------------------------------------------------------------------------
-data.Acceleration.WGSAccelerationBool = 0;
+data.Acceleration.WGSAccelerationBool = 1;
 data.Acceleration.AGSAccelerationBool = 0;
 data.Acceleration.WGSAccelerationResidual = 0;
 data.Acceleration.AGSAccelerationResidual = 0;
@@ -66,6 +66,7 @@ data.Acceleration.WGSAccelerationID = 1;
 data.Acceleration.AGSAccelerationID = 0;
 data.Acceleration.Info(1).AccelerationType = glob.Accel_WGS_DSA;
 data.Acceleration.Info(1).DiscretizationType = glob.Accel_DSA_MIP;
+data.Acceleration.Info(1).ErrorShape = ones(5,1);
 data.Acceleration.Info(1).IP_Constant = 4;
 data.Acceleration.Info(1).Groups = 1;
 data.Acceleration.Info(1).Moments = 1;
@@ -80,8 +81,8 @@ data.solver.AGSAbsoluteTolerance = 1e-8;
 data.solver.WGSAbsoluteTolerance = 1e-8;
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
-L = 1; ncells = 10;
+data.problem.Dimension = 2;
+L = 1; ncells = 4;
 
 % tx = linspace(0,L,ncells+1);
 % [x,y]=meshgrid(tx,tx);
@@ -92,8 +93,8 @@ L = 1; ncells = 10;
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(1,x);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D([0,1/3,2/3,1]);
@@ -103,3 +104,27 @@ geometry = CartesianGeometry(1,x);
 % geometry.set_face_flag_on_surface(2,[0,L;L,L]);
 % geometry.set_face_flag_on_surface(2,[L,0;L,L]);
 % geometry.set_face_flag_on_surface(2,[0,0;L,0]);
+
+% [data, geometry] = get_Reed_1D( data, data.Transport.XSID, 4 );
+
+% Specific problem layouts
+% ------------------------------------------------------------------------------
+function [data, geometry] = get_Reed_1D( data, xsid, n )
+global glob
+data.problem.Dimension = 1;
+% Get XS
+data = get_Reed_XS( data, xsid );
+% Get Geometry
+L = 8; nx = n*8;
+x = linspace(0,L,nx+1);
+geometry = CartesianGeometry(1,x);
+% Set Material IDs
+geometry.set_cell_matIDs_inside_domain(1, [0,2]);
+geometry.set_cell_matIDs_inside_domain(2, [2,3]);
+geometry.set_cell_matIDs_inside_domain(3, [3,5]);
+geometry.set_cell_matIDs_inside_domain(4, [5,6]);
+geometry.set_cell_matIDs_inside_domain(5, [6,8]);
+% Boundary Conditions
+data.XS(xsid).BCFlags = [glob.Vacuum];
+data.XS(xsid).BCVals{1}  = 0;
+% ------------------------------------------------------------------------------

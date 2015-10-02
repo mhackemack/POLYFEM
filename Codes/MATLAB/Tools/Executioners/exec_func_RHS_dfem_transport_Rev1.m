@@ -32,14 +32,14 @@ for q=1:na
         grp = groups(g);
         qg_off = q_offset(q) + g_offset(g);
         % Apply Fission Terms - 0th order only
-        rhs(1:ndof+qg_off) = rhs(1:ndof+qg_off) + data.Sources.FissionSource{grp,1}*m2d(1,tq);
+        rhs((1:ndof)+qg_off) = rhs((1:ndof)+qg_off) + data.Sources.FissionSource{grp,1}*m2d(1,tq);
         % Apply External Source Terms - 0th order only
-        rhs(1:ndof+qg_off) = rhs(1:ndof+qg_off) + data.Sources.ExtSource{grp,1}*m2d(1,tq);
+        rhs((1:ndof)+qg_off) = rhs((1:ndof)+qg_off) + data.Sources.ExtSource{grp,1}*m2d(1,tq);
         for m=1:mquad.TotalFluxMoments
             % Apply InScattering Terms
-            rhs(1:ndof+qg_off) = rhs(1:ndof+qg_off) + data.Sources.InScatteringSource{grp,m}*m2d(m,tq);
+            rhs((1:ndof)+qg_off) = rhs((1:ndof)+qg_off) + data.Sources.InScatteringSource{g,m}*m2d(m,tq);
             % Apply WithinScattering Terms
-            rhs(1:ndof+qg_off) = rhs(1:ndof+qg_off) + data.Sources.WithinScatteringSource{grp,m}*m2d(m,tq);
+            rhs((1:ndof)+qg_off) = rhs((1:ndof)+qg_off) + data.Sources.WithinScatteringSource{g,m}*m2d(m,tq);
         end
     end
 end 

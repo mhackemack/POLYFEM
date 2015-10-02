@@ -38,7 +38,9 @@ if ~isempty(XS(i).TotalXS)
 end
 % Check Diffusion Coefficients - we will set this automatically if needed
 % ------------------------------------------------------------------------------
-if ~isempty(XS(i).DiffXS)
+if ~isfield(XS(i),'DiffXS')
+    diff_bools(i) = false;
+elseif ~isempty(XS(i).DiffXS)
     % Check for any non-zero entries
     if all(XS(i).DiffXS(:))
         diff_bools(i) = true;
@@ -46,7 +48,7 @@ if ~isempty(XS(i).DiffXS)
         diff_bools(i) = false;
     end
 else
-    if tot_bools(i)
+    if ~all(XS(i).DiffXS(:)) && tot_bools(i)
         XS(i).DiffXS = 1/3/XS(i).TotalXS;
         diff_bools(i) = true;
     else
@@ -72,6 +74,11 @@ end
 % ------------------------------------------------------------------------------
 if ~isempty(XS(i).FissSpec)
     if nnz(XS(i).FissSpec) > 0, chi_bools(i) = true; end
+end
+% Check Scattering Cross Section
+% ------------------------------------------------------------------------------
+if ~isempty(XS(i).ScatteringXS)
+    if nnz(XS(i).ScatteringXS) > 0, scatt_bools(i) = true; end
 end
 % Check External Source
 % ------------------------------------------------------------------------------

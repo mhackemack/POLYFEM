@@ -39,7 +39,7 @@ for c=1:mesh.TotalCells
     M = FE.CellMassMatrix{c};
     for g=gb:ge
         grp = groups(g);
-        for gg=ggb(g):gge(e)
+        for gg=ggb(g):gge(g)
             ggrp = groups(gg);
             sxs = XS.ScatteringXS(cmat,grp,ggrp,1);
             out(cdof) = out(cdof) + sxs*M*(x{ggrp,1}(cdof) - x0{ggrp,1}(cdof));
@@ -57,6 +57,6 @@ if accel.AccelerationType == glob.Accel_WGS_DSA
 elseif accel.AccelerationType == glob.Accel_AGS_TG
     gb = 1; ge = ng;
     gge = ng*ones(ng,1);
-    ggb = 1 + 1:ng;
+    ggb = 1 + (1:ng);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

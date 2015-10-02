@@ -13,11 +13,7 @@ function [data, geometry, DoF, FE] = execute_problem_Rev1(data, geometry)
 global glob
 % Generate problem execution schedule
 % ------------------------------------------------------------------------------
-if strcmp(data.problem.ProblemType,'SourceDriven')
-    pcall = @perform_source_driven_problem;
-elseif strcmp(data.problem.ProblemType,'Eigenvalue')
-    pcall = @perform_eignevalue_problem;
-end
+pcall = get_execution_funcation_handle(data);
 geometry = createAMRMesh(data, geometry);
 [mms, deg] = get_mms_information(data);
 % ------------------------------------------------------------------------------
@@ -29,8 +25,8 @@ DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.pr
 % generates Quadrature Sets for the Polygonal/Polyhedral cells
 FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
 % Allocate Solution Space - gets reallocated after a mesh refinement
-data = prepare_problem_execution(data, geometry);
-data = solution_allocation(data, geometry, DoF);
+% data = prepare_problem_execution(data, geometry);
+% data = solution_allocation(data, geometry, DoF);
 % Solve the neutronics problem (either source-driven or k-eigenvalue)
 data = pcall(data, geometry, DoF, FE);
 % sol.CellVertexNumbers = geometry.CellVertexNumbers;
@@ -126,130 +122,97 @@ data = pcall(data, geometry, DoF, FE);
 % ------------------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Procedure for source-driven transport problem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   Iterative Procedure for source-driven neutronics problem
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data, sol] = perform_source_driven_problem(data, geometry, DoF, FE, sol)
-global glob
-% Create DoF and other structures
-% -------------------------------
-ndat = data.Neutronics;
-ndat.keff = 1.0;
-solvdat = data.solver;
-rT = solvdat.relativeTolerance;
-aT = solvdat.absoluteTolerance;
-fcall = get_solution_function_handle(data);
-sol.flux0 = sol.flux;
-mat = []; ferr0 = 1.0;
+function data = perform_transport_source_driven_problem(data, mesh, DoF, FE)
+% Prepare for transport execution
+% ------------------------------------------------------------------------------
+data = prepare_transport_execution(data, mesh, DoF);
+% Get Necessary Function Handles
+% ------------------------------------------------------------------------------
+pcall = @solve_linear_iteration_transport;
+% Get some additional information
+% ------------------------------------------------------------------------------
+xsid = data.Transport.XSID;
+qid  = data.Transport.QuadID;
+% Set fission and external source contributions
+% ------------------------------------------------------------------------------
+ng = data.Groups.NumberEnergyGroups;
+data.Sources.FissionSource = SetFissionSource_Transport(data.XS(xsid),1:ng,1:ng,data.Fluxes.Phi,mesh,DoF,FE);
+data.Sources.ExtSource = SetExtSource_Transport(data,xsid,qid,1:ng,mesh,DoF,FE);
+% Perform single source-driven linear iteration
+% ------------------------------------------------------------------------------
+data = pcall(data,xsid,qid,mesh,DoF,FE);
+% Process some iteration/output information
+% ------------------------------------------------------------------------------
 
-% Loop through iterations
-% -----------------------
-for l=1:solvdat.maxIterations
-    if l > 1 && ~data.Neutronics.MultipleIterations, break; end
-    if glob.print_info, disp(['-> Perform Source-Driven Iteration: ',num2str(l)]); end
-    
-    tictime = tic;
-    [ndat, sol.flux, mat] = fcall(ndat, solvdat, geometry, DoF, FE, sol.flux, mat);
-    [err_L2, norm_L2] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
-    [err_inf, norm_inf] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,inf);
-    % Output iteration data
-    if glob.print_info
-        disp(['   -> Flux L2 Error: ',num2str(err_L2/norm_L2, '%0.9e')])
-        disp(['   -> Flux L0 Error: ',num2str(err_inf, '%0.9e')])
-        disp(' ')
-    end
-    % Check for Convergence
-    toctime(l)   = toc(tictime);
-    error_L2(l)  = err_L2;
-    error_inf(l) = err_inf;
-    n_L2(l)      = norm_L2;
-    n_inf(l)     = norm_inf;
-    if err_L2/norm_L2 < rT && err_inf < aT, break; end
-    sol.flux0 = sol.flux;
-end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Procedure for source-driven diffusion problem
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = perform_diffusion_source_driven_problem(data, mesh, DoF, FE)
+% Get Linear Iteration Function Handle
+% ------------------------------------------------------------------------------
+pcall = @solve_linear_iteration_diffusion;
+% Get some additional information
+% ------------------------------------------------------------------------------
+trans_xsid = data.Diffusion.XSID;
+% Perform single source-driven linear iteration
+% ------------------------------------------------------------------------------
+data = pcall(data,trans_xsid,mesh,DoF,FE);
+% Process some iteration/output information
+% ------------------------------------------------------------------------------
 
-% Apply outputs
-% -------------
-data.Neutronics = ndat;
-sol.iter        = l;
-sol.times       = toctime;
-sol.error_L2    = error_L2;
-sol.error_inf   = error_inf;
-sol.norm_L2     = n_L2;
-sol.norm_inf    = n_inf;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Iterative Procedure for k-eigenvalue neutronics problem
+%   Iterative Procedure for k-eigenvalue transport problem
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = perform_eignevalue_problem(data, geometry, DoF, FE)
-global glob
-% Create DoF and other structures
-% -------------------------------
-ndat = data.Neutronics;
-ndat.keff = 1.0;
-solvdat = data.solver;
-fcall = get_solution_function_handle(data);
-rT = solvdat.relativeTolerance;
-aT = solvdat.absoluteTolerance;
+function data = perform_transport_eignevalue_problem(data, mesh, DoF, FE)
+% Get Linear Iteration Function Handle
+% ------------------------------------------------------------------------------
+pcall = @solve_linear_iteration_transport;
+% Get some additional information
+% ------------------------------------------------------------------------------
+trans_xsid = data.Transport.XSID;
+trans_qid  = data.Transport.QuadID;
 
-% Loop through iterations
-% -----------------------
-keff0 = ndat.keff;
-mat = [];
-sol.flux0 = sol.flux;
-for l=1:solvdat.maxIterations
-    if glob.print_info, disp(['-> Perform Eigenvalue Iteration: ',num2str(l)]); end
-    
-    tictime = tic;
-    [ndat, sol.flux, mat] = fcall(ndat,solvdat,geometry,DoF,FE,sol.flux,mat);
-    % Compute new keff and errors
-    [keff,sol.flux] = estimate_new_keff(sol.flux,sol.flux0);
-    [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
-    [err_inf, norm_inf] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,inf);
-    kerr(l) = abs(keff - keff0) / abs(keff);
-    % Output iteration data
-    if glob.print_info
-        disp(['   -> keff:          ',num2str(keff)])
-        disp(['   -> keff Error:    ',num2str(kerr(l), '%0.9e')])
-        disp(['   -> Flux L2 Error: ',num2str(err_L2/norm_L2, '%0.9e')])
-        disp(['   -> Flux L0 Error: ',num2str(err_inf, '%0.9e')])
-        disp(' ')
-    end
-    % Check for Convergence
-    toctime(l)   = toc(tictime);
-    error_L2(l)  = err_L2;
-    error_inf(l) = err_inf;
-    n_L2(l)      = norm_L2;
-    n_inf(l)     = norm_inf;
-    if err_L2/norm_L2 < rT && err_inf< aT && kerr(l) < rT
-        break
-    end
-    sol.flux0 = sol.flux;
-    keff0 = keff;
-    ndat.keff = keff;
-    
-end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Iterative Procedure for k-eigenvalue diffusion problem
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = perform_diffusion_eignevalue_problem(data, mesh, DoF, FE)
+% Get Linear Iteration Function Handle
+% ------------------------------------------------------------------------------
+pcall = @solve_linear_iteration_diffusion;
+% Get some additional information
+% ------------------------------------------------------------------------------
+trans_xsid = data.Transport.XSID;
+trans_qid  = data.Transport.QuadID;
 
-% Apply outputs
-% -------------
-data.Neutronics = ndat;
-sol.keff        = keff;
-sol.iter        = l;
-sol.times       = toctime;
-sol.error_L2    = error_L2;
-sol.error_inf   = error_inf;
-sol.norm_L2     = n_L2;
-sol.norm_inf    = n_inf;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Miscellaneous Function Calls
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_execution_funcation_handle(data)
+if strcmpi(data.problem.TransportMethod,'transport')
+    if strcmpi(data.problem.ProblemType,'sourcedriven')
+        out = @perform_transport_source_driven_problem;
+    elseif strcmpi(data.problem.ProblemType,'eigenvalue')
+        out = @perform_transport_eignevalue_problem;
+    end
+elseif strcmpi(data.problem.TransportMethod,'diffusion')
+    if strcmpi(data.problem.ProblemType,'sourcedriven')
+        out = @perform_diffusion_source_driven_problem;
+    elseif strcmpi(data.problem.ProblemType,'eigenvalue')
+        out = @perform_diffusion_eignevalue_problem;
+    end
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function geometry = createAMRMesh(data, geometry)
 if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
@@ -259,61 +222,57 @@ if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = prepare_problem_execution(data, mesh)
-% Prepares Angle Angregation and Sweep Orderings if necessary
-if strcmp(data.problem.TransportMethod, 'Transport')
-    % Reflecting Boundaries
-%     if data.Transport.HasReflectingBoundary
-%         data = determine_reflecting_boundaries( data, mesh );
-%     end
-    % Determine Angle Sets
-    data = determine_angle_sets_Rev1(data, mesh);
-    % Determine Sweep Orderings
-    if data.Transport.PerformSweeps
-        data = calculate_sweep_orderings(data, mesh);
-    end
-elseif strcmp(data.problem.TransportMethod, 'Diffusion')
-    % nothing at this time...
+function data = prepare_transport_execution(data, mesh, DoF)
+% Determine Angle Sets
+data = determine_angle_sets_Rev1(data, mesh);
+% Determine Sweep Orderings
+if data.Transport.PerformSweeps
+    data = calculate_sweep_orderings(data, mesh);
+end
+% Allocate Solution Space
+xsid = data.Transport.XSID; qid = data.Transport.QuadID;
+data = solution_allocation(data, DoF.TotalDoFs, data.Groups.NumberEnergyGroups, data.Quadrature(qid).TotalFluxMoments);
+data = set_incident_boundary_fluxes(data,xsid,qid,mesh,DoF);
+if data.Transport.HasReflectingBoundary
+    data = calculate_reflecting_angles_Rev1( data, mesh );
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = solution_allocation(data, mesh, DoF)
-ndof = DoF.TotalDoFs;
-% Generate DoF space for each energy group and flux moment
-% --------------------------------------------------------
-if strcmp(data.problem.TransportMethod, 'Diffusion')
-    mf = data.Groups.NumberEnergyGroups;
-    nf = 1;
-else
-    if data.Transport.HasReflectingBoundary
-        data = allocate_reflecting_flux(data, mesh, DoF);
-        data = calculate_reflecting_angles(data, mesh);
-    end
-    mf = data.Groups.NumberEnergyGroups;
-    nf = data.Quadrature(1).TotalFluxMoments;
+function data = prepare_diffusion_execution(data, mesh, DoF)
+% Determine Angle Sets
+data = determine_angle_sets_Rev1(data, mesh);
+% Determine Sweep Orderings
+if data.Transport.PerformSweeps
+    data = calculate_sweep_orderings(data, mesh);
 end
+% Allocate Solution Space
+data = solution_allocation(data, DoF.TotalDoFs, data.Groups.NumberEnergyGroups, 1);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = solution_allocation(data, ndof, mf, nf)
 data.Fluxes.Phi = cell(mf,nf);
 % Set initial flux values
 for i=1:mf
     for j=1:nf
-        if isa(ndat.StartingSolution, 'char')
-            if strcmp(ndat.StartingSolution, 'random')
+        if isa(data.Fluxes.StartingSolution, 'char')
+            if strcmp(data.Fluxes.StartingSolution, 'random')
                 data.Fluxes.Phi{i,j} = rand(ndof,1);
-            elseif strcmp(ndat.StartingSolution, 'zero')
+            elseif strcmp(data.Fluxes.StartingSolution, 'zero')
                 data.Fluxes.Phi{i,j} = zeros(ndof,1);
-            elseif strcmp(ndat.StartingSolution, 'one')
+            elseif strcmp(data.Fluxes.StartingSolution, 'one')
                 data.Fluxes.Phi{i,j} = ones(ndof,1);
-            elseif strcmp(ndat.StartingSolution, 'function')
+            elseif strcmp(data.Fluxes.StartingSolution, 'function')
                 data.Fluxes.Phi{i,j} = ndat.StartingSolutionFunction{i,j}(DoF.NodeLocations);
             else
                 data.Fluxes.Phi{i,j} = rand(ndof,1);
             end
-        elseif isa(ndat.StartingSolution, 'double')
+        elseif isa(data.Fluxes.StartingSolution, 'double')
             data.Fluxes.Phi{i,j} = ndat.StartingSolution*ones(ndof,1);
         else
             error('Cannot determine starting flux value type.');
         end
     end
 end
+% Set PhiOld
+data.Fluxes.PhiOld = data.Fluxes.Phi;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = compute_global_fission_rate(phi,XS,mesh,DoF,FE)
 out = 0; ng = size(phi,1);

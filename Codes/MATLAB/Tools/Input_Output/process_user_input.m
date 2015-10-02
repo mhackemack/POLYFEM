@@ -33,13 +33,13 @@ data.XS = process_xs_data(data.XS);
 % ------------------------------------------------------------------------------
 if strcmpi(data.problem.TransportMethod, 'transport')
     if ~isfield(data,'Transport'), error('No Transport Field.'); end
-    data = process_transport_data(data);
+    data = process_transport_data(data, geometry);
 end
 % Process Diffusion Problem Data
 % ------------------------------------------------------------------------------
 if strcmpi(data.problem.TransportMethod, 'diffusion')
     if ~isfield(data,'Diffusion'), error('No Diffusion Field.'); end
-    data = process_diffusion_data(data);
+    data = process_diffusion_data(data, geometry);
 end
 % Process DoF/FE Data
 % ------------------------------------------------------------------------------

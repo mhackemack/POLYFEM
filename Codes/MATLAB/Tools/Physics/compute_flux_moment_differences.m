@@ -15,8 +15,13 @@ if isinf(n_type)
     for g=1:length(ngs)
         gg = ngs(g);
         for m=1:length(mom)
-            terr = max(abs(flux{gg,m} - flux0{gg,m}));
-            tden = max(abs(flux{gg,m}));
+            if isempty(flux0{gg,m})
+                terr = max(abs(flux{gg,m}));
+                tden = max(abs(flux{gg,m}));
+            else
+                terr = max(abs(flux{gg,m} - flux0{gg,m}));
+                tden = max(abs(flux{gg,m}));
+            end
             if terr > err, err = terr; end
             if tden > denom, denom = tden; end
         end
@@ -30,8 +35,13 @@ elseif isa(n_type, 'double') && n_type > 0
         for g=1:length(ngs)
             gg = ngs(g);
             for m=1:length(mom)
-                err = err + (M*(flux{gg,m}(cdofs) - flux0{gg,m}(cdofs)).^n_type)'*zn;
-                denom = denom + (M*flux{gg,m}(cdofs).^n_type)'*zn;
+                if ~isempty(flux0{gg,m})
+                    err = err + (M*(flux{gg,m}(cdofs) - flux0{gg,m}(cdofs)).^n_type)'*zn;
+                    denom = denom + (M*flux{gg,m}(cdofs).^n_type)'*zn;
+                else
+                    err = err + (M*(flux{gg,m}(cdofs)).^n_type)'*zn;
+                    denom = denom + (M*flux{gg,m}(cdofs).^n_type)'*zn;
+                end
             end
         end
     end
