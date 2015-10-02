@@ -13,7 +13,7 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data, geometry] = process_input(data, geometry)
+function [data, geometry] = process_user_input(data, geometry)
 % Process Geometry
 % ------------------------------------------------------------------------------
 if isstruct(geometry) && isfield(geometry, 'geometry')

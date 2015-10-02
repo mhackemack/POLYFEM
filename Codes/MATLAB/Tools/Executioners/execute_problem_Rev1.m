@@ -267,7 +267,7 @@ if strcmp(data.problem.TransportMethod, 'Transport')
 %         data = determine_reflecting_boundaries( data, mesh );
 %     end
     % Determine Angle Sets
-    data = determine_angle_sets(data, mesh);
+    data = determine_angle_sets_Rev1(data, mesh);
     % Determine Sweep Orderings
     if data.Transport.PerformSweeps
         data = calculate_sweep_orderings(data, mesh);

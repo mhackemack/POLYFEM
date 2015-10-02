@@ -80,7 +80,7 @@ data.solver.AGSAbsoluteTolerance = 1e-8;
 data.solver.WGSAbsoluteTolerance = 1e-8;
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 2;
+data.problem.Dimension = 1;
 L = 1; ncells = 10;
 
 % tx = linspace(0,L,ncells+1);
@@ -92,8 +92,8 @@ L = 1; ncells = 10;
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
-% geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(1,x);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.extrude_mesh_2D_to_3D([0,1/3,2/3,1]);
