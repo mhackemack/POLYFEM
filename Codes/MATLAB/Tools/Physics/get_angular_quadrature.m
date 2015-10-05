@@ -336,7 +336,7 @@ for a=1:nA
             pkn = (-1)^n * L(kk,nn);
         else
             tf = sin(n*phi);
-            pkn = (-1)^(-n)*factorial(k+n)/factorial(k-n)*L(kk,-nn);
+            pkn = (-1)^(-n)*factorial(k+n)/factorial(k-n)*L(kk,-nn+1);
         end
         Sn(m,a) = sqrt((2-delta(n,0))*factorial(k-n)/factorial(k+n))*tf*pkn;
     end
@@ -349,7 +349,14 @@ if fMom == 0
     Kn = [0, 0];
     Sn = ones(1, nA);
 else
-    
+    nMtot = fMom+1;
+    Kn = [(0:fMom)',(0:fMom)'];
+    Sn = zeros(nMtot, nA);
+    for m=0:fMom
+        for q=1:nA
+            Sn(m+1,q) = legendreP(m,angs(q));
+        end
+    end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function d2m = compute_d2m(nM, w, Sn)

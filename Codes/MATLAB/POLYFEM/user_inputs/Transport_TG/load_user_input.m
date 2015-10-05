@@ -26,17 +26,9 @@ data.problem.SpatialMethod = 'PWLD';
 data.problem.FEMDegree = 1;
 % Transport Properties
 % ------------------------------------------------------------------------------
-% Quadrature Properties
-data.Quadrature(1).PnOrder = 0;
-data.Quadrature(1).AngleAggregation = 'auto';
-data.Quadrature(1).QuadType = 'LS';
-data.Quadrature(1).SnLevels = 4;
-data.Quadrature(1).PolarLevels = 4;
-data.Quadrature(1).AzimuthalLevels = 4;
-% Flux Properties
-data.Fluxes.StartingSolution = 'zero';
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Transport.PerformAcceleration = true;
+data.Transport.PnOrder = 3;
 data.Transport.XSID = 1; data.Transport.QuadID = 1;
 data.Transport.TransportType = 'upwind';
 data.Transport.PerformSweeps = 0;
@@ -44,8 +36,17 @@ data.Transport.VisualizeSweeping = 0;
 data.Transport.StabilizationMethod = 'EGDG';
 data.Transport.FluxStabilization = 2.0;
 data.Transport.CurrentStabilization = 1.0;
+% Quadrature Properties
+data.Quadrature(1).PnOrder = data.Transport.PnOrder;
+data.Quadrature(1).AngleAggregation = 'all';
+data.Quadrature(1).QuadType = 'LS';
+data.Quadrature(1).SnLevels = 2;
+data.Quadrature(1).PolarLevels = 4;
+data.Quadrature(1).AzimuthalLevels = 4;
+% Flux Properties
+data.Fluxes.StartingSolution = 'zero';
 % Retrieve All Physical Properties
-data = get_69G_Graphite_XS(data, data.Quadrature(1).PnOrder);
+data = get_69G_Graphite_XS(data, data.Transport.PnOrder);
 data.XS(1).ExtSource = zeros(1,data.Groups.NumberEnergyGroups);
 data.XS(1).ExtSource(1,1) = 1.0;
 data.XS(1).BCFlags = [glob.Reflecting]; data.XS(1).BCVals{1} = 0;
@@ -74,12 +75,12 @@ data.Acceleration.Info(1).Moments = 1;
 data.Acceleration.Info(1).XSID = 2;
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.AGSMaxIterations = 5000;
+data.solver.AGSMaxIterations = 500000;
 data.solver.WGSMaxIterations = [1000*ones(length(data.Groups.FastGroups),1);ones(length(data.Groups.ThermalGroups),1)];
-data.solver.AGSRelativeTolerance = 1e-8;
-data.solver.WGSRelativeTolerance = 1e-8*ones(data.Groups.NumberGroupSets,1);
-data.solver.AGSAbsoluteTolerance = 1e-8;
-data.solver.WGSAbsoluteTolerance = 1e-8*ones(data.Groups.NumberGroupSets,1);
+data.solver.AGSRelativeTolerance = 1e-4;
+data.solver.WGSRelativeTolerance = 1e-4*ones(data.Groups.NumberGroupSets,1);
+data.solver.AGSAbsoluteTolerance = 1e-4;
+data.solver.WGSAbsoluteTolerance = 1e-4*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;
@@ -94,27 +95,6 @@ geometry = CartesianGeometry(1,x);
 
 % geometry.set_face_flag_on_surface(2,0.0);
 
-% [data, geometry] = get_Reed_1D( data, 2 );
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data, geometry] = get_Reed_1D( data, n )
-global glob
-data.problem.Dimension = 1;
-% Get XS
-data = get_Reed_XS( data );
-% Get Geometry
-L = 8; nx = n*8;
-x = linspace(0,L,nx+1);
-geometry = CartesianGeometry(1,x);
-% Set Material IDs
-geometry.set_cell_matIDs_inside_domain(1, [0,2]);
-geometry.set_cell_matIDs_inside_domain(2, [2,3]);
-geometry.set_cell_matIDs_inside_domain(3, [3,5]);
-geometry.set_cell_matIDs_inside_domain(4, [5,6]);
-geometry.set_cell_matIDs_inside_domain(5, [6,8]);
-% Boundary Conditions
-data.Neutronics.Transport.BCFlags = [glob.Vacuum];
-data.Neutronics.Transport.BCVals  = [0.0];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = collapse_two_grid_xs(data)
 nm = data.problem.NumberMaterials;
