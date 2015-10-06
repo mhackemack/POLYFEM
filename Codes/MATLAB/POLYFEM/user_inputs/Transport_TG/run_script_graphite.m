@@ -23,7 +23,7 @@ clear; clc; close all; format short;
 % fg = 1:62; nfg = length(fg);
 % tg = 63:119; ntg = length(tg);
 dir = '69G_graphite';
-ng = 69; Pn = 1;
+ng = 69; Pn = 0;
 fg = 1:28; nfg = length(fg);
 tg = 29:69; ntg = length(tg);
 % Retrieve XS Data
@@ -58,124 +58,73 @@ if Pn==1
     end
     D1ave = D1'*V;
 end
-<<<<<<< HEAD:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_graphite.m
 % P0 Fourier Analysis
 % ------------------------------------------------------------------------------
-=======
-% % P0 Fourier Analysis
-% % ------------------------------------------------------------------------------
->>>>>>> origin/master:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_69G.m
-% noaccel_func_P0 = get_2G_fourier_func('unaccelerated',0);
-% accel_func_P0 = get_2G_fourier_func('accelerated',0);
-% n = 1e3; x = linspace(0,4*pi,n);
-% y_P0_noaccel = zeros(n,1); y_P0_accel = zeros(n,1);
-% S0 = S(:,:,1);
-% for i=1:n
-%     fprintf('P0 Fourier iterate: %d of %d\n',i,n);
-%     y_P0_noaccel(i) = noaccel_func_P0(x(i), T, S0);
-%     y_P0_accel(i) = accel_func_P0(x(i), T, S0, D0, V);
-% end
-% figure(1)
-% plot(x,[y_P0_noaccel,y_P0_accel])
-% xlabel('Fourier Mode')
-% ylabel('Spectral Radius')
-% axis([0,max(x),0,1])
-% clear S0;
-<<<<<<< HEAD:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_graphite.m
-% % Try lambda = 0 hack here (success)
-% Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
-% F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
-% mat = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
+noaccel_func_P0 = get_2G_fourier_func('unaccelerated',0);
+accel_func_P0 = get_2G_fourier_func('accelerated',0);
+n = 1e3; x = linspace(0,4*pi,n);
+y_P0_noaccel = zeros(n,1); y_P0_accel = zeros(n,1);
+S0 = S(:,:,1);
+for i=1:n
+    fprintf('P0 Fourier iterate: %d of %d\n',i,n);
+    y_P0_noaccel(i) = noaccel_func_P0(x(i), T, S0);
+    y_P0_accel(i) = accel_func_P0(x(i), T, S0, D0, V);
+end
+figure(1)
+plot(x,[y_P0_noaccel,y_P0_accel])
+xlabel('Fourier Mode')
+ylabel('Spectral Radius')
+axis([0,max(x),0,1])
+clear S0;
+% Try lambda = 0 hack here (success)
+Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
+F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
+L0_hack = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
 % P1 Fourier Analysis
 % ------------------------------------------------------------------------------
-=======
-% % Try lambda=0 hack here
-% Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
-% F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
-% mat = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
-% % P1 Fourier Analysis
-% % ------------------------------------------------------------------------------
->>>>>>> origin/master:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_69G.m
-% if Pn == 1
-%     noaccel_func_P1 = get_2G_fourier_func('unaccelerated',1);
-%     accel_func_P1 = get_2G_fourier_func('accelerated',1);
-%     n = 3e2; x = linspace(1e-8,4*pi,n);
-%     y_P1_noaccel = zeros(n, 1); y_P1_accel = zeros(n, 1);
-%     for i=1:n
-%         fprintf('P1 Fourier iterate: %d of %d\n',i,n);
-%         y_P1_noaccel(i) = noaccel_func_P1(x(i), T, S);
-%         y_P1_accel(i) = accel_func_P1(x(i), T, S, D1, V);
-%     end
-%     figure(2)
-%     plot(x,[y_P1_noaccel,y_P1_accel])
-%     xlabel('Fourier Mode')
-%     ylabel('Spectral Radius')
-%     axis([0,max(x),0,1])
-% end
+if Pn == 1
+    noaccel_func_P1 = get_2G_fourier_func('unaccelerated',1);
+    accel_func_P1 = get_2G_fourier_func('accelerated',1);
+    n = 3e2; x = linspace(1e-8,4*pi,n);
+    y_P1_noaccel = zeros(n, 1); y_P1_accel = zeros(n, 1);
+    for i=1:n
+        fprintf('P1 Fourier iterate: %d of %d\n',i,n);
+        y_P1_noaccel(i) = noaccel_func_P1(x(i), T, S);
+        y_P1_accel(i) = accel_func_P1(x(i), T, S, D1, V);
+    end
+    figure(2)
+    plot(x,[y_P1_noaccel,y_P1_accel])
+    xlabel('Fourier Mode')
+    ylabel('Spectral Radius')
+    axis([0,max(x),0,1])
+end
 % P0 Analytical Analysis
 % ------------------------------------------------------------------------------
 A = T - S(:,:,1); b = [1;zeros(ng-1,1)];
 sol_ana = A\b;
 % P0 Numerical Analysis - no acceleration
 % ------------------------------------------------------------------------------
-<<<<<<< HEAD:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_graphite.m
-% itmax = 1e8; tol = 1e-8;
 % q = [1;zeros(ng-1,1)]; sol = zeros(ng,1);
-% % Loop through the fast groups
-% for g=fg(1):fg(end)
-%     b = q(g); A = txs(g) - S(g,g,1);
-%     b = b + S(g,:,1)*sol;
-%     sol(g) = A\b;
-% end
-% sol0 = sol; oldgnorm = 1;
-% % Perform iterations over thermal groups
-% SR_noaccel = [];
-% for m=1:itmax
-%     % Loop through thermal groups
-%     for g=tg(1):tg(end)
-%         b = q(g); A = txs(g);
-%         b = b + S(g,:,1)*sol;
-%         sol(g) = A\b;
-%     end
-%     % Calculate error
-%     inf_norm = max(abs(sol-sol0));
-%     gnorm = sum((sol-sol0).^2);
-%     SR_noaccel = [SR_noaccel; sqrt(gnorm/oldgnorm)];
-%     err = gnorm / sum(sol.^2);
-%     fprintf('Iteration # %d: %0.6e\n', m, inf_norm);
-%     if inf_norm < tol, break; end
-%     % Update iterative values
-%     sol0 = sol; oldgnorm = gnorm;
-% end
-% sol_num_noaccel = sol;
-=======
-q = [1;zeros(ng-1,1)]; sol = zeros(ng,1);
 q=rand(ng,1); sol=rand(ng,1);
-
-itmax = 1e8; tol = 1e-9;
+agsitmax = 1e8; wgsitmax = 1e3;
+agstol = 1e-4; wgstol = 1e-8;
 A=diag(txs)-S(:,:,1);
-exact = A\q;
-% Loop through the fast groups
-for g=fg(1):fg(end)
-%     b = q(g); A = txs(g) - S(g,g,1);
-%     b = b + S(g,:,1)*sol;
-%     sol(g) = A\b;
-    b = q(g) - dot(A(g,:),sol);
-    delta = A(g,g)\b;
-    sol(g) = sol(g) + delta;
-end
+sol(fg) = A(fg,fg)\q(fg);
 sol_older = sol; sol_old = sol; oldgnorm = 1;
 % Perform iterations over thermal groups
 SR_noaccel = []; my_sr=[];
-for m=1:itmax
+for m=1:agsitmax
     % Loop through thermal groups
     for g=tg(1):tg(end)
-        %         b = q(g); A = txs(g);
-        %         b = b + S(g,:,1)*sol;
-        %         sol(g) = A\b;
-        b = q(g) - dot(A(g,:),sol);
-        delta = A(g,g)\b;
-        sol(g) = sol(g) + delta;
+        for mm=1:wgsitmax
+            sol0 = sol(g);
+            b = q(g); A = txs(g);
+            b = b + S(g,:,1)*sol;
+            sol(g) = b/A;
+            if abs(sol(g) - sol0) < wgstol
+                break;
+            end
+        end
     end
     % Calculate error
     inf_norm = max(abs(sol-sol_old));
@@ -183,61 +132,39 @@ for m=1:itmax
     SR_noaccel = [SR_noaccel; sqrt(gnorm/oldgnorm)];
     err = gnorm / sum(sol.^2);
     fprintf('Iteration # %d: %0.6e\n', m, inf_norm);
-    if inf_norm < tol, break; end
+    if inf_norm < agstol, break; end
     % Update iterative values
-    my_sr = [ my_sr, norm(sol-sol_old)/norm(sol_old-sol_older)];
+    my_sr = [ my_sr; norm(sol-sol_old)/norm(sol_old-sol_older)];
     sol_older = sol_old;
     sol_old = sol; 
     oldgnorm = gnorm;
 end
 sol_num_noaccel = sol;
->>>>>>> origin/master:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_69G.m
 % P0 Numerical Analysis - with acceleration
 % ------------------------------------------------------------------------------
-itmax = 1e8; tol = 1e-8;
-q = [1;zeros(ng-1,1)]; sol = zeros(ng,1);
-
 q=rand(ng,1); sol=rand(ng,1);
-
-% Loop through the fast groups
+agsitmax = 1e8; wgsitmax = 1e3;
+agstol = 1e-7; wgstol = 1e-10;
 A=diag(txs)-S(:,:,1);
-for g=fg(1):fg(end)
-%     b = q(g); A = txs(g) - S(g,g,1);
-%     b = b + S(g,:,1)*sol;
-%     sol(g) = A\b;
-    b = q(g) - dot(A(g,:),sol);
-    delta = A(g,g)\b;
-    sol(g) = sol(g) + delta;
-end
+sol(fg) = A(fg,fg)\q(fg);
 sol_older = sol; sol_old = sol; oldgnorm = 1;
-% Perform iterations over thermal groups
-<<<<<<< HEAD:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_graphite.m
-SR_accel = [];
-Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1); F = T - Sd - Su;
-=======
 SR_accel = []; my_sr_acc=[];
->>>>>>> origin/master:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_69G.m
-for m=1:itmax
+Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
+for m=1:agsitmax
     % Loop through thermal groups
     for g=tg(1):tg(end)
-        %         b = q(g); A = txs(g);
-        %         b = b + S(g,:,1)*sol;
-        %         sol(g) = A\b;
-        b = q(g) - dot(A(g,:),sol);
-        delta = A(g,g)\b;
-        sol(g) = sol(g) + delta;
-    end
-    % Perform acceleration
-<<<<<<< HEAD:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_graphite.m
-    R = sum(Su*(sol-sol0));
-=======
-    R = 0;
-    for g=tg(1):tg(end)
-        for gg=g+1:tg(end)
-            R = R + S(g,gg)*(sol(gg)-sol_old(gg));
+        for mm=1:wgsitmax
+            sol0 = sol(g);
+            b = q(g); A = txs(g);
+            b = b + S(g,:,1)*sol;
+            sol(g) = b/A;
+            if abs(sol(g) - sol0) < wgstol
+                break;
+            end
         end
     end
->>>>>>> origin/master:Codes/MATLAB/POLYFEM/user_inputs/Transport_TG/run_script_69G.m
+    % Perform acceleration
+    R = sum(Su*(sol-sol_old));
     dx = R / siga;
     sol = sol + dx*V;
     % Calculate error
@@ -246,7 +173,7 @@ for m=1:itmax
     SR_accel = [SR_accel; sqrt(gnorm/oldgnorm)];
     err = gnorm / sum(sol.^2);
     fprintf('Iteration # %d: %0.6e\n', m, inf_norm);
-    if inf_norm < tol, break; end
+    if inf_norm < agstol, break; end
     % Update iterative values
     my_sr_acc = [ my_sr_acc, norm(sol-sol_old)/norm(sol_old-sol_older)];
     sol_older = sol_old;
