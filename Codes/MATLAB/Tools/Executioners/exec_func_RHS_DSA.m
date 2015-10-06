@@ -9,7 +9,7 @@
 %   Description:    Builds 
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = exec_func_RHS_DSA(data,accel_id,xsid,mesh,DoF,FE)
+function data = exec_func_RHS_DSA(data,accel_id,xsid,mesh,DoF,FE,phi,phi0)
 % Retrieve some data information
 % ------------------------------------------------------------------------------
 global glob
@@ -18,7 +18,8 @@ a_type = accel.AccelerationType;
 % Utilize residual contribution based on acceleration type
 % ------------------------------------------------------------------------------
 if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG
-    res = get_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+    res = get_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,phi,phi0);
+%     res = get_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
     data.Acceleration.Residual{accel_id} = res;
 elseif a_type == glob.Accel_Fission_DSA
     

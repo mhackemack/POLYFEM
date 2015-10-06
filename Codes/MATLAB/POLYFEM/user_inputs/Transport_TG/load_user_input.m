@@ -28,7 +28,7 @@ data.problem.FEMDegree = 1;
 % ------------------------------------------------------------------------------
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Transport.PerformAcceleration = true;
-data.Transport.PnOrder = 3;
+data.Transport.PnOrder = 0;
 data.Transport.XSID = 1; data.Transport.QuadID = 1;
 data.Transport.TransportType = 'upwind';
 data.Transport.PerformSweeps = 0;
@@ -40,7 +40,7 @@ data.Transport.CurrentStabilization = 1.0;
 data.Quadrature(1).PnOrder = data.Transport.PnOrder;
 data.Quadrature(1).AngleAggregation = 'all';
 data.Quadrature(1).QuadType = 'LS';
-data.Quadrature(1).SnLevels = 2;
+data.Quadrature(1).SnLevels = 4;
 data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
@@ -49,8 +49,8 @@ data.Fluxes.StartingSolution = 'zero';
 data = get_69G_Graphite_XS(data, data.Transport.PnOrder);
 data.XS(1).ExtSource = zeros(1,data.Groups.NumberEnergyGroups);
 data.XS(1).ExtSource(1,1) = 1.0;
-data.XS(1).BCFlags = [glob.Reflecting]; data.XS(1).BCVals{1} = 0;
-data.XS(2).BCFlags = [glob.Reflecting]; data.XS(2).BCVals{1} = 0;
+data.XS(1).BCFlags = [glob.Vacuum]; data.XS(1).BCVals{1} = 0;
+data.XS(2).BCFlags = [glob.Vacuum]; data.XS(2).BCVals{1} = 0;
 % Construct Group Set Information
 data.Groups.NumberGroupSets = data.Groups.NumberEnergyGroups;
 data.Groups.GroupSets = cell(data.Groups.NumberGroupSets,1);
@@ -76,21 +76,22 @@ data.Acceleration.Info(1).XSID = 2;
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
 data.solver.AGSMaxIterations = 500000;
-data.solver.WGSMaxIterations = [1000*ones(length(data.Groups.FastGroups),1);ones(length(data.Groups.ThermalGroups),1)];
+data.solver.WGSMaxIterations = 1e2*ones(data.Groups.NumberGroupSets,1);
 data.solver.AGSRelativeTolerance = 1e-4;
-data.solver.WGSRelativeTolerance = 1e-4*ones(data.Groups.NumberGroupSets,1);
+data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 data.solver.AGSAbsoluteTolerance = 1e-4;
-data.solver.WGSAbsoluteTolerance = 1e-4*ones(data.Groups.NumberGroupSets,1);
+data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
-L = 30*6.953164954422388e-02; ncells = 10;
+data.problem.Dimension = 2;
+L = 1e1; ncells = 10;
+% L = 30*6.953164954422388e-02; ncells = 30;
 
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(1,x);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.set_face_flag_on_surface(2,0.0);
