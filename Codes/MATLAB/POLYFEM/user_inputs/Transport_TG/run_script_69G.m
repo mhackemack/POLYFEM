@@ -18,14 +18,14 @@
 clear; clc; close all; format long e;
 % Define some group/order information
 % ------------------------------------------------------------------------------
-% dir = '119G_graphite';
-% ng = 119; Pn = 0;
-% fg = 1:62; nfg = length(fg);
-% tg = 63:119; ntg = length(tg);
-dir = '69G_graphite';
-ng = 69; Pn = 0;
-fg = 1:28; nfg = length(fg);
-tg = 29:69; ntg = length(tg);
+dir = '119G_graphite';
+ng = 119; Pn = 1;
+fg = 1:62; nfg = length(fg);
+tg = 63:119; ntg = length(tg);
+% dir = '69G_graphite';
+% ng = 69; Pn = 1;
+% fg = 1:28; nfg = length(fg);
+% tg = 29:69; ntg = length(tg);
 % Retrieve XS Data
 % ------------------------------------------------------------------------------
 % Get Energy Bounds
@@ -46,53 +46,70 @@ S = S(:,:,1:Pn+1);
 A = (T - tril(S(:,:,1)))\triu(S(:,:,1),1);
 % A = (diag(txs(tg)) - tril(sxs(tg,tg,1)))\triu(sxs(tg,tg,1),1);
 [V,D] = eig(A); D = diag(D);
-[eval,Ei] = max(abs(D));
+[eval,Ei] = max(abs(D)); D = [];
 V = V(:,Ei); V = V / sum(V); Vtg = V(tg);
-if Pn==0
-    D = (1/3)./txs;
-    Dave = sum(D.*V);
-    siga = 0;
-    for g=1:ng
-        siga = siga + V(g)*txs(g);
-        for gg=1:ng
-            siga = siga - S(g,gg,1)*V(gg);
-        end
+% P0 Collapse
+D0 = (1/3)./txs;
+D0ave = sum(D0.*V);
+siga = 0;
+for g=1:ng
+    siga = siga + V(g)*txs(g);
+    for gg=1:ng
+        siga = siga - S(g,gg,1)*V(gg);
     end
-elseif Pn==1
-    D = zeros(ng,1); siga = 0;
+end
+if Pn==1
+    D1 = zeros(ng,1); siga = 0;
     for g=1:ng
         siga = siga + V(g)*txs(g); tt = 0;
         for gg=1:ng
             tt = tt + S(gg,g,2);
             siga = siga - S(g,gg,1)*V(gg);
         end
-        D(g) = 1/(3*(txs(g) - tt));
+        D1(g) = 1/(3*(txs(g) - tt));
     end
-    Dave = sum(D.*V);
+    D1ave = sum(D1.*V);
 end
 % P0 Fourier Analysis
 % ------------------------------------------------------------------------------
 noaccel_func_P0 = get_2G_fourier_func('unaccelerated',0);
 accel_func_P0 = get_2G_fourier_func('accelerated',0);
-n = 1e2; x = linspace(1e-8,2,n);
+n = 1e3; x = linspace(0,4*pi,n);
 y_P0_noaccel = zeros(n,1); y_P0_accel = zeros(n,1);
+S0 = S(:,:,1);
 for i=1:n
     fprintf('P0 Fourier iterate: %d of %d\n',i,n);
-    y_P0_noaccel(i) = noaccel_func_P0(x(i), T, S);
-    y_P0_accel(i) = accel_func_P0(x(i), T, S, D, V);
+    y_P0_noaccel(i) = noaccel_func_P0(x(i), T, S0);
+    y_P0_accel(i) = accel_func_P0(x(i), T, S0, D0, V);
 end
+figure(1)
+plot(x,[y_P0_noaccel,y_P0_accel])
+xlabel('Fourier Mode')
+ylabel('Spectral Radius')
+axis([0,max(x),0,1])
+clear S0;
+% Try lambda=0 hack here
+Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
+F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
+mat = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
 % P1 Fourier Analysis
 % ------------------------------------------------------------------------------
-% if Pn == 1
-%     noaccel_func_P1 = get_2G_fourier_func('unaccelerated',1);
-%     accel_func_P1 = get_2G_fourier_func('accelerated',1);
-%     n = 2e2; x = linspace(1e-6,2,n)';
-%     y_P1_noaccel = zeros(n, 1); y_P1_accel = zeros(n, 1);
-%     for i=1:n
-%         fprintf('P1 Fourier iterate: %d of %d\n',i,n);
-%         y_P1_noaccel(i) = noaccel_func_P1(x(i), T, S);
-%     end
-% end
+if Pn == 1
+    noaccel_func_P1 = get_2G_fourier_func('unaccelerated',1);
+    accel_func_P1 = get_2G_fourier_func('accelerated',1);
+    n = 3e2; x = linspace(1e-8,4*pi,n);
+    y_P1_noaccel = zeros(n, 1); y_P1_accel = zeros(n, 1);
+    for i=1:n
+        fprintf('P1 Fourier iterate: %d of %d\n',i,n);
+        y_P1_noaccel(i) = noaccel_func_P1(x(i), T, S);
+        y_P1_accel(i) = accel_func_P1(x(i), T, S, D1, V);
+    end
+    figure(2)
+    plot(x,[y_P1_noaccel,y_P1_accel])
+    xlabel('Fourier Mode')
+    ylabel('Spectral Radius')
+    axis([0,max(x),0,1])
+end
 % P0 Analytical Analysis
 % ------------------------------------------------------------------------------
 A = T - S(:,:,1); b = [1;zeros(ng-1,1)];
