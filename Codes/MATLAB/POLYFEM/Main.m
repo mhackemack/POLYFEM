@@ -1,4 +1,4 @@
-fac%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   Title:          1D/2D/3D Poly Run Script
 %
@@ -35,7 +35,7 @@ inp = 'Transport_TG';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Load data and perform error checking
 % ------------------------------------
-print_heading(now,date);
+print_heading(now, date);
 [data, geometry] = load_user_input();
 [data, geometry] = process_user_input(data, geometry);
 % [data, geometry] = process_input_data(data, geometry);

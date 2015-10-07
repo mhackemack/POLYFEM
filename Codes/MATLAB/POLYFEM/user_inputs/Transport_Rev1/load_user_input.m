@@ -30,7 +30,7 @@ data.problem.FEMDegree = 1;
 data.Quadrature(1).PnOrder = 0;
 data.Quadrature(1).AngleAggregation = 'all';
 data.Quadrature(1).QuadType = 'LS';
-data.Quadrature(1).SnLevels = 2;
+data.Quadrature(1).SnLevels = 4;
 data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
@@ -51,14 +51,15 @@ data.Groups.NumberGroupSets = 1;
 data.Groups.GroupSets{1} = 1;
 data.Groups.GroupSetUpscattering = false;
 % Retrieve All Physical Properties
-txs = 10; c = 0.9999;
+txs = 10; c = 0.999;
 data.XS(1).TotalXS = txs; data.XS(1).DiffXS = 1/3/txs; data.XS(1).AbsorbXS = (1-c)*txs;
 data.XS(1).FissionXS = 0; data.XS(1).NuBar = 0; data.XS(1).FissSpec = 0;
 data.XS(1).ScatteringXS = c*txs; data.XS(1).ExtSource = 1.0;
-data.XS(1).BCFlags = [glob.Reflecting]; data.XS(1).BCVals{1} = 0;
+data.XS(1).BCFlags = [glob.Reflecting];
+data.XS(1).BCVals{1} = 0;
 % Acceleration Properties
 % ------------------------------------------------------------------------------
-data.Acceleration.WGSAccelerationBool = 1;
+data.Acceleration.WGSAccelerationBool = 0;
 data.Acceleration.AGSAccelerationBool = 0;
 data.Acceleration.WGSAccelerationResidual = 0;
 data.Acceleration.AGSAccelerationResidual = 0;
@@ -74,7 +75,7 @@ data.Acceleration.Info(1).XSID = 1;
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
 data.solver.AGSMaxIterations = 1;
-data.solver.WGSMaxIterations = 1000;
+data.solver.WGSMaxIterations = 100000;
 data.solver.AGSRelativeTolerance = 1e-8;
 data.solver.WGSRelativeTolerance = 1e-8;
 data.solver.AGSAbsoluteTolerance = 1e-8;
@@ -82,7 +83,7 @@ data.solver.WGSAbsoluteTolerance = 1e-8;
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 4;
+L = 1; ncells = 1;
 
 % tx = linspace(0,L,ncells+1);
 % [x,y]=meshgrid(tx,tx);

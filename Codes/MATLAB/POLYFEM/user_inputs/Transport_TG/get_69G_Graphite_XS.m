@@ -40,3 +40,10 @@ data.XS(1).TotalXS(1,:) = mat; clear mat;
 % Get Scattering Cross Sections
 load('user_inputs/Transport_TG/69G_graphite/MT_2500.mat');
 data.XS(1).ScatteringXS(1,:,:,1:nf) = mat(:,:,1:nf); clear mat;
+% Build Absorption Cross Sections
+data.XS(1).AbsorbXS(1,:) = data.XS(1).TotalXS(1,:);
+for g=1:ng
+    for gg=1:ng
+        data.XS(1).AbsorbXS(1,g) = data.XS(1).AbsorbXS(1,g) - data.XS(1).ScatteringXS(1,gg,g,1);
+    end
+end
