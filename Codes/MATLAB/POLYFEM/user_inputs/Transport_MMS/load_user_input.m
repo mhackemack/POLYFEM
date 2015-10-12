@@ -3,20 +3,20 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Transport_MMS/Gauss_iso_2D';
-data.problem.Name = 'AMR_tri_Irr=3_rtol=0.5';
+data.problem.Name = 'Gauss_iso_LS4_cart_Irr=2_rt=1_rtol=0.3';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 0;
+data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 0;
-data.problem.refinementLevels = 5;
-data.problem.refinementTolerance = 0.0;
-data.problem.AMRIrregularity = 1;
-data.problem.projectSolution = 0;
-data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
+data.problem.refineMesh = 1;
+data.problem.refinementLevels = 12;
+data.problem.refinementTolerance = 0.3;
+data.problem.AMRIrregularity = 2;
+data.problem.projectSolution = 1;
+data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'MAXENT';
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
 % ------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ data.Neutronics.Transport.QuadOrder = 6;
 data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1);
 data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties
-data.Neutronics.Transport.fluxMoments = 0;
+data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'single';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
@@ -58,8 +58,8 @@ data.Neutronics.Transport.ScatteringXS(1,:,:) = [0.0];
 data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
-data.Neutronics.Transport.ExtSource{1,1} = @rhs_func_quad_iso;
-data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_quad_iso;
+data.Neutronics.Transport.ExtSource{1,1} = @rhs_func_gauss_iso;
+data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_gauss_iso;
 % Boundary Conditions
 % data.Neutronics.Transport.BCFlags = [glob.Function];
 % data.Neutronics.Transport.BCVals{1,1} = @ang_sol_func_quad_patch;
@@ -100,7 +100,7 @@ x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

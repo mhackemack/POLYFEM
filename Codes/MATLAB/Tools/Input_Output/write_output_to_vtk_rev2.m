@@ -65,6 +65,7 @@ else
     error('Solution structures are weird...')
 end
 % print vertex information
+ntotdofs = get_total_dof(DoF);
 fprintf(fid2,'POINTS %d float \n',DoF.TotalDoFs);
 fprintf(fid2,'%f %f %f \n',[DoF.NodeLocations zeros(DoF.TotalDoFs,3-mesh.Dimension)]');
 % print cell information

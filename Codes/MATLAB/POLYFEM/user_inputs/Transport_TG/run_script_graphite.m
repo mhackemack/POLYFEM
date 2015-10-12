@@ -18,14 +18,14 @@
 clear; clc; close all; format short;
 % Define some group/order information
 % ------------------------------------------------------------------------------
-% dir = '119G_graphite';
-% ng = 119; Pn = 1;
-% fg = 1:62; nfg = length(fg);
-% tg = 63:119; ntg = length(tg);
-dir = '69G_graphite';
-ng = 69; Pn = 0;
-fg = 1:28; nfg = length(fg);
-tg = 29:69; ntg = length(tg);
+dir = '119G_graphite';
+ng = 119; Pn = 1;
+fg = 1:62; nfg = length(fg);
+tg = 63:119; ntg = length(tg);
+% dir = '69G_graphite';
+% ng = 69; Pn = 1;
+% fg = 1:28; nfg = length(fg);
+% tg = 29:69; ntg = length(tg);
 % Retrieve XS Data
 % ------------------------------------------------------------------------------
 % Get Energy Bounds
@@ -74,6 +74,7 @@ figure(1)
 plot(x,[y_P0_noaccel,y_P0_accel])
 xlabel('Fourier Mode')
 ylabel('Spectral Radius')
+legend('Gauss-Seidel','Two-Grid','Location','NorthEast');
 axis([0,max(x),0,1])
 clear S0;
 % Try lambda = 0 hack here (success)
@@ -96,6 +97,7 @@ if Pn == 1
     plot(x,[y_P1_noaccel,y_P1_accel])
     xlabel('Fourier Mode')
     ylabel('Spectral Radius')
+    legend('Gauss-Seidel','Two-Grid','Location','NorthEast');
     axis([0,max(x),0,1])
 end
 % P0 Analytical Analysis
