@@ -104,7 +104,7 @@ for ff=1:mesh.TotalBoundaryFaces
 
                 case(glob.IncidentBeam)
                     beam_val = ndat.BeamFluxes{f}(tq, grp);
-                    rhs(cnqg) = rhs(cnqg) - (fdot*beam_val/angNorm)*F;
+                    rhs(cnqg) = rhs(cnqg) - (fdot*beam_val)*F;
                 case(glob.Function)
                     fxn = DoF.NodeLocations(fnodes,:);
                     fvals = ndat.BCVals{fflag,grp}(fxn,angdirs(:,tq));

@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Searchlight Problem Run Script
+%   Title:          Thick Diffusion Limit AMR Problem Run Script
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -18,7 +18,7 @@
 clc; close all; format long e
 fpath = get_path(); addpath(fpath);
 global glob; glob = get_globals('Office');
-inp = 'Searchlight';
+inp = 'Transport_DL_AMR';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Load data and perform error checking
 % ------------------------------------
