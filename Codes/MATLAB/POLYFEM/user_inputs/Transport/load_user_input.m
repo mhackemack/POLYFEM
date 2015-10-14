@@ -2,18 +2,18 @@ function [data, geometry] = load_user_input()
 global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.Path = 'Transport/Homogeneous';
-data.problem.Name = 'AMR_cart_Irr=3_rtol=0.2';
+data.problem.Path = 'Transport/IronWater';
+data.problem.Name = 'test';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 0;
+data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 0;
-data.problem.refinementLevels = 24;
-data.problem.refinementTolerance = 0.5;
+data.problem.refineMesh = 1;
+data.problem.refinementLevels = 16;
+data.problem.refinementTolerance = 0.7;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 1;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
@@ -24,17 +24,17 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWLD';
-data.Neutronics.FEMDegree = 1;
+data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'all';
+data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 2;
+data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1; c = 0.0;
+txs = 1e2; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -76,16 +76,16 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-7;
-data.solver.relativeTolerance = 1e-7;
+data.solver.absoluteTolerance = 1e-6;
+data.solver.relativeTolerance = 1e-6;
 data.solver.maxIterations = 10000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
-L = 1; ncells = 4;
+data.problem.Dimension = 2;
+L = 1; ncells = 16;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
@@ -127,13 +127,14 @@ z=linspace(0,L,ncells+1);
 % geometry.set_face_flag_on_surface(2,[L,0;L,L]);
 % geometry.set_face_flag_on_surface(2,[0,0;L,0]);
 
-% [data, geometry] = get_EIR( data, 1, 'tri' );
-% [data, geometry] = get_IronWater( data, 1, 'cart' );
+% [data, geometry] = get_EIR( data, 4, 'cart' );
+% [data, geometry] = get_IronWater( data, 4, 'cart' );
+[data, geometry] = get_IronWaterII( data, 1, 'tri' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
-% [data, geometry] = get_Yaqi_2D( data, 2, 'cart' );
+% [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
-[data, geometry] = get_Reed_1D( data, 4 );
+% [data, geometry] = get_Reed_1D( data, 4 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EIR-2 Benchmark Overwrite
@@ -202,6 +203,32 @@ geometry.set_cell_matIDs_inside_domain(1, [0,0;12,0;12,12;0,12]);
 % Boundary Conditions
 geometry.set_face_flag_on_surface(2,[0,0;0,30]);
 geometry.set_face_flag_on_surface(2,[0,0;30,0]);
+data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.Reflecting];
+data.Neutronics.Transport.BCVals  = [0.0,         0.0];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Iron-Water Benchmark Overwrite
+function [data, geometry] = get_IronWaterII( data, n, s )
+global glob
+% Get XS
+data = get_IronWaterII_XS( data );
+% Get Geometry
+L = 10;
+x = linspace(0,L,5*n+1);
+if strcmp(s, 'cart')
+    geometry = CartesianGeometry(2,x,x);
+elseif strcmp(s, 'tri')
+    [x,y]=meshgrid(x,x);
+    x=x(:);y=y(:);
+    tri = delaunayTriangulation(x,y);
+    geometry = GeneralGeometry(2, 'Delaunay', tri);
+end
+% Set Material IDs
+geometry.set_cell_matIDs_inside_domain(3, [0,0;L,0;L,L;0,L]);
+geometry.set_cell_matIDs_inside_domain(2, [0,6;4,6;4,10;0,10]);
+geometry.set_cell_matIDs_inside_domain(1, [0,8;2,8;2,10;0,10]);
+% Boundary Conditions
+geometry.set_face_flag_on_surface(2,[0,0;0,L]);
+geometry.set_face_flag_on_surface(2,[0,L;L,L]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.Reflecting];
 data.Neutronics.Transport.BCVals  = [0.0,         0.0];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

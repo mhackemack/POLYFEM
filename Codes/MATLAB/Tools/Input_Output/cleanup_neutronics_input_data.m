@@ -191,7 +191,7 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
             % Set Diffusion Coefficients
             for m=1:nm
                 for g=1:ng
-                    if data.Neutronics.Transport.fluxMoments == 0
+                    if data.Neutronics.Transport.PnOrder == 0
                         data.Neutronics.Diffusion.DiffXS(m,g) = 1/(3*data.Neutronics.Transport.TotalXS(m,g));
                     else
                         data.Neutronics.Diffusion.DiffXS(m,g) = 1/(3*(data.Neutronics.Transport.TotalXS(m,g) - data.Neutronics.Transport.ScatteringXS(m,g,g,2)));
