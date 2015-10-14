@@ -329,8 +329,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function fid = generate_mesh_file(filename)
 [y, m, d, h, mi, ~] = datevec(now);
-str_mesh = sprintf('%s_mesh.vtk',filename);
-fid = fopen(str_mesh,'w');
+% str_mesh = sprintf('%s_mesh.vtk',filename);
+fid = fopen(filename,'w');
 % Print Basic Information
 fprintf(fid,'# vtk DataFile Version 3.0 \n');
 fprintf(fid,'Date: %d/%d/%d   Time: %d:%d\n', m, d, y, h, mi);
@@ -340,8 +340,8 @@ fprintf(fid,' \n');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function fid = generate_solution_file(filename)
 [y, m, d, h, mi, ~] = datevec(now);
-str_sol = sprintf('%s_solution.vtk',filename);
-fid = fopen(str_sol,'w');
+% str_sol = sprintf('%s_solution.vtk',filename);
+fid = fopen(filename,'w');
 % Print Basic Information
 fprintf(fid,'# vtk DataFile Version 3.0 \n');
 fprintf(fid,'Date: %d/%d/%d   Time: %d:%d\n', m, d, y, h, mi);

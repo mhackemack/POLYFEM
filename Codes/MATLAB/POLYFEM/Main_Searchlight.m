@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          1D/2D/3D Poly Run Script
+%   Title:          Searchlight Problem Run Script
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -13,34 +13,19 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Clear Project Space
-% -------------------
-if exist('pbool', 'var')
-    clearvars -except pbool
-else
-    clear; pbool = false;
-end
+% Prepare Project Space
+% ------------------------------------------------------------------------------
 clc; close all; format long e
-if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
-% Populate global space
-% ---------------------
-global glob
-glob = get_globals('Home');
-% Specify User-Specific Input Folder Location
-% -------------------------------------------
-% inp = 'Diffusion';
-inp = 'Transport';
-% Populate path with additional folders
-% -------------------------------------
+fpath = get_path(); addpath(fpath);
+global glob; glob = get_globals('Home');
+inp = 'Searchlight';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Load data and perform error checking
 % ------------------------------------
 print_heading(now, date);
 [data, geometry] = load_user_input();
-% [data, geometry] = process_user_input(data, geometry); % Rev1
 [data, geometry] = process_input_data(data, geometry);
 data = cleanup_neutronics_input_data(data, geometry);
 % Execute Problem Suite
 % ---------------------
-% [data, geometry, DoF, FE] = execute_problem_Rev1(data, geometry); % Rev1
 [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);

@@ -3,7 +3,7 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Transport/IronWater';
-data.problem.Name = 'test';
+data.problem.Name = 'test_cart';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -13,10 +13,10 @@ data.problem.saveVTKSolution = 1;
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
 data.problem.refinementLevels = 16;
-data.problem.refinementTolerance = 0.7;
-data.problem.AMRIrregularity = 1;
+data.problem.refinementTolerance = 0.2;
+data.problem.AMRIrregularity = 2;
 data.problem.projectSolution = 1;
-data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
+data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
@@ -129,7 +129,7 @@ z=linspace(0,L,ncells+1);
 
 % [data, geometry] = get_EIR( data, 4, 'cart' );
 % [data, geometry] = get_IronWater( data, 4, 'cart' );
-[data, geometry] = get_IronWaterII( data, 1, 'tri' );
+[data, geometry] = get_IronWaterII( data, 1, 'cart' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
 % [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );

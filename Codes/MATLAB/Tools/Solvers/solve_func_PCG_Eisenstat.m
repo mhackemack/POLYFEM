@@ -9,13 +9,13 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = solve_func_PCG_Eisenstat(Lfunc, Rfunc, x, data, varargin)
+function x = solve_func_PCG_Eisenstat(A, b, x, data, varargin)
 
 % Retrieve Matrix and RHS Vector
-A = Lfunc(x, data, varargin);
-b = Rfunc(x, data, varargin);
+% A = Lfunc(x, data, varargin);
+% b = Rfunc(x, data, varargin);
 % Form Operation Matrices and Compute Initial Vectors
-D = diag(A); DL = tril(A);
+D = diag(diag(A)); DL = tril(A);
 I = speye(size(D,1)); DLinv = DL\I; DLinvt = DLinv';
 AA = DLinv*A*DLinvt*DL';
 r = DLinv*(b-A*x); p = D*r; rp = p;
