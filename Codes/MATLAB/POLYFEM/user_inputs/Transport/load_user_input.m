@@ -11,7 +11,7 @@ data.problem.saveSolution = 0;
 data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 1;
+data.problem.refineMesh = 0;
 data.problem.refinementLevels = 16;
 data.problem.refinementTolerance = 0.2;
 data.problem.AMRIrregularity = 2;
@@ -24,8 +24,8 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MAXENT';
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
@@ -33,10 +33,10 @@ data.Neutronics.numberEnergyGroups = 1;
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
-data.Neutronics.Transport.QuadType = 'LS';
+data.Neutronics.Transport.QuadType = 'PGLC';
 data.Neutronics.Transport.SnLevels = 4;
-data.Neutronics.Transport.PolarLevels = 4;
-data.Neutronics.Transport.AzimuthalLevels = 4;
+data.Neutronics.Transport.AzimuthalLevels = 20;
+data.Neutronics.Transport.PolarLevels = 8;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e2; c = 0.9999;
+txs = 1e2; c = 0.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -84,8 +84,8 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 2;
-L = 1; ncells = 16;
+data.problem.Dimension = 3;
+L = 1; ncells = 1;
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
@@ -114,7 +114,7 @@ y=linspace(0,L,ncells+1);
 z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
-% geometry = CartesianGeometry(3,x,y,z);
+geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
 
@@ -129,7 +129,7 @@ z=linspace(0,L,ncells+1);
 
 % [data, geometry] = get_EIR( data, 4, 'cart' );
 % [data, geometry] = get_IronWater( data, 4, 'cart' );
-[data, geometry] = get_IronWaterII( data, 1, 'cart' );
+% [data, geometry] = get_IronWaterII( data, 1, 'cart' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
 % [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
