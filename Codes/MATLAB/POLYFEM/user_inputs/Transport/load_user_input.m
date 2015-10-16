@@ -35,8 +35,8 @@ data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'PGLC';
 data.Neutronics.Transport.SnLevels = 4;
-data.Neutronics.Transport.AzimuthalLevels = 20;
-data.Neutronics.Transport.PolarLevels = 8;
+data.Neutronics.Transport.AzimuthalLevels = 8;
+data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
