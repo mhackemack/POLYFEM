@@ -87,8 +87,13 @@ end
 deg = data.Neutronics.FEMDegree;
 fem = data.Neutronics.FEMType;
 sdm = data.Neutronics.SpatialMethod;
+if strcmpi(sdm, 'lagrange')
+    dtype = 1;
+else
+    dtype = 2;
+end
 for i=1:ntot
-    inputs.dofs{i} = DoFHandler(inputs.meshes{i}, deg, fem, 1);
+    inputs.dofs{i} = DoFHandler(inputs.meshes{i}, deg, fem, dtype);
     inputs.fes{i} = FEHandler(inputs.meshes{i}, inputs.dofs{i}, sdm, [1,1,1], [1,1,0,0]);
 end
 % Get Angular Quadrature
@@ -99,7 +104,7 @@ inputs.quadrature = cell(m_num, 1);
 for i=1:m_num
     m_data = data;
     m_data.Neutronics.Transport.SnLevels = mdir(i);
-    m_data.Neutronics.Transport = get_angular_quadrature(m_data.Neutronics.Transport);
+    m_data.Neutronics.Transport = get_angular_quadrature(m_data.Neutronics.Transport, data.problem.Dimension);
     m_data.Neutronics.TotalFluxMoments = m_data.Neutronics.Transport.TotalFluxMoments;
     inputs = combine_angular_quadratures(inputs, m_data, i);
 end

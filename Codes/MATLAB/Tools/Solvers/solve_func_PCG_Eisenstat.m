@@ -9,34 +9,71 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function x = solve_func_PCG_Eisenstat(A, b, x, data, varargin)
-
-% Retrieve Matrix and RHS Vector
-% A = Lfunc(x, data, varargin);
-% b = Rfunc(x, data, varargin);
-% Form Operation Matrices and Compute Initial Vectors
-D = diag(diag(A)); DL = tril(A);
-I = speye(size(D,1)); DLinv = DL\I; DLinvt = DLinv';
-AA = DLinv*A*DLinvt*DL';
-r = DLinv*(b-A*x); p = D*r; rp = p;
-norm0 = residual_norm(r,rp);
-% Run through iterations
-rT = data.solver.relativeTolerance;
-for i=1:data.solver.maxIterations
-    % Get new step length
-    a = residual_norm(r,rp) / residual_norm(p,AA*p);
-    x = x + a*DLinvt*p;
-    % Form new residual
-    r = r + a*AA*p;
-    rp = D*r;
-    b = residual_norm(r,rp) / norm0;
-    if b < rT, break; end
-    % Update search direction
-    p = rp + b*p;
+function x = solve_func_PCG_Eisenstat(L, b, x, tol, maxit)
+% Check if rhs vector is all zeros
+n = length(b);
+if ~any(b)
+    x = zeros(n,1);
+    return
 end
-
+% Retrieve necessary matrices
+D = (diag(L));
+b_Ax0 = b - L*x;
+L = tril(L,-1); 
+% Calculate initial values
+r = (diag(D)+L)\b_Ax0; D = full(D);
+rp = D.*r; p = rp;
+r0_rp0 = dot(r,rp);
+% Loop through iterations
+for iter=1:maxit
+    Ap = compute_Ap(D, L, p);
+    r_rp = dot(r,rp);
+    denom = dot(p,Ap);
+    a = r_rp/denom;
+    
+    tmp = backward_substitution(D, L, p);
+    x = x + a*tmp;
+    r = r - a*Ap;
+    
+    rp = D.*r;
+    num = dot(r,rp);
+    bb = num/r_rp;
+    % Check convergence tolerance
+    if abs(num/r0_rp0) < tol
+        break;
+    end
+     p = rp + bb*p;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = residual_norm(x,y)
 out = sqrt(sum(x.*y));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = forward_substitution(D, L, b)
+n = length(b); out = zeros(n,1);
+out(1) = b(1)/D(1,1);
+% Loop forwards through vector length
+for i=2:n
+    c = L(i,:); [~,col] = find(c);
+    for j=1:length(col)
+        out(i) = out(i) - c(col(j))*out(col(j));
+    end
+    out(i) = out(i) / diag(i);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = backward_substitution(D, L, b)
+n = length(b); out = zeros(n,1);
+% Loop backwards through vector length
+for i=n:-1:1
+    out(i) = b(i);
+    c = L(i,:); [~,col] = find(c);
+    for j=1:length(col)
+        out(i) = out(i) - c(col(j))*out(col(j));
+    end
+    out(i) = out(i) / D(i);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = compute_Ap(D, L, p)
+t = backward_substitution(D, L, p);
+out = t + forward_substitution(D, L, p - D.*t);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

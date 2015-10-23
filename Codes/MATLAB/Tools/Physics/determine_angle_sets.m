@@ -18,6 +18,7 @@ angs = data.Neutronics.Transport.AngularDirections;
 % ---------------------------------------------
 if strcmp(data.Neutronics.Transport.AngleAggregation, 'all')
     na = data.Neutronics.Transport.NumberAngularDirections;
+    data.Neutronics.Transport.NumberAngleSets = 1;
     data.Neutronics.Transport.AngleSets = {1:na};
     data.Neutronics.Transport.AverageAngles{1} = mean(angs);
     return
@@ -27,9 +28,13 @@ end
 if strcmp(data.Neutronics.Transport.AngleAggregation, 'single')
     na = data.Neutronics.Transport.NumberAngularDirections;
     data.Neutronics.Transport.AngleSets = cell(na, 1);
+    data.Neutronics.Transport.NumberAngleSets = na;
     for m=1:na
         data.Neutronics.Transport.AngleSets{m} = m;
         data.Neutronics.Transport.AverageAngles(m,:) = angs(m,:);
+    end
+    if data.Neutronics.Transport.HasReflectingBoundary
+        data = reorder_anglesets(data, mesh);
     end
     return
 end

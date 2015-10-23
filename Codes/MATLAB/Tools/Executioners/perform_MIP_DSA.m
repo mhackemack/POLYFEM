@@ -26,19 +26,24 @@ if nargin < 5 || isempty(x)
 else
     x = cell_to_vector(x, DoF);
 end
-if length(x) > glob.maxSparse
-    rhs = get_rhs(x, ndat, mesh, DoF, FE);
-    [x,flag,res,it] = pcg(@(x) get_Ax(x, ndat, mesh, DoF, FE),rhs,1e-3,1e5,[],[],x);
+% Get Matrix and rhs vector
+if nargin < 6 || ~exist('A','var')
+    [A,rhs] = get_global_matrices(x, ndat, mesh, DoF, FE);
 else
-    if nargin < 6 || ~exist('A','var')
+    if isempty(A)
         [A,rhs] = get_global_matrices(x, ndat, mesh, DoF, FE);
     else
-        if isempty(A)
-            [A,rhs] = get_global_matrices(x, ndat, mesh, DoF, FE);
-        else
-            rhs = get_rhs(x, ndat, mesh, DoF, FE);
-        end
+        rhs = get_rhs(x, ndat, mesh, DoF, FE);
     end
+end
+if length(x) > glob.maxSparse
+    ind=(1:ndof)';
+    M = sparse(ind,ind,diag(A));
+    rT = solvdat.relativeTolerance;
+    mint = solvdat.maxIterations;
+    [x,flag,res,it] = pcg(A,rhs,1e-4,1e5,M);
+%     [x,flag,res,it] = pcg(@(x) get_Ax(x, ndat, mesh, DoF, FE),rhs,1e-3,1e5,[],[],x);
+else
     % Compute Diffusion Solution
     x = A\rhs;
 end

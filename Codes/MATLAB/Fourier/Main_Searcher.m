@@ -37,18 +37,18 @@ data.Output.file_bool = true;
 % geometry
 data.problem.Dimension = 2;
 data.geometry_type = 'cart';
-% x=[logspace(-3,0,35),logspace(0,2,120),logspace(2,3,40)];
+% x=[logspace(-3,0,35),logspace(0,2,120),logspace(2,3,45)];
 % x=unique(x);
-log_xmin = -2; log_xmax = 4; xnum = 120;
+log_xmin = -2; log_xmax = 4; xnum = 40;
 x = logspace(log_xmin, log_xmax, xnum);
 dyz = [1];
 % dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
 % fem
 data.Neutronics.TransportMethod = 'SI';
-data.Neutronics.Transport.transportType = 'hybrid';
+data.Neutronics.Transport.transportType = 'upwind';
 data.problem.refineMesh = false;
-data.Neutronics.FEMDegree = 1;
-data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.FEMDegree = 2;
+data.Neutronics.SpatialMethod = 'MAXENT';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
@@ -58,10 +58,10 @@ data.Neutronics.Transport.FluxStabilization = 2;
 data.Neutronics.Transport.CurrentStabilization = 1;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [8];
-data.Neutronics.Transport.fluxMoments = 0;
+data.Neutronics.Transport.SnLevels = [2,4,8];
+data.Neutronics.Transport.PnOrder = 0;
 % xs
-c = 0.999; sigt = 1.0;
+c = 0.9999; sigt = 1.0;
 data.Neutronics.Transport.TotalXS = sigt;
 data.Neutronics.Diffusion.DiffusionXS = 1/(3*sigt);
 data.Neutronics.Transport.ScatteringXS = c*sigt;

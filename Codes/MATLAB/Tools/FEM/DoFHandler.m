@@ -262,6 +262,7 @@ classdef DoFHandler < handle
         function out = getVertexNodes(obj,vert)
             out = obj.VertexNodes{vert};
         end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
 end
 
@@ -975,8 +976,10 @@ for f=1:mesh.TotalBoundaryFaces
         ofind = 1:dim; ofind(find) = [];
         % set face information
         of = mesh.PeriodicOppositeFaces(ff);
-        dfv = obj.FaceVertexNodes{ff,1}; nv = length(dfv);
-        ofv = obj.FaceVertexNodes{of,1};
+        dfv = obj.FaceCellNodes{ff,1}; nv = length(dfv);
+        ofv = obj.FaceCellNodes{of,1};
+%         dfv = obj.FaceVertexNodes{ff,1}; nv = length(dfv);
+%         ofv = obj.FaceVertexNodes{of,1};
         obj.PeriodicFaceDoFs{ff} = zeros(nv, 2);
         obj.PeriodicFaceDoFs{of} = zeros(nv, 2);
         for i=1:nv
