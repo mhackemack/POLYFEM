@@ -6,9 +6,8 @@
 %   Institution:    Texas A&M University
 %   Year:           2014
 %
-%   Description:    MATLAB script to produce the mass, stiffness, and
-%                   gradient matrices for an element's volume using 
-%                   the Maximum-Entropy basis functions.
+%   Description:    MATLAB function to read the input deck from Dr. Ragusa's
+%                   mesh library and produce our mesh structures.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

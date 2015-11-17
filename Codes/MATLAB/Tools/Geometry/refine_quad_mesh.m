@@ -43,8 +43,12 @@ disp(['   -> Number of Refinement Flags: ',num2str(num_new_cells)])
 % Loop through cells and refine cell-by-cell
 % ------------------------------------------------------------------------------
 c_count = mesh.TotalCells; f_count = mesh.TotalFaces; v_count = mesh.TotalVertices;
+rev_str = [];
 mesh.allocate_more_memory(0,num_new_cells*3,0);
-for c=1:length(new_cells)
+for c=1:num_new_cells
+    msg = sprintf('      -> Refining Cell: %d of %d',c,num_new_cells);
+    fprintf([rev_str,msg]);
+    rev_str = repmat(sprintf('\b'), 1, length(msg));
     tcell = new_cells(c);
     % Determine new cell/face/vert counts
     ncells = 3; nfaces = 4; nverts = 1;
@@ -72,6 +76,7 @@ end
 % ------------------------------------------------------------------------------
 % Update Final geometry information
 % ------------------------------------------------------------------------------
+fprintf(rev_str);
 mesh.update_geometry_info_after_modifications();
 if mesh.IsExtruded && ~strcmp(mesh.MeshType, 'Quadrilateral')
     mesh.IsExtruded = false;

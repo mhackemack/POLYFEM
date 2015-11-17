@@ -199,12 +199,10 @@ classdef FEHandler < handle
                         else
                             cfn = varargin{2}.FaceVertexNodes{ff,2};
                         end
-%                         cfn = varargin{2}.CellFaceNodes{c}{f};
                         tfn = zeros(1,length(cfn));
                         for i=1:length(tfn)
                             for j=1:length(cind)
                                 if cfn(i) == cind(j);
-%                                 if cfn(i) == cind(j);
                                     tfn(i) = j;
                                     break
                                 end

@@ -17,7 +17,6 @@ data.problem.plotSolution = 0;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = bf;
-data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
@@ -39,8 +38,8 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % -----------------------
-data.solver.absoluteTolerance = 1e-10;
+data.solver.absoluteTolerance = 1e-8;
 data.solver.relativeTolerance = 1e-8;
-data.solver.maxIterations = 24;
+data.solver.maxIterations = 20;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];

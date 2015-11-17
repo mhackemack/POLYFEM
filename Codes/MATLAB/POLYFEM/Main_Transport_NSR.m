@@ -25,26 +25,27 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ---------------------
 global glob
-glob = get_globals('Office');
+glob = get_globals('Home');
 glob.print_info = false;
 
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bf, quad, bc
-bf_name = 'PWLD';
-q_type = 'LS'; sn_levels = [8];
+bf_name = 'MAXENT';
+fdeg = 2;
+q_type = 'LS'; sn_levels = [2,4,8];
 bc_type = 'Vacuum';
 % geometry
-dim = 3; m_type = 'hex';
-dx_num_start = 11; L = 1;
+dim = 2; m_type = 'quad';
+dx_num_start = 13; L = 1;
 dx_start = linspace(0,L,dx_num_start);
 % xs
 c = 0.9999;
-mfp_lower = 0; mfp_upper = 35;
-mfp_min = 1e0; mfp_max = 1e3;
-mfp_vals = 10.^(linspace(log10(mfp_min), log10(mfp_max), mfp_upper));
+mfp_lower = 3; mfp_upper = 41;
+mfp_min = 0; mfp_max = 3;
+mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
-diff_type = 'MIP'; C_IP = [2,4];
+diff_type = 'MIP'; C_IP = [4,2,1];
 % End user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -53,6 +54,8 @@ diff_type = 'MIP'; C_IP = [2,4];
 addpath([glob.input_path,'Transport_NSR']);
 data = load_user_input(dim, bf_name, bc_type);
 data.Neutronics.Transport.DSAType = diff_type;
+data.Neutronics.StartingSolution = 'random';
+data.Neutronics.FEMDegree = fdeg;
 geom = load_geometry_input(dim, m_type, dx_start, 1);
 
 % Loop through problem space and execute test suite
@@ -103,10 +106,10 @@ for m=1:sn_num
             [data, sol, ~, ~, ~] = execute_problem(data, geom);
             % Collect statistics
             SI_iters(m,i,jj) = sol.iter;
-            SI_err_L2{m,i,jj} = sol.error_L2{1};
-            SI_err_inf{m,i,jj} = sol.error_inf{1};
-            SI_norm_L2{m,i,jj} = sol.norm_L2{1};
-            SI_norm_inf{m,i,jj} = sol.norm_inf{1};
+            SI_err_L2{m,i,jj} = sol.error_L2;
+            SI_err_inf{m,i,jj} = sol.error_inf;
+            SI_norm_L2{m,i,jj} = sol.norm_L2;
+            SI_norm_inf{m,i,jj} = sol.norm_inf;
         end
         % Next loop through mesh refinement steps
         jj = 1;
@@ -117,7 +120,7 @@ for m=1:sn_num
             fprintf([rev_str,msg]);
             rev_str = repmat(sprintf('\b'), 1, length(msg));
             
-            dx_num = dx_num*2;
+            dx_num = (dx_num-1)*2+1;
             dx = linspace(0,L,dx_num);
             geom = load_geometry_input(dim, m_type, dx, jj);
             mfp(j) = txs * (max(geom.CellVolume))^(1/dim);
@@ -128,11 +131,11 @@ for m=1:sn_num
             [data, sol, ~, ~, ~] = execute_problem(data, geom);
             glob.print_info = false;
             % Collect statistics
-            SI_iters(m,i,jj) = sol.iter;
-            SI_err_L2{m,i,jj} = sol.error_L2{1};
-            SI_err_inf{m,i,jj} = sol.error_inf{1};
-            SI_norm_L2{m,i,jj} = sol.norm_L2{1};
-            SI_norm_inf{m,i,jj} = sol.norm_inf{1};
+            SI_iters(m,i,j) = sol.iter;
+            SI_err_L2{m,i,j} = sol.error_L2;
+            SI_err_inf{m,i,j} = sol.error_inf;
+            SI_norm_L2{m,i,j} = sol.norm_L2;
+            SI_norm_inf{m,i,j} = sol.norm_inf;
         end
         % Process statistics
         for j=1:mfp_tot
@@ -153,7 +156,7 @@ for m=1:sn_num
         % Save off information
         if ~isequal(exist(dname, 'dir'),7), mkdir(dname); end
         q = sn_levels(m); C = C_IP(i);
-        fname = [q_type,num2str(q),'_C=',num2str(C)];
+        fname = [bf_name,'_',q_type,num2str(q),'_C=',num2str(C)];
         mat_out = [mfp, squeeze(NSR_norm(m,i,:)), squeeze(NSR_err(m,i,:))];
         dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
     end

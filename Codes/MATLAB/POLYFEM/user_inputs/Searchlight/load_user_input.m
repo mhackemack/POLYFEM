@@ -2,21 +2,21 @@ function [data, geometry] = load_user_input()
 global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.Path = 'Transport/Searchlight';
-data.problem.Name = 'test_cart';
+data.problem.Path = 'Transport/Searchlight/MAXENT_k2';
+data.problem.Name = 'cart_Irr=1_type=0_tol=0.2';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
-data.problem.saveSolution = 0;
+data.problem.saveSolution = 1;
 data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 12;
+data.problem.refinementLevels = 16;
 data.problem.refinementTolerance = 0.2;
-data.problem.AMRIrregularity = 2;
+data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
-data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
+data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
@@ -36,7 +36,7 @@ data.Neutronics.Transport.QuadType = 'manual';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
-data.Neutronics.Transport.QuadAngles  = [1,.4];  % Angles for manual set
+data.Neutronics.Transport.QuadAngles  = [1,.4]/norm([1,.4]);  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
 data.Neutronics.Transport.performSweeps = 0;

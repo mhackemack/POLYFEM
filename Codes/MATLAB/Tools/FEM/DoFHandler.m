@@ -146,9 +146,9 @@ classdef DoFHandler < handle
                 obj.determine_face_node_partners();
                 obj.determine_face_cell_nodes();
                 obj.determine_max_cell_nodes();
-                if obj.Degree == 1
-                    obj = generateLDDoFs(obj, d);
-                end
+%                 if obj.Degree == 1
+%                     obj = generateLDDoFs(obj, d);
+%                 end
                 if glob.print_info
                     disp(['-> Total Degree of Freedom Generation Time:  ',num2str(toc(ttime))])
                     disp(' ')

@@ -128,18 +128,21 @@ classdef GeneralGeometry < handle
                             || strcmp(varargin{2}, 'tri') || strcmp(varargin{2}, 'Tri')
                         [verts, cells, faces] = readTriangleMesh(varargin{3});
                         [tri_out] = process_triangle_file(obj.Dimension,cells,verts,faces);
-                        obj.MeshType = 'Triangle';
-                        obj.OriginalMeshType = 'Triangle';
+                        obj.MeshType = 'Triangle'; obj.OriginalMeshType = 'Triangle';
                         obj.transfer_data(tri_out);
                     elseif strcmp(varargin{2}, 'Delaunay') || strcmp(varargin{2}, 'delaunay')
                         d_out = process_delaunay_structure_2D(obj.Dimension, varargin{3});
-                        obj.MeshType = 'Triangle';
-                        obj.OriginalMeshType = 'Triangle';
+                        obj.MeshType = 'Triangle'; obj.OriginalMeshType = 'Triangle';
                         obj.transfer_data(d_out);
                     elseif strcmp(varargin{2}, 'DG') || strcmp(varargin{2}, 'dg')
                         dg_out = process_2D_DG_structure(varargin{3});
                         obj.transfer_data(dg_out);
-                        obj.determine_mesh_type()
+                        obj.determine_mesh_type();
+                        obj.OriginalMeshType = obj.MeshType;
+                    elseif strcmpi(varargin{2}, 'polymesher') || strcmpi(varargin{2}, 'polymesh')
+                        pm_out = process_polymesher_structure(varargin{3}, varargin{4});
+                        obj.transfer_data(pm_out);
+                        obj.determine_mesh_type();
                         obj.OriginalMeshType = obj.MeshType;
                     end
                     obj.minX = min( obj.Vertices(:,1) );

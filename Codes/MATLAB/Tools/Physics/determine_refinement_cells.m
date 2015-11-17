@@ -24,7 +24,7 @@ if ~iscell(x)
 else
     y = x;
 end
-ny = length(y);
+ny = size(y,1);
 clear x
 if strcmp(data.Neutronics.transportMethod,'Diffusion')
     diff_bool = true;
@@ -97,10 +97,17 @@ if DoF.FEMType == 1
         end
     end
 elseif DoF.FEMType == 2
+    sum_tot = 0;
     % Loop through cells in mesh - estimate error for each cell
     % ---------------------------------------------------------
     for c=1:mesh.TotalCells
         faces = mesh.CellFaces{c};
+        MM = FE.CellMassMatrix{c};
+        cn = DoF.ConnectivityArray{c};
+        for iy=1:ny
+            dy = y{iy,1}(cn);
+            sum_tot = sum_tot + (MM*dy)'*dy;
+        end
         % Loop through faces in cell
         % --------------------------
         for ff=1:length(faces)
@@ -114,15 +121,42 @@ elseif DoF.FEMType == 2
                 elseif c == mesh.FaceCells(f,2)
                     M = FE.FaceMassMatrix{f,2};
                 end
-                for iy=1:ny
-                    err(c) = err(c) + sum(M*abs(y{iy,1}(ndp(:,1)) - y{iy,1}(ndp(:,2))));
+                if diff_bool
+                    for iy=1:ny
+                        dy = y{iy,1}(ndp(:,1)) - y{iy,1}(ndp(:,2));
+                        err(c) = err(c) + sum(M*abs(dy));
+                    end
+                else
+                    for iy=1:ny
+                        dy = (y{iy,1}(ndp(:,1)) - y{iy,1}(ndp(:,2))).^2;
+                        err(c) = err(c) + sum(M*dy);
+%                         err(c) = err(c) + (M*dy)'*dy;
+                    end
                 end
             end
         end
-        err(c) = abs(err(c)) / abs(mesh.CellSurfaceArea(c));
+        if diff_bool
+            err(c) = abs(err(c)) / abs(mesh.CellSurfaceArea(c));
+        else
+%             MM = FE.CellMassMatrix{c};
+%             cn = DoF.ConnectivityArray{c};
+%             sum_tol = 0;
+%             for iy=1:ny
+%                 dy = y{iy,1}(cn);
+%                 sum_tol = sum_tol + (MM*dy)'*dy;
+%             end
+%             if abs(sum_tol) > 1e-14
+%                 err(c) = err(c) / sum_tol;
+%             else
+%                 err(c) = 0;
+%             end
+        end
     end
 end
 % Normal error estimates and set refinement flags
+if ~diff_bool
+    err = err / sum_tot;
+end
 err = err / max(err);
 % Switch based on cell refinement type
 if data.problem.refinementType == 0

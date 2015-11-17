@@ -387,16 +387,18 @@ classdef AMRGeometry < handle
             obj.TotalVertices = size(obj.Vertices, 1);
             obj.TotalCells = length(obj.CellVerts);
             obj.TotalFaces = length(obj.FaceVerts);
-            obj.BoundaryFaces = [];
-            obj.InteriorFaces = [];
+            obj.BoundaryFaces = []; obj.TotalBoundaryFaces = 0;
+            obj.InteriorFaces = []; obj.TotalInteriorFaces = 0;
             % Loop through all faces
             for f=1:obj.TotalFaces
                 fv = obj.FaceVerts{f}; nfv = length(fv);
                 fid = obj.FaceID(f);
                 if fid == 0
-                    obj.InteriorFaces = [obj.InteriorFaces;f];
+                    obj.TotalInteriorFaces = obj.TotalInteriorFaces + 1;
+                    %obj.InteriorFaces = [obj.InteriorFaces;f];
                 else
-                    obj.BoundaryFaces = [obj.BoundaryFaces;f];
+                    obj.TotalBoundaryFaces = obj.TotalBoundaryFaces + 1;
+                    %obj.BoundaryFaces = [obj.BoundaryFaces;f];
                 end
                 fverts = obj.Vertices(fv,:);
                 obj.FaceCenter(f,:) = mean(fverts);
@@ -428,8 +430,22 @@ classdef AMRGeometry < handle
                     obj.FaceNormal(f,:) = tfnorm / nfv;
                 end
             end
-            obj.TotalBoundaryFaces = length(obj.BoundaryFaces);
-            obj.TotalInteriorFaces = length(obj.InteriorFaces);
+            obj.InteriorFaces = zeros(obj.TotalInteriorFaces, 1);
+            obj.BoundaryFaces = zeros(obj.TotalBoundaryFaces, 1);
+            % Loop through all faces again
+            bfcount = 1; ifcount = 1;
+            for f=1:obj.TotalFaces
+              fid = obj.FaceID(f);
+              if fid == 0
+                obj.InteriorFaces(ifcount) = f;
+                ifcount = ifcount + 1;
+              else
+                obj.BoundaryFaces(bfcount) = f;
+                bfcount = bfcount + 1;
+              end
+            end
+            %obj.TotalBoundaryFaces = length(obj.BoundaryFaces);
+            %obj.TotalInteriorFaces = length(obj.InteriorFaces);
             % Loop through all cells
             obj.CellVertexNumbers = [];
             for c=1:obj.TotalCells
