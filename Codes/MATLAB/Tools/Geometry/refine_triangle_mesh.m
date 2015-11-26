@@ -44,7 +44,11 @@ disp(['   -> Number of Refinement Flags: ',num2str(num_new_cells)])
 % ------------------------------------------------------------------------------
 c_count = mesh.TotalCells; f_count = mesh.TotalFaces; v_count = mesh.TotalVertices;
 mesh.allocate_more_memory(0,num_new_cells*3,0);
+rev_str = [];
 for c=1:length(new_cells)
+    msg = sprintf('      -> Refining Cell: %d of %d',c,num_new_cells);
+    fprintf([rev_str,msg]);
+    rev_str = repmat(sprintf('\b'), 1, length(msg));
     tcell = new_cells(c);
     % Determine new cell/face/vert counts
     ncells = 3; nfaces = 3; nverts = 0;
@@ -72,6 +76,7 @@ end
 % ------------------------------------------------------------------------------
 % Update Final geometry information
 % ------------------------------------------------------------------------------
+fprintf(rev_str);
 mesh.update_geometry_info_after_modifications();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

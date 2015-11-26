@@ -3,7 +3,7 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Transport_MMS/Gauss2D';
-data.problem.Name = 'tri_uniform';
+data.problem.Name = 'tri_Irr=3_type=0_tol=0.3';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -12,9 +12,9 @@ data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 5;
-data.problem.refinementTolerance = 0.0;
-data.problem.AMRIrregularity = 1;
+data.problem.refinementLevels = 26;
+data.problem.refinementTolerance = 0.3;
+data.problem.AMRIrregularity = 3;
 data.problem.projectSolution = 0;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data

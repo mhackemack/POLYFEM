@@ -16,17 +16,18 @@ for i=1:nv
     vind(i,:) = ii;
 end
 % Get Basis Set Values and Transformations
-% ----------------------------------------
+% ------------------------------------------------------------------------------
 [quad_pairs, qp1, qp2, nq] = get_quad_pairings(nv);
 diag_pairs = get_diagonal_pairings(nv, quad_pairs);
-if nout == 1
-    bvals = basis(v, x, faces, 1, nv);
-    grad_bool = false;
-    q_vals = zeros(nx, nq);
-    for i=1:nx
-        q_vals(i,:) = bvals(i,qp1).*bvals(i,qp2);
-    end
-elseif nout == 2
+% Get basis values
+bvals = basis(v, x, faces, 1, nv);
+grad_bool = false;
+q_vals = zeros(nx, nq);
+for i=1:nx
+    q_vals(i,:) = bvals(i,qp1).*bvals(i,qp2);
+end
+% Get basis gradients if necessary
+if nout == 2
     [bvals, bgrads] = basis(v, x, faces, 1, nv);
     grad_bool = true;
     q_grads = zeros(nq, dim, nx);
@@ -36,23 +37,33 @@ elseif nout == 2
     end
 end
 A = get_quad_pairing_transformation(nv, v, vind, diag_pairs);
-B = get_lagrange_transformation(nv);
+% B = get_lagrange_transformation(nv);
 % Perform Transformations
-% -----------------------
+% ------------------------------------------------------------------------------
 ser_vals = zeros(nx, 2*nv);
 ser_grads = zeros(2*nv, dim, nx);
 for i=1:nx
-    ser_vals(i,:) = (B*(A*q_vals(i,:)'))';
-    if grad_bool
-        for d=1:dim
-            ser_grads(:,d,i) = (B*(A*q_grads(:,d,i)))';
-        end
-    end
+    ser_vals(i,:) = A*q_vals(i,:)';
 end
+% for i=1:nx
+%     ser_vals(i,:) = (B*(A*q_vals(i,:)'))';
+%     if grad_bool
+%         for d=1:dim
+%             ser_grads(:,d,i) = (B*(A*q_grads(:,d,i)))';
+%         end
+%     end
+% end
 % Set Outputs
 % -----------
 varargout{1} = ser_vals;
 if grad_bool
+    dqp = quad_pairs(2*nv+1:end,:);
+    for i=1:2*nv
+        dvals = A(i,2*nv+1:end);
+        for j=1:nx
+            
+        end
+    end
     varargout{2} = ser_grads;
 end
 
