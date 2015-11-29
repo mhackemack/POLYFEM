@@ -34,6 +34,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
+data.Neutronics.Transport.DSASolveMethod = 'direct';
+data.Neutronics.Transport.DSAPreconditioner = 'Jacobi';
+data.Neutronics.Transport.DSATolerance = 1e-4;
+data.Neutronics.Transport.DSAMaxIterations = 1e4;
 data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters

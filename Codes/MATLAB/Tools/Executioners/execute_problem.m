@@ -131,7 +131,7 @@ end
 function [data, sol] = perform_source_driven_problem(data, geometry, DoF, FE, sol)
 global glob
 % Create DoF and other structures
-% -------------------------------
+% ------------------------------------------------------------------------------
 ndat = data.Neutronics;
 ndat.keff = 1.0;
 solvdat = data.solver;
@@ -140,15 +140,14 @@ aT = solvdat.absoluteTolerance;
 fcall = get_solution_function_handle(data);
 sol.flux0 = sol.flux;
 mat = []; ferr0 = 1.0;
-
 % Loop through iterations
-% -----------------------
+% ------------------------------------------------------------------------------
 for l=1:solvdat.maxIterations
     if l > 1 && ~data.Neutronics.MultipleIterations, break; end
     if glob.print_info, disp(['-> Perform Source-Driven Iteration: ',num2str(l)]); end
     
     tictime = tic;
-    [ndat, sol.flux, mat] = fcall(ndat, solvdat, geometry, DoF, FE, sol.flux, mat);
+    [ndat, sol.flux, mat, extra_its] = fcall(ndat, solvdat, geometry, DoF, FE, sol.flux, mat);
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
     [err_inf, norm_inf] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,inf);
     % Output iteration data
@@ -159,6 +158,7 @@ for l=1:solvdat.maxIterations
     end
     % Check for Convergence
     toctime(l)   = toc(tictime);
+    DSA_its(l)   = extra_its;
     error_L2(l)  = err_L2;
     error_inf(l) = err_inf;
     n_L2(l)      = norm_L2;
@@ -166,17 +166,17 @@ for l=1:solvdat.maxIterations
     if err_L2/norm_L2 < rT && err_inf< aT, break; end
     sol.flux0 = sol.flux;
 end
-
 % Apply outputs
-% -------------
+% ------------------------------------------------------------------------------
 data.Neutronics = ndat;
 sol.iter        = l;
+sol.DSA_iters   = DSA_its;
 sol.times       = toctime;
 sol.error_L2    = error_L2;
 sol.error_inf   = error_inf;
 sol.norm_L2     = n_L2;
 sol.norm_inf    = n_inf;
-
+% ------------------------------------------------------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -187,16 +187,15 @@ sol.norm_inf    = n_inf;
 function [data, sol] = perform_eignevalue_problem(data, geometry, DoF, FE, sol)
 global glob
 % Create DoF and other structures
-% -------------------------------
+% ------------------------------------------------------------------------------
 ndat = data.Neutronics;
 ndat.keff = 1.0;
 solvdat = data.solver;
 fcall = get_solution_function_handle(data);
 rT = solvdat.relativeTolerance;
 aT = solvdat.absoluteTolerance;
-
 % Loop through iterations
-% -----------------------
+% ------------------------------------------------------------------------------
 keff0 = ndat.keff;
 mat = [];
 sol.flux0 = sol.flux;
@@ -204,7 +203,7 @@ for l=1:solvdat.maxIterations
     if glob.print_info, disp(['-> Perform Eigenvalue Iteration: ',num2str(l)]); end
     
     tictime = tic;
-    [ndat, sol.flux, mat] = fcall(ndat,solvdat,geometry,DoF,FE,sol.flux,mat);
+    [ndat, sol.flux, mat, extra_its] = fcall(ndat,solvdat,geometry,DoF,FE,sol.flux,mat);
     % Compute new keff and errors
     [keff,sol.flux] = estimate_new_keff(sol.flux,sol.flux0);
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
@@ -220,6 +219,7 @@ for l=1:solvdat.maxIterations
     end
     % Check for Convergence
     toctime(l)   = toc(tictime);
+    DSA_its(l)   = extra_its;
     error_L2(l)  = err_L2;
     error_inf(l) = err_inf;
     n_L2(l)      = norm_L2;
@@ -230,20 +230,19 @@ for l=1:solvdat.maxIterations
     sol.flux0 = sol.flux;
     keff0 = keff;
     ndat.keff = keff;
-    
 end
-
 % Apply outputs
-% -------------
+% ------------------------------------------------------------------------------
 data.Neutronics = ndat;
 sol.keff        = keff;
 sol.iter        = l;
+sol.DSA_iters   = DSA_its;
 sol.times       = toctime;
 sol.error_L2    = error_L2;
 sol.error_inf   = error_inf;
 sol.norm_L2     = n_L2;
 sol.norm_inf    = n_inf;
-
+% ------------------------------------------------------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Miscellaneous Function Calls
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

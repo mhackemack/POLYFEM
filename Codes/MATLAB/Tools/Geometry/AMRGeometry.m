@@ -84,6 +84,7 @@ classdef AMRGeometry < handle
         OriginalFacesPerCell
         MeshRefinementLevel
         PreviousCell
+        CellRefinedLastCycle
         CellRefinementFlag
         CellRefinementLevel
         CellRefinementTree

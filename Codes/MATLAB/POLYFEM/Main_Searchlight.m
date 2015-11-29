@@ -17,7 +17,7 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Office');
+global glob; glob = get_globals('Home');
 inp = 'Searchlight';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Load data and perform error checking

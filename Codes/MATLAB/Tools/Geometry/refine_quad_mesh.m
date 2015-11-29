@@ -45,6 +45,7 @@ disp(['   -> Number of Refinement Flags: ',num2str(num_new_cells)])
 c_count = mesh.TotalCells; f_count = mesh.TotalFaces; v_count = mesh.TotalVertices;
 rev_str = [];
 mesh.allocate_more_memory(0,num_new_cells*3,0);
+mesh.CellRefinedLastCycle = false(mesh.TotalCells,1);
 for c=1:num_new_cells
     msg = sprintf('      -> Refining Cell: %d of %d',c,num_new_cells);
     fprintf([rev_str,msg]);
@@ -403,6 +404,7 @@ end
 % Update Refinement Tree - this is actually mostly general for all mesh types
 % ------------------------------------------------------------------------------
 mesh.PreviousCell(tcnums) = c;
+mesh.CellRefinedLastCycle(tcnums) = true;
 mesh.CellRefinementLevel(tcnums) = mesh.CellRefinementLevel(c) + 1;
 mesh.CellRefinementTop(tcnums) = mesh.CellRefinementTop(c);
 ctop = mesh.CellRefinementTop(c);

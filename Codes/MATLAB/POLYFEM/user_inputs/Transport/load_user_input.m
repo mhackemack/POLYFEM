@@ -16,7 +16,7 @@ data.problem.refinementLevels = 22;
 data.problem.refinementTolerance = 0.2;
 data.problem.AMRIrregularity = 2;
 data.problem.projectSolution = 1;
-data.problem.refinementType = 1; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
+data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
@@ -24,8 +24,8 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MAXENT';
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e0; c = 0.0;
+txs = 1e1; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -70,8 +70,12 @@ data.Neutronics.Transport.BCVals  = [0.0];
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 0;
+data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
+data.Neutronics.Transport.DSASolveMethod = 'pcg';
+data.Neutronics.Transport.DSAPreconditioner = 'gs';
+data.Neutronics.Transport.DSATolerance = 1e-4;
+data.Neutronics.Transport.DSAMaxIterations = 1e4;
 data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
@@ -84,9 +88,9 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 2;
-L = 1; ncells = 20;
-gname = 'PolyMesh_SqDomain_L1_n1024';
+% data.problem.Dimension = 2;
+% L = 1; ncells = 5;
+% gname = 'PolyMesh_SqDomain_L1_n1024';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
@@ -95,7 +99,7 @@ gname = 'PolyMesh_SqDomain_L1_n1024';
 % gname = 'z_mesh_poly_L1_n20_a0.05';
 % gname = 'smooth_quad_mesh_L1_nc5_emb6_a0.15';
 % gname = 'smooth_poly_mesh_L1_n8_a0.15';
-load(strcat(glob.geom_path,gname,'.mat'));
+% load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
 % tx = linspace(0,L,ncells+1);
@@ -130,7 +134,7 @@ load(strcat(glob.geom_path,gname,'.mat'));
 
 % [data, geometry] = get_EIR( data, 4, 'cart' );
 % [data, geometry] = get_IronWater( data, 4, 'cart' );
-% [data, geometry] = get_IronWaterII( data, 1, 'cart' );
+[data, geometry] = get_IronWaterII( data, 1, 'tri' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
 % [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );

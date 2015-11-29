@@ -17,6 +17,7 @@ if ndat.Transport.HasOpposingReflectingBoundary
     error('Currently cannot support opposing reflecting boundaries.');
 end
 % ------------------------------------------------------------------------------
+% Get solution information
 global glob
 nout = nargout;
 ndg = DoF.TotalDoFs;
@@ -26,6 +27,13 @@ if nargin < 5 || isempty(x)
 else
     x = cell_to_vector(x, DoF);
 end
+% ------------------------------------------------------------------------------
+% Get solver information
+solve_meth = ndat.Transport.DSASolveMethod;
+prec_meth = ndat.Transport.DSAPreconditioner;
+DSA_tol = ndat.Transport.DSATolerance;
+DSA_max_iters = ndat.Transport.DSAMaxIterations;
+% ------------------------------------------------------------------------------
 % Get Matrix and rhs vector
 if nargin < 6 || ~exist('A','var')
     [A,rhs] = get_global_matrices(x, ndat, mesh, DoF, FE);
@@ -36,27 +44,44 @@ else
         rhs = get_rhs(x, ndat, mesh, DoF, FE);
     end
 end
-if length(x) > glob.maxSparse
-    ind=(1:ndof)';
-    M = sparse(ind,ind,diag(A));
-    rT = solvdat.relativeTolerance;
-    mint = solvdat.maxIterations;
-    [x,flag,res,it] = pcg(A,rhs,1e-4,1e5,M);
-%     [x,flag,res,it] = pcg(@(x) get_Ax(x, ndat, mesh, DoF, FE),rhs,1e-3,1e5,[],[],x);
-else
-    % Compute Diffusion Solution
-    x = A\rhs;
+% ------------------------------------------------------------------------------
+% Solve diffusion system
+if strcmpi(solve_meth, 'direct')
+    if length(x) > glob.maxSparse
+        if strcmpi(prec_meth, 'none')
+            M1 = []; M2 = [];
+        elseif strcmpi(prec_meth, 'jacobi')
+            ind=(1:ndof)'; M1 = sparse(ind,ind,diag(A));  M2 = [];
+        elseif strcmpi(prec_meth, 'gs')
+            ind=(1:ndof)'; D = sparse(ind,ind,diag(A)); LD = tril(A);
+            M1 = LD*(D\(LD')); M2 = [];
+        elseif strcmpi(prec_meth, 'ilu')
+            [M1, M2] = ilu(A);
+        end
+        [x,flag,res,DSA_it] = pcg(A,rhs,DSA_tol,DSA_max_iters,M1,M2);
+    else
+        x = A\rhs;
+        DSA_it = 0;
+    end
+elseif strcmpi(ndat.Transport.DSASolveMethod, 'PCG')
+    if strcmpi(prec_meth, 'none')
+        M1 = []; M2 = [];
+    elseif strcmpi(prec_meth, 'jacobi')
+        ind=(1:ndof)'; M1 = sparse(ind,ind,diag(A));  M2 = [];
+    elseif strcmpi(prec_meth, 'gs')
+        ind=(1:ndof)'; D = sparse(ind,ind,diag(A)); LD = tril(A);
+        M1 = LD*(D\(LD')); M2 = [];
+    elseif strcmpi(prec_meth, 'ilu')
+        [M1, M2] = ilu(A);
+    end
+    [x,flag,res,DSA_it] = pcg(A,rhs,DSA_tol,DSA_max_iters,M1,M2);
 end
+% ------------------------------------------------------------------------------
 % Outputs
 x = vector_to_cell(x,DoF);
 varargout{1} = x;
-if nout == 2
-    if exist('A', 'var')
-        varargout{2} = A; 
-    else
-        varargout{2} = []; 
-    end
-end
+varargout{2} = A;
+varargout{3} = DSA_it;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

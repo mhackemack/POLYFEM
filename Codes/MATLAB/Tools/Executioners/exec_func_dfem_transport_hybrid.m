@@ -14,6 +14,7 @@ global glob
 % Setup Solution Space
 % ------------------------------------------------------------------------------
 [ndat, flux_out] = setup_solution_space(ndat, mesh, DoF);
+DSA_iterations = 0;
 % Loop through Angle Sets
 % ------------------------------------------------------------------------------
 groups = 1:ndat.numberEnergyGroups;
@@ -44,21 +45,15 @@ if ndat.Transport.performDSA
         fprintf([rev_str,msg]);
         rev_str = repmat(sprintf('\b'), 1, length(msg));
     end
-    
-    [flux_out, A] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, flux_out, x, A);
+    [flux_out, A, DSA_iterations] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, flux_out, x, A);
 end
 % Set Outputs
 % ------------------------------------------------------------------------------
 nout = nargout;
 varargout{1} = ndat;
 varargout{2} = flux_out;
-if nout == 3
-    if exist('A', 'var')
-        varargout{3} = A; 
-    else
-        varargout{3} = []; 
-    end
-end
+if nout > 2, varargout{3} = A; end
+if nout > 3, varargout{4} = DSA_iterations; end
 % Clear Command Line Text
 if glob.print_info, fprintf(rev_str); end
 
@@ -167,23 +162,21 @@ for f=1:mesh.TotalBoundaryFaces
     ndat.Transport.IncomingCurrents{ff} = zeros(fdn,ng);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [x, A] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, x, x0, A)
+function [x, A, DSA_it] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, x, x0, A)
 % Form scalar flux differences
 for g=1:ndat.numberEnergyGroups
     x0{g} = x{g,1} - x0{g,1};
 end
 % Switch based on DSA type
 if strcmp(ndat.Transport.DSAType, 'MIP')
-    [x0, A] = perform_MIP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
+    [x0, A, DSA_it] = perform_MIP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 elseif strcmp(ndat.Transport.DSAType, 'IP')
-    [x0, A] = perform_IP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
+    [x0, A, DSA_it] = perform_IP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 elseif strcmp(ndat.Transport.DSAType, 'M4S')
-    [x0, A] = perform_M4S_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
+    [x0, A, DSA_it] = perform_M4S_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 end
-
 % Add DSA correction
 for g=1:ndat.numberEnergyGroups
     x{g,1} = x{g,1} + x0{g};
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

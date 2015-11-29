@@ -2,8 +2,8 @@ function [data, geometry] = load_user_input()
 global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.Path = 'Transport/Searchlight/MAXENT_k2';
-data.problem.Name = 'cart_Irr=1_type=0_tol=0.2';
+data.problem.Path = 'Transport/Searchlight';
+data.problem.Name = 'tri_Irr=1_type=0_tol=0.1';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -12,8 +12,8 @@ data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 16;
-data.problem.refinementTolerance = 0.2;
+data.problem.refinementLevels = 24;
+data.problem.refinementTolerance = 0.1;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
@@ -64,6 +64,10 @@ data.Neutronics.Transport.BCVals = [0.0; 0.515];
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 0;
 data.Neutronics.Transport.DSAType = 'MIP';
+data.Neutronics.Transport.DSASolveMethod = 'direct';
+data.Neutronics.Transport.DSAPreconditioner = 'Jacobi';
+data.Neutronics.Transport.DSATolerance = 1e-4;
+data.Neutronics.Transport.DSAMaxIterations = 1e4;
 data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
@@ -79,15 +83,15 @@ data.solver.kyrlovSubspace = [];
 data.problem.Dimension = 2;
 L = 1; ncells = 5;
 
-% tx = linspace(0,L,ncells+1);
-% [x,y]=meshgrid(tx,tx);
-% x=x(:);y=y(:);
-% tri = delaunayTriangulation(x,y);
-% geometry = GeneralGeometry(2, 'Delaunay', tri);
+tx = linspace(0,L,ncells+1);
+[x,y]=meshgrid(tx,tx);
+x=x(:);y=y(:);
+tri = delaunayTriangulation(x,y);
+geometry = GeneralGeometry(2, 'Delaunay', tri);
 
-x=linspace(0,L,ncells+1);
-y=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(2,x,y);
+% x=linspace(0,L,ncells+1);
+% y=linspace(0,L,ncells+1);
+% geometry = CartesianGeometry(2,x,y);
 
 % Set Boundary Flags
 geometry.set_face_flag_on_surface(2,[0,.2*L;0,.4*L]);
