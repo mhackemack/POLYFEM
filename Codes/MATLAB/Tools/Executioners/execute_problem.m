@@ -31,9 +31,7 @@ data = prepare_problem_execution(data, geometry);
 [data, sol] = pcall(data, geometry, DoF, FE, sol);
 sol.CellVertexNumbers = geometry.CellVertexNumbers;
 % Calculate MMS Error if necessary
-if mms
-    sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux);
-end
+if mms, sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux); end
 % Plot solution for viewer to see
 if data.problem.plotSolution
     glob.plot_counter = glob.plot_counter + 1;
@@ -92,9 +90,7 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         sol{r} = tsol;
         sol{r}.CellVertexNumbers = geometry.CellVertexNumbers;
         % Calculate MMS Error if necessary
-        if mms
-            sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux);
-        end
+        if mms, sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux); end
         % Save off output objects if necessary
         if data.problem.saveSolution
             save([f_name,'_data',o_str,'.mat'], 'data');
