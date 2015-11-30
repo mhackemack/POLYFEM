@@ -70,86 +70,13 @@ end
 h = get_max_diamter( verts );
 f_dofs = get_face_dofs(nv, faces, order);
 % Calculate quadrature points and basis function values
+[qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
 if order == 1
-    [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
     [bmv, gmv] = max_entropy_O1_basis_functions(verts, qx_v, faces, order, nverts);
     [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, order, q_ord, h);
 elseif order == 2
-    % Hard code quadrature orders for right now...
-    [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
     [bmv, gmv] = max_entropy_O2_basis_functions(verts, qx_v, faces, order, nverts);
     [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, order, q_ord, h);
-%     bmv = max_entropy_O2_basis_functions(verts, qx_v, faces, order, nverts);
-%     gmv = zeros(ntot, dim, nqx);
-%     [bmv, tgmv] = max_entropy_O2_basis_functions(verts, qx_v, faces, order, nverts);
-%     [rqx, rqw] = get_legendre_gauss_quad(2);
-%     fc = mean(verts); iqx = zeros(nf*2,2); iqw = zeros(nf*2,1); nin = zeros(nf,2);
-%     % Loop through and get inner integration points
-%     it = [1;1];
-%     for f=1:nf
-%         ff = 2*(f-1)+1:2*f;
-%         v0 = verts(f,:);
-%         dx = fc - v0; len = norm(dx);
-%         nin(f,:) = [dx(2), -dx(1)]/len;
-%         iqx(ff,:) = it*v0 + rqx*dx;
-%         iqw(ff,:) = rqw*len;
-%     end
-%     ibmv = max_entropy_O2_basis_functions(verts, iqx, faces, order, nverts);
-%     % Make corrections
-%     for f=1:nf
-%         fv = faces{f}; fverts = verts(fv,:); fdofs = f_dofs{f};
-%         iiv = 3*(f-1)+1:3*f;
-%         ii = [f,mod(f,nf)+1];
-%         iis1 = 2*(ii(1)-1)+1:2*ii(1);
-%         iis2 = 2*(ii(2)-1)+1:2*ii(2);
-%         dx = diff(fverts); n = [dx(2), -dx(1)]/norm(dx);
-%         this_nf = [-nin(ii(1),:);nin(ii(2),:);n];
-%         tqx = qx_v(iiv,:)'; tqw_v = qw_v(iiv)';
-%         int_bv = tqw_v * bmv(iiv,:);
-%         % Build LHS matrix
-%         A = zeros(3); 
-%         A(1,:) = 1; A(2,:) = tqx(1,:); A(3,:) = tqx(2,:);
-%         A = A.*(qw_v(iiv)*[1,1,1]);
-%         % Construct RHS terms
-%         tbms = bms{f};
-%         fx = zeros(3,ntot); fy = zeros(3,ntot);
-%         fx(2,:) = -int_bv;  fy(3,:) = -int_bv;
-%         % Face 1 - 1st interior
-%         ttbb = ibmv(iis1,:);
-%         fx(1,:) = fx(1,:) +  iqw(iis1)'*ttbb*this_nf(1,1);
-%         fy(1,:) = fy(1,:) +  iqw(iis1)'*ttbb*this_nf(1,2);
-%         fx(2,:) = fx(2,:) + (iqw(iis1).*iqx(iis1,1))'*ttbb*this_nf(1,1);
-%         fy(2,:) = fy(2,:) + (iqw(iis1).*iqx(iis1,1))'*ttbb*this_nf(1,2);
-%         fx(3,:) = fx(3,:) + (iqw(iis1).*iqx(iis1,2))'*ttbb*this_nf(1,1);
-%         fy(3,:) = fy(3,:) + (iqw(iis1).*iqx(iis1,2))'*ttbb*this_nf(1,2);
-%         % Face 2 - 2nd interior
-%         ttbb = ibmv(iis2,:);
-%         fx(1,:) = fx(1,:) +  iqw(iis2)'*ttbb*this_nf(2,1);
-%         fy(1,:) = fy(1,:) +  iqw(iis2)'*ttbb*this_nf(2,2);
-%         fx(2,:) = fx(2,:) + (iqw(iis2).*iqx(iis2,1))'*ttbb*this_nf(2,1);
-%         fy(2,:) = fy(2,:) + (iqw(iis2).*iqx(iis2,1))'*ttbb*this_nf(2,2);
-%         fx(3,:) = fx(3,:) + (iqw(iis2).*iqx(iis2,2))'*ttbb*this_nf(2,1);
-%         fy(3,:) = fy(3,:) + (iqw(iis2).*iqx(iis2,2))'*ttbb*this_nf(2,2);
-%         % Face 3 - cell boundary
-%         ttbb = zeros(length(qw_s{f}),ntot);
-%         ttbb(:,fdofs) = tbms;
-%         tqws = qw_s{f}; tqxs = qx_s{f};
-%         fx(1,:) = fx(1,:) +  tqws'*ttbb*this_nf(3,1);
-%         fy(1,:) = fy(1,:) +  tqws'*ttbb*this_nf(3,2);
-%         fx(2,:) = fx(2,:) + (tqws.*tqxs(:,1))'*ttbb*this_nf(3,1);
-%         fy(2,:) = fy(2,:) + (tqws.*tqxs(:,1))'*ttbb*this_nf(3,2);
-%         fx(3,:) = fx(3,:) + (tqws.*tqxs(:,2))'*ttbb*this_nf(3,1);
-%         fy(3,:) = fy(3,:) + (tqws.*tqxs(:,2))'*ttbb*this_nf(3,2);
-%         % Loop through basis functions and compute smoothed gradients
-%         for i=1:ntot
-%             % x-direction
-%             tgx = A\fx(:,i);
-%             gmv(i,1,iiv) = tgx';
-%             % y-direction
-%             tgy = A\fy(:,i);
-%             gmv(i,2,iiv) = tgy';
-%         end
-%     end
 end
 % mass matrix
 for q=1:nqx
