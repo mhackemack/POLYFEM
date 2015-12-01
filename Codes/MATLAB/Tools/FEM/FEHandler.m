@@ -82,6 +82,7 @@ classdef FEHandler < handle
         use_only_poly_quad = false
         
         bf_cell_func
+        basis_eval_func
         volume_func
         surface_func
         quadrature_func
@@ -535,6 +536,11 @@ classdef FEHandler < handle
         % Get surface function matrix by face number
         function out = get_face_function_matrix(obj, faceID)
             out = obj.FaceFunctionMatrix{faceID};
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Get basis evaluation functor
+        function out = get_basis_eval_func(obj)
+            out = @obj.basis_eval_func;
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end

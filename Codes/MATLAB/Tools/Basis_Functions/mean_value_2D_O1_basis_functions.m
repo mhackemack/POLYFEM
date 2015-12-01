@@ -1,3 +1,19 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Title:          Linear Mean Value (2D) Basis Function Generator
+%
+%   Author:         Michael W. Hackemack
+%   Institution:    Texas A&M University
+%   Year:           2014
+%
+%   Description:    MATLAB script to produce the basis function and gradient
+%                   values using the Maximum Entropy Methodology.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Notes:
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = mean_value_2D_O1_basis_functions(verts, xin, faces, varargin)
 nout = nargout;
 % check if any input
@@ -40,9 +56,6 @@ for i=1:nv
         v = [i,i+1];
     end
     vt = [xx(v(1),:);xx(v(2),:)]';
-    if vdim == 3
-        vt = [vt,[0;0;0]];
-    end
     A(i) = (det(vt));
     D(i) = dot(xx(v(1),:),xx(v(2),:));
     if abs(A(i)) < 1e-14 && D(i) < 0
@@ -105,15 +118,9 @@ for i=1:nv
     t2 = tan(ang2/2);
     c1 = e1/r1 - e2/r2;
     c2 = e2/r2 - e3/r3;
-    if dim == 2
-        R(i,:) = t1/(t1+t2)*[-c1(2),c1(1)]/sin(ang1) + t2/(t1+t2)*[-c2(2),c2(1)]/sin(ang2) + e2/r2;
-    elseif dim == 3
-        
-%         R(i,:) = (t1/(t1+t2))/sin(ang1)*[-c1(2),c1(1)] + (t2/(t1+t2))/sin(ang2)*[-c2(2),c2(1)] + e2/r2;
-    end
+    R(i,:) = t1/(t1+t2)*[-c1(2),c1(1)]/sin(ang1) + t2/(t1+t2)*[-c2(2),c2(1)]/sin(ang2) + e2/r2;
 end
 for i=1:nv
     grad(i,:) = val(i)*(R(i,:) - val*R);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
