@@ -18,8 +18,8 @@
 clear; clc; close all; format long e
 % Set all user input information necessary
 % ------------------------------------------------------------------------------
-data.file_name = 'Z:\PDT\pdt_inputs\work_inputs\Simple_TG_Testing\pdt-99g_ni58.cx';
-data.out_dir = 'inputs/Ni58_99G';
+data.file_name = 'Z:\PDT\pdt_inputs\work_inputs\Simple_TG_Testing\pdt-99g-poly_h-1.cx';
+data.out_dir = 'inputs/PolyH1_99G';
 data.num_groups = 99;           % removes some parsing burden
 data.iscat = 8;                 % make sure this one is correct
 data.scatt_enums = [2500,2501,2519]; % scattering kernels
