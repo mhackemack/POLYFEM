@@ -19,5 +19,5 @@ clear; clc; close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 global glob; glob = get_globals('Home');
 inp = '';
-addpath(['inputs/',inp]); % This one must be last to properly switch input files
+addpath(['inputs/InfMedium_AllComponents',inp]); % This one must be last to properly switch input files
 % ------------------------------------------------------------------------------
