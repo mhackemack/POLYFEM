@@ -1,6 +1,6 @@
 function out = get_globals( s )
 % Numbers
-%%%%%%%%%
+% ------------------------------------------------------------------------------
 out.small = 1e-14;
 out.large = 1/eps/10;
 if strcmp(s, 'Home')
@@ -13,7 +13,7 @@ else
     out.maxSparse = 6e4;
 end
 % Constants
-%%%%%%%%%%%
+% ------------------------------------------------------------------------------
 out.speed_of_light = 2.99792458e10;
 out.planck = 6.62606957e-34;
 out.boltzmann_ev = 8.6173324e-5;
@@ -29,28 +29,9 @@ out.amu_to_MeV = 931.5016;
 out.MeV_to_J = 1.601892e-13;
 out.J_to_MeV = 6.2415065e12;
 % Miscellaneous
-%%%%%%%%%%%%%%%
-out.input_path = 'user_inputs/';
-out.output_path = '../Outputs/';
-out.geom_path = '/geometry_inputs/precompiled/';
-out.geom_raw_tri_tet_path = 'geometry_inputs/raw_tri_tet_files/';
-out.geom_raw_dg_path = 'geometry_inputs/raw_dg_files/';
-out.directory = [];
+% ------------------------------------------------------------------------------
+out.input_path = 'inputs/';
+out.output_path = 'outputs/';
+out.XS_path = 'XSFiles/';
 out.print_info = true;
-% Global Face Condition Types
-% ---------------------------
-out.Periodic = -1;
-out.Interior = 0;
-% Boundary Conditions
-% -------------------
-out.Dirichlet = 1;
-out.Neumann = 2;
-out.Robin = 3;
-out.Function = 4;
-% Transport Boundary Conditions
-% -----------------------------
-out.Vacuum = 1;
-out.Reflecting = 2;
-out.IncidentIsotropic = 3;
-out.IncidentCurrent = 4;
-out.IncidentBeam = 5;
+
