@@ -14,6 +14,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = load_user_input()
+data.OutputName = 'IM1_Materials';
 data.Energy.NumberEngeryGroups = 99;
 data.Energy.FastGroups = 1:42;
 data.Energy.ThermalGroups = 43:99;
