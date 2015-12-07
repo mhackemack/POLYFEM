@@ -182,7 +182,7 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
-%                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + M/2;
+%                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + 2*kp*M;
                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
             end
@@ -320,7 +320,7 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
-%                 tfmat = M/2;
+%                 tfmat = 2*kp*M;
 %                 I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tfmat(:)];
                 tcmat = -0.5*D*(G + G'); tfmat = kp*M;
                 I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
