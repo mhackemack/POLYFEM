@@ -10,7 +10,13 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Input Space:    
+%   A Matrix Notes: To determine the quadratic to serendipity transformation
+%                   matrix (xi=A*mu), we utilize the Moore-Penrose psuedoinverse.
+%                   Eliminating each diagonal entry provides an underdetermined
+%                   system of equations. Given a (6x2v) system of constraint
+%                   equations, L, the pseudoinverse is L'*(L*L')^(-1).
+%
+%                   https://en.wikipedia.org/wiki/Moore-Penrose_pseudoinverse
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = barycentric_serendipity_Rev1(varargin)
@@ -37,6 +43,7 @@ bout = zeros(nqx, ntot); gout = zeros(ntot,dim,nqx);
 if nout > 1, grad_bool = true; end
 h = get_max_diamter( verts ); h0 = eye(dim)/h;
 scaled_verts = (h0*verts')'; qx = (h0*qx')';
+[ser_verts, ser_nodes] = get_serendipity_nodes(nverts, scaled_verts, faces);
 % rva = get_vertex_differences( scaled_verts, qx );
 quad_pairs = get_quad_pairings(nverts);
 diag_pairs = get_diag_pairings(nverts, quad_pairs); num_dp = size(diag_pairs,1);
@@ -49,7 +56,7 @@ else
 end
 % Build Quadratic Serendipity Basis Function Space
 % ------------------------------------------------------------------------------
-A = get_quad_pairing_transformation(scaled_verts, quad_pairs, diag_pairs);
+A = get_quad_pairing_transformation(ser_verts, ser_nodes, quad_pairs, diag_pairs);
 q_vals = blin(:,quad_pairs(:,1)).*blin(:,quad_pairs(:,2));
 for q=1:nqx
     bout(q,:) = A*q_vals(q,:)';
@@ -98,19 +105,15 @@ for i=1:nv
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function rv = get_vertex_differences( verts, qx )
-[nv, dim] = size(verts);
-nvones = ones(nv,1);
-nqx = size(qx, 1);
-rv = zeros(2*nv, dim, nqx);
-for q=1:nqx
-    rv(1:nv,:,q) = verts - nvones*qx(q,:);
-    for i=1:nv
-        an = nv + i;
-        ii = [i,mod(i,nv)+1];
-        fc = (verts(ii(1),:) + verts(ii(2),:))/2;
-        rv(an,:,q) = fc - qx(q,:);
-    end
+function [ser_verts, ser_nodes] = get_serendipity_nodes(nverts, verts, faces)
+dim = size(verts,2);
+ser_verts = zeros(2*nverts, dim);
+ser_nodes = zeros(2*nverts, 2); ser_nodes(1:nverts,:) = [(1:nverts)',(1:nverts)'];
+ser_verts(1:nverts,:) = verts;
+for f=1:length(faces)
+    fv = faces{f};
+    ser_verts(nverts+f,:) = (verts(fv(1),:) + verts(fv(2),:))/2;
+    ser_nodes(nverts+f,:) = fv;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function quad_pairs = get_quad_pairings(nv)
@@ -157,12 +160,47 @@ for i=1:nq
     out(i,6) = nv + tqp(2);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function A = get_quad_pairing_transformation(verts, quad_pairs, diag_pairs)
-nv = size(verts,1); nqp = size(quad_pairs,1);
-A = zeros(2*nv, nqp); A(1:2*nv,1:2*nv) = eye(2*nv);
+% function A = get_quad_pairing_transformation(verts, ser_nodes, quad_pairs, diag_pairs)
+% nv = size(verts,1); nqp = size(diag_pairs,1);
+% A = zeros(nv, size(quad_pairs,1)); A(1:nv,1:nv) = eye(nv);
+% tL = zeros(6,nv); %tq = zeros(6,1);
+% % tL = zeros(6); tq = zeros(6,1);
+% % Loop through interior diagonal pairs
+% d = nv;
+% for i=1:nqp
+%     d = d + 1;
+%     va = verts(quad_pairs(d,1),:);
+%     vb = verts(quad_pairs(d,2),:);
+%     L = tL;
+%     % Loop through all serendipity nodes
+%     for j=1:nv
+%         v1 = verts(ser_nodes(j,1),:); v2 = verts(ser_nodes(j,2),:);
+%         t = v1'*v2/2 + v2'*v1/2;
+%         % c-constraint
+%         L(1,j) = 1;
+%         % x-constraint
+%         L(2,j) = verts(j,1);
+%         % y-constraint
+%         L(3,j) = verts(j,2);
+%         % x_x-constraint
+%         L(4,j) = t(1,1);
+%         % y_y-constraint
+%         L(5,j) = t(2,2);
+%         % x_y-constraint
+%         L(6,j) = t(1,2);
+%     end
+%     % Apply right-hand side
+%     q = [1;(va(1)+vb(1))/2;(va(2)+vb(2))/2;va(1)*vb(1);va(2)*vb(2);(va(1)*vb(2)+va(2)*vb(1))/2];
+%     t = L'*((L*L')\q); t(abs(t) < 1e-14) = 0;
+%     A(:,d) = t;
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function A = get_quad_pairing_transformation(verts, ser_nodes, quad_pairs, diag_pairs)
+nv = size(verts,1); nqp = size(diag_pairs,1);
+A = zeros(nv, nqp); A(1:nv,1:nv) = eye(nv);
 tL = zeros(6); tq = zeros(6,1);
 % Loop through interior diagonal pairs
-d = 2*nv;
+d = nv;
 for i=1:nqp
     d = d + 1;
     va = verts(quad_pairs(d,1),:);
@@ -172,16 +210,21 @@ for i=1:nqp
     % c-constraint
     L(1,:) = 1; q(1) = 1;
     % x-constraint
-%     L(2,:) = ; q(2) = (va(1) + vb(1))/2;
+    L(2,:) = verts(tdp,1); q(2) = (va(1) + vb(1))/2;
     % y-constraint
-%     L(3,:) = ; q(3) = (va(2) + vb(2))/2;
+    L(3,:) = verts(tdp,2); q(3) = (va(2) + vb(2))/2;
     % x_x-constraint
+    L(4,:) = (verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),1))';
     q(4) = va(1)*vb(1);
     % y_y-constraint
+    L(5,:) = (verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),2))';
     q(5) = va(2)*vb(2);
     % x_y-constraint
+    L(6,:) = ((verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),2))')/2 + ...
+             ((verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),1))')/2;
     q(6) = (va(1)*vb(2) + va(2)*vb(1))/2;
     % Solve and apply constraint
-    A(tdp,d) = L\q;
+    t = L'*((L*L')\q); t(abs(t) < 1e-14) = 0;
+    A(tdp,d) = t;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

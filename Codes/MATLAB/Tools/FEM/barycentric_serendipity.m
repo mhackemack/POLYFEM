@@ -37,7 +37,7 @@ if nout == 2
     end
 end
 A = get_quad_pairing_transformation(nv, v, vind, diag_pairs);
-% B = get_lagrange_transformation(nv);
+B = get_lagrange_transformation(nv);
 % Perform Transformations
 % ------------------------------------------------------------------------------
 ser_vals = zeros(nx, 2*nv);
@@ -45,14 +45,14 @@ ser_grads = zeros(2*nv, dim, nx);
 for i=1:nx
     ser_vals(i,:) = A*q_vals(i,:)';
 end
-% for i=1:nx
+for i=1:nx
 %     ser_vals(i,:) = (B*(A*q_vals(i,:)'))';
 %     if grad_bool
 %         for d=1:dim
 %             ser_grads(:,d,i) = (B*(A*q_grads(:,d,i)))';
 %         end
 %     end
-% end
+end
 % Set Outputs
 % -----------
 varargout{1} = ser_vals;
