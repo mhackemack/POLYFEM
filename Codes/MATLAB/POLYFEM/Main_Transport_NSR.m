@@ -25,8 +25,8 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ---------------------
 global glob
-glob = get_globals('Home');
-glob.print_info = true;
+glob = get_globals('Office');
+glob.print_info = false;
 
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,7 +45,7 @@ mfp_lower = 3; mfp_upper = 51;
 mfp_min = 0; mfp_max = 3;
 mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
-diff_type = 'MIP'; C_IP = [1/2];
+diff_type = 'MIP'; C_IP = [4];
 % End user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
