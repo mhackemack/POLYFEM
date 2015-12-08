@@ -37,7 +37,7 @@ if nout == 2
     end
 end
 A = get_quad_pairing_transformation(nv, v, vind, diag_pairs);
-B = get_lagrange_transformation(nv);
+% B = get_lagrange_transformation(nv);
 % Perform Transformations
 % ------------------------------------------------------------------------------
 ser_vals = zeros(nx, 2*nv);
