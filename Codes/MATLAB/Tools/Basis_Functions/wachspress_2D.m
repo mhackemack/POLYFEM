@@ -8,7 +8,7 @@ nx = size(xin,1);
 % get Wachpress interpolant values/grads
 varargout{1} = get_values(verts, xin, nv, nx);
 if nout == 2, varargout{2} = get_grads(verts, xin, varargout{1}, nv, nx, dim); end
-return
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %                               Function Lists

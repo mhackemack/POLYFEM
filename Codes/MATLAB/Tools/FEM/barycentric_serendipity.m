@@ -55,17 +55,20 @@ for i=1:nx
 end
 % Set Outputs
 % -----------
+ser_vals(:,nv+1:end) = 2*ser_vals(:,nv+1:end);
 varargout{1} = ser_vals;
-if grad_bool
-    dqp = quad_pairs(2*nv+1:end,:);
-    for i=1:2*nv
-        dvals = A(i,2*nv+1:end);
-        for j=1:nx
-            
-        end
-    end
-    varargout{2} = ser_grads;
-end
+% if grad_bool
+%     % Loop through all serendipity points
+%     for q=1:nx
+%         for i=1:2*nv
+%             tt = [0,0];
+%             t1 = quad_pairs(i,1); t2 = quad_pairs(i,2);
+%             tt = tt + blin(q,t1)*glin(t2,:,q);
+%             tt = tt + blin(q,t2)*glin(t1,:,q);
+%         end
+%     end
+%     varargout{2} = ser_grads;
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               Function List
@@ -149,7 +152,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_a_prime_matrix(nd, nv, v, vind, diag_pairs)
 out = zeros(2*nv, nd);
-% ap = [1,1,2,2,2,2];
 for i=1:nd
     cvec = zeros(6, 1);
     % get rotation information for each diagonal

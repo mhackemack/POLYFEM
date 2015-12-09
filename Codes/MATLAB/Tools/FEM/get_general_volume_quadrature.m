@@ -16,7 +16,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [qx, qw] = get_general_volume_quadrature(verts, faces, deg, poly_bool)
 % Get General Input Information 
-% -----------------------------
+% ------------------------------------------------------------------------------
 [nverts, dim] = size(verts);
 if dim == 1
     [qx, qw] = lgwt(deg, verts(1), verts(2));
@@ -30,13 +30,13 @@ rcenter = mean(verts);
 ctype = get_cell_type(nverts, dim, nfaces);
 nvs = get_number_side_volumes(dim, ctype, faces, poly_bool);
 % Get Quadrature Prelims
-% ----------------------
+% ------------------------------------------------------------------------------
 [rqx, rqw] = get_reference_quadrature(ctype, dim, deg, poly_bool);
 nrqx = length(rqw); nqx  = nvs*nrqx;
 qx   = zeros(nqx, dim);
 qw   = zeros(nqx,1);
 % Get Quadrature Set
-% ------------------
+% ------------------------------------------------------------------------------
 if ctype == 3 || poly_bool
     for f=1:nfaces
         ff = faces{f}; nf = length(ff);
