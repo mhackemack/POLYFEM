@@ -17,7 +17,7 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Home');
+global glob; glob = get_globals('Office');
 inp = 'EIR2';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
@@ -31,10 +31,10 @@ dat_in.SnLevels = 8;
 dat_in.AzimuthalLevels = 14;
 dat_in.PolarLevels = 2;
 % ---
-dat_in.refinementLevels = 2;
+dat_in.refinementLevels = 4;
 dat_in.AMRIrregularity = 1;
-dat_in.refinementTolerance = 0;
-dat_in.projectSolution = 0;
+dat_in.refinementTolerance = 0.2;
+dat_in.projectSolution = 1;
 % ---
 dat_in.DSASolveMethod = 'direct';
 % Load data and perform error checking

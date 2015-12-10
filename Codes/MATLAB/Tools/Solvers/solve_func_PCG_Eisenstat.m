@@ -31,7 +31,8 @@ for iter=1:maxit
     denom = dot(p,Ap);
     a = r_rp/denom;
     
-    tmp = backward_substitution(D, L, p);
+    tmp = (diag(D) + L)'\p;
+%     tmp = backward_substitution(D, L, p);
     x = x + a*tmp;
     r = r - a*Ap;
     
@@ -44,13 +45,13 @@ for iter=1:maxit
     end
      p = rp + bb*p;
 end
-
+return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = residual_norm(x,y)
 out = sqrt(sum(x.*y));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = forward_substitution(D, L, b)
-n = length(b); out = zeros(n,1);
+n = length(b); out = b;
 out(1) = b(1)/D(1,1);
 % Loop forwards through vector length
 for i=2:n
@@ -58,22 +59,24 @@ for i=2:n
     for j=1:length(col)
         out(i) = out(i) - c(col(j))*out(col(j));
     end
-    out(i) = out(i) / diag(i);
+    out(i) = out(i) / D(i);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = backward_substitution(D, L, b)
-n = length(b); out = zeros(n,1);
+n = length(b); out = b;
 % Loop backwards through vector length
 for i=n:-1:1
     out(i) = b(i);
     c = L(i,:); [~,col] = find(c);
+    tcol = n-col+1;
     for j=1:length(col)
-        out(i) = out(i) - c(col(j))*out(col(j));
+        out(i) = out(i) - c(col(j))*out(tcol(j));
     end
     out(i) = out(i) / D(i);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = compute_Ap(D, L, p)
-t = backward_substitution(D, L, p);
+t = (diag(D) + L)'\p;
+% t = backward_substitution(D, L, p);
 out = t + forward_substitution(D, L, p - D.*t);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

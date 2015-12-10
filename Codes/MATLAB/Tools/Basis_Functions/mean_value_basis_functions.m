@@ -19,25 +19,25 @@ global glob
 nout = nargout;
 grad_bool = false;
 % Collect Input Arguments
-% -----------------------
+% ------------------------------------------------------------------------------
 verts = varargin{1};
 qx = varargin{2};
 faces = varargin{3};
 % Prepare Vertices and Dimensional Space
-% --------------------------------------
+% ------------------------------------------------------------------------------
 [nverts, dim] = size(verts);
 nqx = size(qx, 1);
 % Allocate Matrix Memory
-% ----------------------
+% ------------------------------------------------------------------------------
 if nout > 1, grad_bool = true; end
 ntot = get_num_serendipity_points( dim, nverts, length(faces), 1);
 bout = zeros(nqx, ntot);
 if grad_bool, gout = zeros(ntot, dim, nqx); end
 % Get Problem Preliminaries
-% -------------------------
+% ------------------------------------------------------------------------------
 [rv, sv] = get_vertex_differences(verts, qx);
 % Build Basis Function Sets
-% -------------------------
+% ------------------------------------------------------------------------------
 if dim == 2
     [bout, R] = mv2D(bout, rv, sv, grad_bool);
 elseif dim == 3
@@ -45,7 +45,7 @@ elseif dim == 3
 end
 if grad_bool, gout = get_basis_gradients(bout, R); end
 % Set Output Arguments
-% --------------------
+% ------------------------------------------------------------------------------
 varargout{1} = bout;
 if grad_bool, varargout{2} = gout; end
 

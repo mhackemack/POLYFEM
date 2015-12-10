@@ -45,6 +45,7 @@ disp(['   -> Number of Refinement Flags: ',num2str(num_new_cells)])
 c_count = mesh.TotalCells; f_count = mesh.TotalFaces; v_count = mesh.TotalVertices;
 rev_str = [];
 mesh.allocate_more_memory(0,num_new_cells*3,0);
+mesh.PreviousCell = (1:mesh.TotalCells)';
 mesh.CellRefinedLastCycle = false(mesh.TotalCells,1);
 for c=1:num_new_cells
     msg = sprintf('      -> Refining Cell: %d of %d',c,num_new_cells);

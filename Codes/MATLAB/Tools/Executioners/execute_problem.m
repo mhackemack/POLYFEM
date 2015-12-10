@@ -76,8 +76,8 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         r = iter + 1;
         % Save old objects for flux interpolation if necessary
         if data.problem.projectSolution
-            data0 = data;
             DoF0  = DoF;
+            FE0 = FE;
         end
         % Form new mesh/DoFHandler/FEHandler
         refine_problem_mesh(data, geometry, DoF, FE, sol{r-1}.flux); % This works because of pass-by-reference
@@ -87,7 +87,7 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         [data.Neutronics, sol{r}] = solution_allocation(data.Neutronics, geometry, DoF);
         % Interpolate flux solutions to next refinement level
         if data.problem.projectSolution
-            [data,sol{r}.flux] = interpolate_ref_flux(data0,data,geometry,DoF0,DoF,sol{r-1}.flux,sol{r}.flux);
+            sol{r}.flux = interpolate_ref_flux_Rev1(geometry,DoF0,DoF,FE0,sol{r-1}.flux);
         end
         % Compute new flux solution
         [data, tsol] = pcall(data, geometry, DoF, FE, sol{r});

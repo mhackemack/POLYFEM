@@ -591,85 +591,87 @@ classdef FEHandler < handle
             elseif strcmp(bbname, 'PWLD')
                 obj.BasisType = 3;
                 obj.bf_cell_func = @bf_cell_func_PWLD;
-                obj.volume_func = @PWLD_volume;
-                obj.surface_func = @PWLD_surface;
-                obj.quadrature_func = @PWLD_quad_gen;
+                obj.basis_eval_func = @PWLD_basis_functions;
+%                 obj.volume_func = @PWLD_volume;
+%                 obj.surface_func = @PWLD_surface;
+%                 obj.quadrature_func = @PWLD_quad_gen;
             elseif strcmp(bbname, 'WACHSPRESS')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_Wachspress;
-                obj.volume_func = @wachspress_volume;
-                obj.surface_func = @wachspress_surface;
-                obj.quadrature_func = @eval_quad_gen;
-                obj.eval_volume_func = @wachspress_basis_functions;
-                obj.eval_surface_func = @wachspress_basis_functions;
+%                 obj.volume_func = @wachspress_volume;
+%                 obj.surface_func = @wachspress_surface;
+%                 obj.quadrature_func = @eval_quad_gen;
+%                 obj.eval_volume_func = @wachspress_basis_functions;
+%                 obj.eval_surface_func = @wachspress_basis_functions;
             elseif strcmp(bbname, 'MV')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_MV;
-                obj.volume_func = @mean_value_volume;
-                obj.surface_func = @mean_value_surface;
-                obj.quadrature_func = @eval_quad_gen;
-                obj.eval_volume_func = @mean_value_basis_functions;
-                obj.eval_surface_func = @mean_value_basis_functions;
+%                 obj.volume_func = @mean_value_volume;
+%                 obj.surface_func = @mean_value_surface;
+%                 obj.quadrature_func = @eval_quad_gen;
+%                 obj.eval_volume_func = @mean_value_basis_functions;
+%                 obj.eval_surface_func = @mean_value_basis_functions;
             elseif strcmp(bbname, 'HARMONIC')
                 obj.BasisType = 4;
-                obj.volume_func = @obj.eval_volume_ints;
-                obj.surface_func = @obj.eval_surface_ints;
-                obj.quadrature_func = @obj.eval_quad_gen;
+%                 obj.volume_func = @obj.eval_volume_ints;
+%                 obj.surface_func = @obj.eval_surface_ints;
+%                 obj.quadrature_func = @obj.eval_quad_gen;
             elseif strcmp(bbname, 'MAXENT') || strcmp(bbname, 'MAX_ENT')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_max_entropy;
-                obj.volume_func = @max_entropy_volume;
-                obj.surface_func = @max_entropy_surface;
-                obj.quadrature_func = @eval_quad_gen;
-                obj.eval_volume_func = @max_entropy_basis_functions;
-                obj.eval_surface_func = @max_entropy_basis_functions;
+                obj.basis_eval_func = @max_entropy_basis_functions;
+%                 obj.volume_func = @max_entropy_volume;
+%                 obj.surface_func = @max_entropy_surface;
+%                 obj.quadrature_func = @eval_quad_gen;
+%                 obj.eval_volume_func = @max_entropy_basis_functions;
+%                 obj.eval_surface_func = @max_entropy_basis_functions;
             elseif strcmp(bbname, 'METRIC')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_Metric;
-                obj.quadrature_func = @eval_quad_gen;
-                obj.eval_volume_func = @metric_basis_functions;
-                obj.eval_surface_func = @metric_basis_functions;
-            else
-                slength = length(bbname);
-                if strcmp(bbname(1:11), 'BARYCENTRIC')
-                    snum = find_dash_mark_in_string(bbname);
-                    if snum == 13
-                        obj.BasisType = 4;
-                        bename = bbname(15:end);
-                    elseif slength >= 23
-                        if strcmp(bbname(1:23), 'BARYCENTRIC SERENDIPITY')
-                            bename = bbname(27:end);
-                            if obj.Degree == 1
-                                obj.BasisType = 4;
-                            else
-                                obj.BasisType = 5;
-                            end
-                        else
-                            error(['Cannot read basis set name: ',obj.BasisName])
-                        end
-                    end
-                    % Assign matrix construction routines
-                    % -----------------------------------
-                    obj.volume_func = @obj.eval_volume_ints;
-                    obj.surface_func = @obj.eval_surface_ints;
-                    obj.quadrature_func = @obj.eval_quad_gen;
-                    % Assign basis function generator routines
-                    % ----------------------------------------
-                    if strcmp(bename, 'MV')
-                        obj.eval_volume_func = @mean_value_basis_functions;
-                        obj.eval_surface_func = @mean_value_basis_functions;
-                    elseif strcmp(bename, 'WACHSPRESS')
-                        obj.eval_volume_func = @wachspress_basis_functions;
-                            obj.eval_surface_func = @wachspress_basis_functions;
-                    elseif strcmp(bename, 'PWLD')
-                        obj.increase_quad_degree = true;
-                        obj.use_only_poly_quad = true;
-                        obj.eval_volume_func = @PWLD_basis_functions_volume;
-                        obj.eval_surface_func = @PWLD_basis_functions_surface;
-                    end
-                else
-                    error(['Cannot read basis set name: ',obj.BasisName])
-                end
+%                 obj.quadrature_func = @eval_quad_gen;
+%                 obj.eval_volume_func = @metric_basis_functions;
+%                 obj.eval_surface_func = @metric_basis_functions;
+%             else
+%                 slength = length(bbname);
+%                 if strcmp(bbname(1:11), 'BARYCENTRIC')
+%                     snum = find_dash_mark_in_string(bbname);
+%                     if snum == 13
+%                         obj.BasisType = 4;
+%                         bename = bbname(15:end);
+%                     elseif slength >= 23
+%                         if strcmp(bbname(1:23), 'BARYCENTRIC SERENDIPITY')
+%                             bename = bbname(27:end);
+%                             if obj.Degree == 1
+%                                 obj.BasisType = 4;
+%                             else
+%                                 obj.BasisType = 5;
+%                             end
+%                         else
+%                             error(['Cannot read basis set name: ',obj.BasisName])
+%                         end
+%                     end
+%                     % Assign matrix construction routines
+%                     % -----------------------------------
+%                     obj.volume_func = @obj.eval_volume_ints;
+%                     obj.surface_func = @obj.eval_surface_ints;
+%                     obj.quadrature_func = @obj.eval_quad_gen;
+%                     % Assign basis function generator routines
+%                     % ----------------------------------------
+%                     if strcmp(bename, 'MV')
+%                         obj.eval_volume_func = @mean_value_basis_functions;
+%                         obj.eval_surface_func = @mean_value_basis_functions;
+%                     elseif strcmp(bename, 'WACHSPRESS')
+%                         obj.eval_volume_func = @wachspress_basis_functions;
+%                             obj.eval_surface_func = @wachspress_basis_functions;
+%                     elseif strcmp(bename, 'PWLD')
+%                         obj.increase_quad_degree = true;
+%                         obj.use_only_poly_quad = true;
+%                         obj.eval_volume_func = @PWLD_basis_functions_volume;
+%                         obj.eval_surface_func = @PWLD_basis_functions_surface;
+%                     end
+%                 else
+%                     error(['Cannot read basis set name: ',obj.BasisName])
+%                 end
             end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
