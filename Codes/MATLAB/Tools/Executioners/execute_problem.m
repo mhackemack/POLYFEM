@@ -30,6 +30,10 @@ data = prepare_problem_execution(data, geometry);
 % Solve the neutronics problem (either source-driven or k-eigenvalue)
 [data, sol] = pcall(data, geometry, DoF, FE, sol);
 sol.CellVertexNumbers = geometry.CellVertexNumbers;
+% Compute average material fluxes and some qoi's
+sol.AverageMaterialFlux = calculate_average_material_QoI(data,geometry,DoF,FE,sol.flux);
+sol.TotalMaterialInteraction = calculate_average_material_QoI(data,geometry,DoF,FE,sol.flux,'Total');
+sol.TotalMaterialAbsorption = calculate_average_material_QoI(data,geometry,DoF,FE,sol.flux,'Absorption');
 % Calculate MMS Error if necessary
 if mms, sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux); end
 % Plot solution for viewer to see
@@ -89,6 +93,10 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         [data, tsol] = pcall(data, geometry, DoF, FE, sol{r});
         sol{r} = tsol;
         sol{r}.CellVertexNumbers = geometry.CellVertexNumbers;
+        % Compute average material fluxes and some qoi's
+        sol{r}.AverageMaterialFlux = calculate_average_material_QoI(data,geometry,DoF,FE,sol{r}.flux);
+        sol{r}.TotalMaterialInteraction = calculate_average_material_QoI(data,geometry,DoF,FE,sol{r}.flux,'Total');
+        sol{r}.TotalMaterialAbsorption = calculate_average_material_QoI(data,geometry,DoF,FE,sol{r}.flux,'Absorption');
         % Calculate MMS Error if necessary
         if mms, sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux); end
         % Save off output objects if necessary

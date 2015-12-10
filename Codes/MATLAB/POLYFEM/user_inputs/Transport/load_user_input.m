@@ -11,11 +11,11 @@ data.problem.saveSolution = 0;
 data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 0;
-data.problem.refinementLevels = 22;
+data.problem.refineMesh = 1;
+data.problem.refinementLevels = 8;
 data.problem.refinementTolerance = 0.2;
-data.problem.AMRIrregularity = 2;
-data.problem.projectSolution = 1;
+data.problem.AMRIrregularity = 1;
+data.problem.projectSolution = 0;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ data.Neutronics.Transport.BCVals  = [0.0];
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = 'pcg';
+data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'gs';
 data.Neutronics.Transport.DSATolerance = 1e-4;
 data.Neutronics.Transport.DSAMaxIterations = 1e4;
@@ -132,9 +132,9 @@ data.solver.kyrlovSubspace = [];
 % geometry.set_face_flag_on_surface(2,[L,0;L,L]);
 % geometry.set_face_flag_on_surface(2,[0,0;L,0]);
 
-% [data, geometry] = get_EIR( data, 4, 'cart' );
+[data, geometry] = get_EIR( data, 1, 'cart' );
 % [data, geometry] = get_IronWater( data, 4, 'cart' );
-[data, geometry] = get_IronWaterII( data, 1, 'tri' );
+% [data, geometry] = get_IronWaterII( data, 1, 'tri' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
 % [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
