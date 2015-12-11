@@ -67,5 +67,14 @@ data = cleanup_neutronics_input_data(data, geometry);
 [data, sol, ~, ~, ~] = execute_problem(data, geometry);
 % Postprocess Solution Data
 % ------------------------------------------------------------------------------
-ave_flux = [1.5263e0;1.1960e1;5.3968e-1;1.9202e1;8.3364e-1];
-mat_map = [5;1;2;3;4];
+ave_flux = [1.5263e0; 1.1960e1; 5.3968e-1; 1.9202e1; 8.3364e-1];
+mat_map = [5; 1; 2; 3; 4];
+% Build data storage structures
+nr = data.problem.refinementLevels + 1;
+dofnum = zeros(nr,1);
+aflux = zeros(nr,5);
+afluxerr = zeros(nr,5);
+
+for rlvl=0:nr-1
+    
+end
