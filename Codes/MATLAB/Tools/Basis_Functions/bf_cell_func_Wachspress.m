@@ -44,7 +44,8 @@ if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
 % Quick Error Checking
 % --------------------
-if order > 1, error('Wachpress only defined for order 1.'); end
+if order > 2, error('Wachpress only defined for order 1 and 2.'); end
+if order == 2 && dim ~= 2, error('2nd order only for 2D.'); end
 % Compute and exit immediately if 1D
 % ------------------------------------------------------------------------------
 if dim == 1
@@ -54,8 +55,9 @@ if dim == 1
 end
 % ------------------------------------------------------------------------------
 % Allocate Matrix Space
-% ---------------------
-znv = zeros(nv);
+% ------------------------------------------------------------------------------
+ntot = get_num_serendipity_points( dim, nverts, nf, order);
+znv = zeros(ntot);
 J = zeros(dim);
 M = znv;
 K = znv;

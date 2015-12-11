@@ -58,7 +58,7 @@ end
 % Build Quadratic Serendipity Basis Function Space
 % ------------------------------------------------------------------------------
 A = get_quad_pairing_transformation(nverts, scaled_verts, vind, diag_pairs);
-% A = get_quad_pairing_transformation(ser_verts, ser_nodes, quad_pairs, diag_pairs);
+% A = get_quad_pairing_transformation(ser_verts, ser_nodes, quad_pairs, diag_pairs, vind);
 q_vals = blin(:,quad_pairs(:,1)).*blin(:,quad_pairs(:,2));
 for q=1:nqx
     bout(q,:) = A*q_vals(q,:)';
@@ -119,16 +119,16 @@ for i=1:nv
     vind(i,:) = ii;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% function [ser_verts, ser_nodes] = get_serendipity_nodes(nverts, verts, faces)
-% dim = size(verts,2);
-% ser_verts = zeros(2*nverts, dim);
-% ser_nodes = zeros(2*nverts, 2); ser_nodes(1:nverts,:) = [(1:nverts)',(1:nverts)'];
-% ser_verts(1:nverts,:) = verts;
-% for f=1:length(faces)
-%     fv = faces{f};
-%     ser_verts(nverts+f,:) = (verts(fv(1),:) + verts(fv(2),:))/2;
-%     ser_nodes(nverts+f,:) = fv;
-% end
+function [ser_verts, ser_nodes] = get_serendipity_nodes(nverts, verts, faces)
+dim = size(verts,2);
+ser_verts = zeros(2*nverts, dim);
+ser_nodes = zeros(2*nverts, 2); ser_nodes(1:nverts,:) = [(1:nverts)',(1:nverts)'];
+ser_verts(1:nverts,:) = verts;
+for f=1:length(faces)
+    fv = faces{f};
+    ser_verts(nverts+f,:) = (verts(fv(1),:) + verts(fv(2),:))/2;
+    ser_nodes(nverts+f,:) = fv;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function quad_pairs = get_quad_pairings(nv)
 ntot = 2*nv+nv*(nv-3)/2;
@@ -174,7 +174,7 @@ for i=1:nq
     out(i,6) = nv + tqp(2);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% function A = get_quad_pairing_transformation(verts, ser_nodes, quad_pairs, diag_pairs)
+% function A = get_quad_pairing_transformation(verts, ser_nodes, quad_pairs, diag_pairs, vind)
 % nv = size(verts,1); nqp = size(diag_pairs,1);
 % A = zeros(nv, size(quad_pairs,1)); A(1:nv,1:nv) = eye(nv);
 % tL = zeros(6,nv); %tq = zeros(6,1);
@@ -187,9 +187,9 @@ end
 %     vb = verts(quad_pairs(d,2),:);
 %     L = tL;
 %     % Loop through all serendipity nodes
-%     for j=1:nv
+%     for j=1:6
 %         v1 = verts(ser_nodes(j,1),:); v2 = verts(ser_nodes(j,2),:);
-%         t = v1'*v2/2 + v2'*v1/2;
+%         t = v1'*v2 + v2'*v1;
 %         % c-constraint
 %         L(1,j) = 1;
 %         % x-constraint
@@ -204,7 +204,7 @@ end
 %         L(6,j) = t(1,2);
 %     end
 %     % Apply right-hand side
-%     q = [1;(va(1)+vb(1))/2;(va(2)+vb(2))/2;va(1)*vb(1);va(2)*vb(2);(va(1)*vb(2)+va(2)*vb(1))/2];
+%     q = [2;(va(1)+vb(1));(va(2)+vb(2));2*va(1)*vb(1);2*va(2)*vb(2);(va(1)*vb(2)+va(2)*vb(1))];
 %     t = L'*((L*L')\q); t(abs(t) < 1e-14) = 0;
 %     A(:,d) = t;
 % end

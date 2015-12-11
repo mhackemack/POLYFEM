@@ -24,7 +24,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = bf_cell_func_PWLD( varargin )
 % Collect Input/Output Arguments
-% ------------------------------
+% ------------------------------------------------------------------------------
 nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
@@ -38,7 +38,7 @@ if nargin > 7
     if ~isempty(varargin{8}),q_ord = varargin{8};end
 end
 % Prepare Vertices and Dimensional Space
-% --------------------------------------
+% ------------------------------------------------------------------------------
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
@@ -96,7 +96,7 @@ if q_bool
     end
 end
 % Allocate Matrix Space
-% ---------------------
+% ------------------------------------------------------------------------------
 znv = zeros(nv);
 J = zeros(dim);
 M = znv;

@@ -15,7 +15,6 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = mean_value_basis_functions( varargin )
-global glob
 nout = nargout;
 grad_bool = false;
 % Collect Input Arguments

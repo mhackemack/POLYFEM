@@ -3,7 +3,7 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Transport_MMS/Gauss2D';
-data.problem.Name = 'tri_Irr=3_type=0_tol=0.3';
+data.problem.Name = 'cart_uniform';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -12,8 +12,8 @@ data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 26;
-data.problem.refinementTolerance = 0.3;
+data.problem.refinementLevels = 5;
+data.problem.refinementTolerance = 0.0;
 data.problem.AMRIrregularity = 3;
 data.problem.projectSolution = 0;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
@@ -23,7 +23,7 @@ data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.SpatialMethod = 'PWQ';
 data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
@@ -58,11 +58,11 @@ data.Neutronics.Transport.ScatteringXS(1,:,:) = [0.0];
 data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
-data.Neutronics.Transport.ExtSource{1,1} = @rhs_func_gauss_iso;
-data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_gauss_iso;
+data.Neutronics.Transport.ExtSource{1,1} = @rhs_func_sinusoid;
+data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_sinusoid;
 % Boundary Conditions
 % data.Neutronics.Transport.BCFlags = [glob.Function];
-% data.Neutronics.Transport.BCVals{1,1} = @ang_sol_func_quad_patch;
+% data.Neutronics.Transport.BCVals{1,1} = @ang_sol_func_sinusoid;
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 data.Neutronics.Transport.BCVals = [0.0];
 
@@ -83,7 +83,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 4;
+L = 1; ncells = 6;
 % gname = 'PolyMesh_SqDomain_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
 % gname = 'shestakov_poly_mesh_L1_nc5_a0.15';
@@ -91,17 +91,17 @@ L = 1; ncells = 4;
 % gname = 'smooth_poly_mesh_L1_n64_a0.15';
 % load(strcat(glob.geom_path,gname,'.mat'));
 
-xx=linspace(0,L,ncells+1);
-[x,y]=meshgrid(xx,xx);
-x=x(:);y=y(:);
-tri = delaunayTriangulation(x,y);
-geometry = GeneralGeometry(2, 'Delaunay', tri);
+% xx=linspace(0,L,ncells+1);
+% [x,y]=meshgrid(xx,xx);
+% x=x(:);y=y(:);
+% tri = delaunayTriangulation(x,y);
+% geometry = GeneralGeometry(2, 'Delaunay', tri);
 
 x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

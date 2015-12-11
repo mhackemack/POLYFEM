@@ -590,11 +590,19 @@ classdef FEHandler < handle
                 end
             elseif strcmp(bbname, 'PWLD')
                 obj.BasisType = 3;
-                obj.bf_cell_func = @bf_cell_func_PWLD;
+                if obj.Degree == 1
+                    obj.bf_cell_func = @bf_cell_func_PWLD;
+                elseif obj.Degree == 2
+                    obj.bf_cell_func = @bf_cell_func_PWQ;
+                end
                 obj.basis_eval_func = @PWLD_basis_functions;
 %                 obj.volume_func = @PWLD_volume;
 %                 obj.surface_func = @PWLD_surface;
 %                 obj.quadrature_func = @PWLD_quad_gen;
+            elseif strcmp(bbname, 'PWQ')
+                obj.BasisType = 3;
+                obj.bf_cell_func = @bf_cell_func_PWQ;
+                obj.basis_eval_func = @PWLD_basis_functions;
             elseif strcmp(bbname, 'WACHSPRESS')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_Wachspress;
