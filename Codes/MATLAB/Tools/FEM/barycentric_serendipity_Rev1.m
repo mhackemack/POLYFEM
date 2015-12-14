@@ -257,15 +257,21 @@ for i=1:nd
     vind2 = vind(dp(2),:);
     vm = mean(v(dp(1:2),:));
     len = norm(diff(v(dp(1:2),:)))/2;
-    vv = [v(:,1)-vm(1),v(:,2)-vm(2)]; vvv = vv'; 
-    vvt = vv(dp(1),:);
-    thet = acos(vv(dp(2),1)/len);
-    tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
-    vvt = tmat*vvt';
-    if abs(vvt(2)) > 1e-14
-        thet = 2*pi - thet;
-        tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+    vv = [v(:,1)-vm(1),v(:,2)-vm(2)]; vvv = vv';
+    thet1 = acos(vv(dp(1),1)/len); thet2 = acos(vv(dp(2),1)/len);
+    if thet1 > pi/2
+        tmat = [cos(thet1), -sin(thet1);  sin(thet1), cos(thet1)];
+    else
+        tmat = [cos(thet2), -sin(thet2);  sin(thet2), cos(thet2)];
     end
+    vvt = tmat*vv(dp(1),:)';
+%     thet = acos(vv(dp(2),1)/len);
+%     tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+%     vvt = tmat*vvt';
+%     if abs(vvt(2)) > 1e-14
+%         thet = 2*pi - thet;
+%         tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+%     end
     for j=1:nv
         vv(j,:) = (tmat*vvv(:,j))';
     end

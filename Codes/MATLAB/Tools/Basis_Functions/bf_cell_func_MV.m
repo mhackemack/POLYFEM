@@ -57,7 +57,6 @@ end
 % Allocate Matrix Space
 % ---------------------
 znv = zeros(nv);
-J = zeros(dim);
 M = znv;
 K = znv;
 G = cell(dim, 1);

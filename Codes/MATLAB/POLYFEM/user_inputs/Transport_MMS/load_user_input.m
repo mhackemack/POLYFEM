@@ -83,7 +83,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 192;
+L = 1; ncells = 6;
 % gname = 'PolyMesh_SqDomain_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
 % gname = 'shestakov_poly_mesh_L1_nc5_a0.15';
@@ -91,17 +91,17 @@ L = 1; ncells = 192;
 % gname = 'smooth_poly_mesh_L1_n64_a0.15';
 % load(strcat(glob.geom_path,gname,'.mat'));
 
-xx=linspace(0,L,ncells+1);
-[x,y]=meshgrid(xx,xx);
-x=x(:);y=y(:);
-tri = delaunayTriangulation(x,y);
-geometry = GeneralGeometry(2, 'Delaunay', tri);
+% xx=linspace(0,L,ncells+1);
+% [x,y]=meshgrid(xx,xx);
+% x=x(:);y=y(:);
+% tri = delaunayTriangulation(x,y);
+% geometry = GeneralGeometry(2, 'Delaunay', tri);
 
-% x=linspace(0,L,ncells+1);
-% y=linspace(0,L,ncells+1);
+x=linspace(0,L,ncells+1);
+y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
