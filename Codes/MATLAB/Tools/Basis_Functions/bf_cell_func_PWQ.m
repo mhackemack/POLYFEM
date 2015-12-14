@@ -80,6 +80,7 @@ end
 bms = cell(nf,1); gms = cell(nf,1);
 for f=1:nf
     bms{f} = tbms(qs_ind{f},:);
+    gms{f} = tgms(:,:,qs_ind{f});
 end
 % mass matrix
 for q=1:nqx

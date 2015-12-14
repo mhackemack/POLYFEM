@@ -39,7 +39,7 @@ data.problem.Dimension = 2;
 data.geometry_type = 'tri';
 % x=[logspace(-3,0,35),logspace(0,2,100),logspace(2,3,40)];
 % x=unique(x);
-log_xmin = 0; log_xmax = 0; xnum = 1;
+log_xmin = -1; log_xmax = -1; xnum = 1;
 x = logspace(log_xmin, log_xmax, xnum);
 dyz = [1];
 % dyz = [1/100,1/16,1/4,4,16,100];
@@ -49,14 +49,15 @@ data.Neutronics.FEMDegree = 1;
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
+data.Neutronics.Transport.transportType = 'upwind';
 data.Neutronics.DSAType = 'MIP';
-data.Neutronics.IP_Constant = 2;
+data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2];
-data.Neutronics.Transport.fluxMoments = 0;
+data.Neutronics.Transport.SnLevels = [4];
+data.Neutronics.Transport.PnOrder = 0;
 % xs
-c = 0.9; sigt = 1.0;
+c = 0.9999; sigt = 1.0;
 data.Neutronics.Transport.TotalXS = sigt;
 data.Neutronics.Diffusion.DiffusionXS = 1/(3*sigt);
 data.Neutronics.Transport.ScatteringXS = c*sigt;
@@ -65,7 +66,7 @@ data.Neutronics.Diffusion.AbsorbXS = (1-c)*sigt;
 data.Neutronics.Transport.BCFlags = glob.Periodic;
 data.Neutronics.Transport.BCVals = 0.0;
 % phase
-data.NumberPhasePerDim = 2;
+data.NumberPhasePerDim = 151;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -76,4 +77,10 @@ inputs = build_phase_transformation_matrix(data, inputs);
 % Retrieve all spectrum data and postprocess
 % ------------------------------------------
 outputs = calculate_eigenspectrums(data, inputs);
-% process_fourier_outputs(data, inputs, outputs);
+% Loop through quadrature sets
+for q=1:length(data.Neutronics.Transport.SnLevels)
+    % Loop through meshes
+    for i=1:inputs.TotalMeshes
+        
+    end
+end
