@@ -20,18 +20,18 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; %format long e
+clc; close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % -----------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = false;
 % Define all user inputs
 % ------------------------------------------------------------------------------
 data.Type = 'Search';
 % outputs
-data.Output.plotting_bool = true;
+data.Output.plotting_bool = false;
 data.Output.printing_bool = false;
 data.Output.file_bool = false;
 % geometry
@@ -39,7 +39,7 @@ data.problem.Dimension = 2;
 data.geometry_type = 'cart';
 % x=[logspace(-3,0,35),logspace(0,2,120),logspace(2,3,45)];
 % x=unique(x);
-log_xmin = -2; log_xmax = 4; xnum = 40;
+log_xmin = 0; log_xmax = 0; xnum = 1;
 x = logspace(log_xmin, log_xmax, xnum);
 dyz = [1];
 % dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
@@ -48,7 +48,7 @@ data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
-data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.SpatialMethod = 'LAGRANGE';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
@@ -58,7 +58,7 @@ data.Neutronics.Transport.FluxStabilization = 2;
 data.Neutronics.Transport.CurrentStabilization = 1;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4];
+data.Neutronics.Transport.SnLevels = [2];
 data.Neutronics.Transport.PnOrder = 0;
 % xs
 c = 0.9999; sigt = 1.0;

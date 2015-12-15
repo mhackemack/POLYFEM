@@ -58,7 +58,7 @@ if strcmpi(solve_meth, 'direct')
         elseif strcmpi(prec_meth, 'ilu')
             [M1, M2] = ilu(A);
         end
-        [x,DSA_it] = solve_func_PCG(A,rhs,M1,M2,DSA_tol,DSA_max_iters);
+        [x,DSA_it] = solve_func_PCG(A,rhs,x,M1,M2,DSA_tol,DSA_max_iters);
 %         [x,flag,res,DSA_it] = pcg(A,rhs,DSA_tol,DSA_max_iters,M1,M2);
     else
         x = A\rhs;
@@ -75,7 +75,7 @@ elseif strcmpi(ndat.Transport.DSASolveMethod, 'PCG')
     elseif strcmpi(prec_meth, 'ilu')
         [M1, M2] = ilu(A);
     end
-    [x,DSA_it] = solve_func_PCG(A,rhs,M1,M2,DSA_tol,DSA_max_iters);
+    [x,DSA_it] = solve_func_PCG(A,rhs,x,M1,M2,DSA_tol,DSA_max_iters);
 %     [x,flag,res,DSA_it] = pcg(A,rhs,DSA_tol,DSA_max_iters,M1,M2);
 end
 % ------------------------------------------------------------------------------

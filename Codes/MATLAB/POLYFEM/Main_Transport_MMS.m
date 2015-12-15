@@ -21,7 +21,7 @@ addpath(fpath);
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = true;
 inp = 'Transport_MMS';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files

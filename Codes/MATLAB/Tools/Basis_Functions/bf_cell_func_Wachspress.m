@@ -24,7 +24,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = bf_cell_func_Wachspress( varargin )
 % Collect Input/Output Arguments
-% ------------------------------
+% ------------------------------------------------------------------------------
 nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
@@ -38,12 +38,14 @@ if nargin > 7
     if ~isempty(varargin{8}),q_ord = varargin{8};end
 end
 % Prepare Vertices and Dimensional Space
-% --------------------------------------
+% ------------------------------------------------------------------------------
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
+ntot = get_num_serendipity_points( dim, nverts, nf, order);
+f_dofs = get_face_dofs(nv, faces, order);
 % Quick Error Checking
-% --------------------
+% ------------------------------------------------------------------------------
 if order > 2, error('Wachpress only defined for order 1 and 2.'); end
 if order == 2 && dim ~= 2, error('2nd order only for 2D.'); end
 % Compute and exit immediately if 1D
@@ -56,9 +58,7 @@ end
 % ------------------------------------------------------------------------------
 % Allocate Matrix Space
 % ------------------------------------------------------------------------------
-ntot = get_num_serendipity_points( dim, nverts, nf, order);
 znv = zeros(ntot);
-J = zeros(dim);
 M = znv;
 K = znv;
 G = cell(dim, 1);
@@ -66,7 +66,7 @@ for d=1:dim, G{d} = znv; end
 MM = cell(nf, 1);
 G2 = cell(nf, 1);
 for f=1:nf
-    MM{f} = zeros(length(faces{f}));
+    MM{f} = zeros(length(f_dofs{f}));
     for d=1:dim, G2{f}{d} = znv; end
 end
 % Collect all Matrices and Quadratures
@@ -120,6 +120,17 @@ varargout{4} = {qx_s, qw_s, bms, gms};
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxiallary Function Calls
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_face_dofs(nv, faces, ord)
+if ord == 1
+    out = faces;
+else % only 2D allowed here
+    nf = length(faces);
+    out = cell(nf,1);
+    for f=1:nf
+        out{f} = [faces{f},nv+f];
+    end
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord)
 nf = length(faces);

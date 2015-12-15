@@ -7,7 +7,7 @@
 %   Year:           2014
 %
 %   Description:    MATLAB script to produce the basis function and gradient
-%                   values using the Maximum Entropy Methodology.
+%                   values using the linear mean value methodology.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

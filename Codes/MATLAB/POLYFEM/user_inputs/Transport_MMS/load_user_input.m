@@ -3,7 +3,8 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Transport_MMS/Gauss2D';
-data.problem.Name = 'poly_n65536';
+data.problem.Name = 'poly_n16384';
+gname = 'PolyMesh_SqDomain_L1_n16384';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -23,7 +24,7 @@ data.Neutronics.PowerLevel = 1.0; % only for eigenvalue problems
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWQ';
+data.Neutronics.SpatialMethod = 'WACHSPRESS';
 data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
@@ -84,7 +85,7 @@ data.solver.kyrlovSubspace = [];
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
 % L = 1; ncells = 6;
-gname = 'PolyMesh_SqDomain_L1_n65536';
+% gname = 'PolyMesh_SqDomain_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
 % gname = 'shestakov_poly_mesh_L1_nc5_a0.15';
 % gname = 'z_mesh_poly_L1_n40_a0.05';
