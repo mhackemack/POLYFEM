@@ -258,13 +258,33 @@ for i=1:nd
     vm = mean(v(dp(1:2),:));
     len = norm(diff(v(dp(1:2),:)))/2;
     vv = [v(:,1)-vm(1),v(:,2)-vm(2)]; vvv = vv';
-    thet1 = acos(vv(dp(1),1)/len); thet2 = acos(vv(dp(2),1)/len);
-    if thet1 > pi/2
-        tmat = [cos(thet1), -sin(thet1);  sin(thet1), cos(thet1)];
-    else
-        tmat = [cos(thet2), -sin(thet2);  sin(thet2), cos(thet2)];
+    thet = acos(vv(dp(1),1)/len);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     |  
+    %  4  |  3
+    %     |
+    %-----------
+    %     |
+    %  1  |  2
+    %     |
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if vv(dp(1),1) <= 0 && vv(dp(1),2) <= 0
+%         t = -(pi-thet);
+        thet = thet - pi;
+    elseif vv(dp(1),1) > 0 && vv(dp(1),2) <= 0
+        thet = thet + pi;
+    elseif vv(dp(1),1) > 0 && vv(dp(1),2) > 0
+        thet = pi - thet;
+    elseif vv(dp(1),1) <= 0 && vv(dp(1),2) > 0
+        thet = pi - thet;
     end
-    vvt = tmat*vv(dp(1),:)';
+    tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+%     if thet1 > pi/2
+%         tmat = [cos(thet1), -sin(thet1);  sin(thet1), cos(thet1)];
+%     else
+%         tmat = [cos(thet2), -sin(thet2);  sin(thet2), cos(thet2)];
+%     end
+%     vvt = tmat*vv(dp(1),:)';
 %     thet = acos(vv(dp(2),1)/len);
 %     tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
 %     vvt = tmat*vvt';
