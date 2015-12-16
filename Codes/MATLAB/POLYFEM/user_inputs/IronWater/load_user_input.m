@@ -4,7 +4,7 @@ function [data, geometry] = load_user_input(dat_in)
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
-data.problem.saveSolution = 0;
+data.problem.saveSolution = 1;
 data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------

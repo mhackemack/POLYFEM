@@ -48,10 +48,10 @@ data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
-data.Neutronics.SpatialMethod = 'LAGRANGE';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
-data.Neutronics.IP_Constant = 4;
+data.Neutronics.IP_Constant = 1;
 % hybrid transport properties
 data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2;

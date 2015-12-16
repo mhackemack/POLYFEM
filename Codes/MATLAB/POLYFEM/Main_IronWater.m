@@ -68,9 +68,27 @@ else
 end
 oname = [oname,'_',dat_in.DSASolveMethod,'_',dat_in.DSAPreconditioner];
 data.problem.Name = oname;
-% Execute Problem Suite
-% ------------------------------------------------------------------------------
 [data, geometry] = process_input_data(data, geometry);
 data = cleanup_neutronics_input_data(data, geometry);
-[data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-% [~, ~, ~, ~, ~] = execute_problem(data, geometry);
+% Execute Problem Suite
+% ------------------------------------------------------------------------------
+[data, ~, ~, ~, ~] = execute_problem(data, geometry);
+% Build data storage structures
+nr = data.problem.refinementLevels + 1;
+dofnum = zeros(nr,1);
+
+% Loop through AMR cycles
+ddir = ['outputs/',data.problem.Path,'/',data.problem.Name];
+for rlvl=0:nr-1
+    (fprintf(1,'Refinement Calculation: %d of %d.\n',rlvl,nr-1));
+    cname = ['_',num2str(rlvl)];
+    % Load data structures
+    load([ddir,'_data',cname,'.mat']);
+    load([ddir,'_geometry',cname,'.mat']);
+    load([ddir,'_DoF',cname,'.mat']);
+    load([ddir,'_FE',cname,'.mat']);
+    load([ddir,'_sol',cname,'.mat']);
+    flux = sol.flux{:};
+    dofnum(rlvl+1) = DoF.TotalDoFs;
+    
+end
