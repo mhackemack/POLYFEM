@@ -107,8 +107,8 @@ for f=1:mesh.TotalFaces
         fn2   = dof.PeriodicFaceDoFs{f}(:,2)';
         cn1   = dof.ConnectivityArray{fcells(1)};
         cn2   = dof.ConnectivityArray{op_c};
-        fcnn1 = dof.FaceCellNodeNumbering{f,1};
-        fcnn2 = dof.FaceCellNodeNumbering{op_f,1};
+%         fcnn1 = dof.FaceCellNodeNumbering{f,1};
+%         fcnn2 = dof.FaceCellNodeNumbering{op_f,1};
         M     = fe.FaceMassMatrix{f,1};
         G1    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{f,1});
         G2    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{op_f,1});
@@ -117,17 +117,25 @@ for f=1:mesh.TotalFaces
         PMc1  = PM(cn1, cn1); PMc2 = PM(cn2, cn2)*exp(1i*t_off*lam);
         % Build all periodic matrix contributions
         % ---------------------------------------
-        Gf1 = G1(:,fcnn1); Gf2 = G2(:,fcnn2);
-        Gf1t = Gf1'; Gf2t = Gf2';
+%         Gf1 = G1(:,fcnn1); Gf2 = G2(:,fcnn2);
+%         Gf1t = Gf1'; Gf2t = Gf2';
         % ( [[u]] , [[b]] )
         A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
         A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
         % ( {{Du}} , [[b]] )
-        A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
-        A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf2t*PMc2;
+        A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
+        A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
         % ( [[u]] , {{Db}} )
-        A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
-        A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf1*PMf2;
+        A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
+        A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
+        
+        
+%         % ( {{Du}} , [[b]] )
+%         A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
+%         A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf1t*PMc2;
+%         % ( [[u]] , {{Db}} )
+%         A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
+%         A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf2*PMf2;
     end
 end
 return
