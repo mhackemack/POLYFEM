@@ -31,7 +31,7 @@ glob.print_info = false;
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bf, quad, bc
-bf_name = 'PWLD';
+bf_name = 'LAGRANGE';
 fdeg = 1;
 q_type = 'LS'; sn_levels = [2,4];
 bc_type = 'Vacuum';
@@ -41,7 +41,7 @@ dx_num_start = 17; L = 1;
 dx_start = linspace(0,L,dx_num_start);
 % xs
 c = 0.9999;
-mfp_lower = 3; mfp_upper = 51;
+mfp_lower = 2; mfp_upper = 51;
 mfp_min = 0; mfp_max = 3;
 mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
