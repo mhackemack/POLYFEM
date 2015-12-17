@@ -33,7 +33,7 @@ data.Type = 'Search';
 % outputs
 data.Output.plotting_bool = true;
 data.Output.printing_bool = false;
-data.Output.file_bool = false;
+data.Output.file_bool = true;
 % geometry
 data.problem.Dimension = 2;
 data.geometry_type = 'cart';
