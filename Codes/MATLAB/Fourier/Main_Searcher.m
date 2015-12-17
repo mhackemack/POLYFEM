@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % -----------
 global glob
-glob = get_globals('Office');
+glob = get_globals('Home');
 glob.print_info = false;
 % Define all user inputs
 % ------------------------------------------------------------------------------
@@ -33,22 +33,22 @@ data.Type = 'Search';
 % outputs
 data.Output.plotting_bool = true;
 data.Output.printing_bool = false;
-data.Output.file_bool = false;
+data.Output.file_bool = true;
 % geometry
 data.problem.Dimension = 2;
 data.geometry_type = 'cart';
-x=[logspace(-3,0,35),logspace(0,2,121),logspace(2,3,45)];
+x=[logspace(-3,0,55),logspace(0,2,141),logspace(2,3,45)];
 x=unique(x);
 % log_xmin = -2; log_xmax = 3; xnum = 51;
 % x = logspace(log_xmin, log_xmax, xnum);
-dyz = [1];
-% dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
+% dyz = [1];
+dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
 % fem
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
-data.Neutronics.SpatialMethod = 'LAGRANGE';
+data.Neutronics.SpatialMethod = 'MAXENT';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
