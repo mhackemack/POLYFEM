@@ -32,8 +32,9 @@ data = prepare_problem_execution(data, geometry);
 sol.CellVertexNumbers = geometry.CellVertexNumbers;
 % Compute average material fluxes and some qoi's
 sol.AverageMaterialFlux = calculate_average_material_QoI(data,geometry,DoF,FE,sol.flux);
-sol.TotalMaterialInteraction = calculate_average_material_QoI(data,geometry,DoF,FE,sol.flux,'Total');
-sol.TotalMaterialAbsorption = calculate_average_material_QoI(data,geometry,DoF,FE,sol.flux,'Absorption');
+sol.TotalMaterialFlux = calculate_total_QoI(data,geometry,DoF,FE,sol.flux,'Flux');
+sol.TotalMaterialInteraction = calculate_total_QoI(data,geometry,DoF,FE,sol.flux,'Total');
+sol.TotalMaterialAbsorption = calculate_total_QoI(data,geometry,DoF,FE,sol.flux,'Absorption');
 % Calculate MMS Error if necessary
 if mms, sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux); end
 % Plot solution for viewer to see
@@ -95,8 +96,9 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         sol{r}.CellVertexNumbers = geometry.CellVertexNumbers;
         % Compute average material fluxes and some qoi's
         sol{r}.AverageMaterialFlux = calculate_average_material_QoI(data,geometry,DoF,FE,sol{r}.flux);
-        sol{r}.TotalMaterialInteraction = calculate_average_material_QoI(data,geometry,DoF,FE,sol{r}.flux,'Total');
-        sol{r}.TotalMaterialAbsorption = calculate_average_material_QoI(data,geometry,DoF,FE,sol{r}.flux,'Absorption');
+        sol{r}.TotalMaterialFlux = calculate_total_QoI(data,geometry,DoF,FE,sol{r}.flux,'Flux');
+        sol{r}.TotalMaterialInteraction = calculate_total_QoI(data,geometry,DoF,FE,sol{r}.flux,'Total');
+        sol{r}.TotalMaterialAbsorption = calculate_total_QoI(data,geometry,DoF,FE,sol{r}.flux,'Absorption');
         % Calculate MMS Error if necessary
         if mms, sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux); end
         % Save off output objects if necessary

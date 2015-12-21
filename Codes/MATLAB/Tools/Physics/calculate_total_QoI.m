@@ -28,7 +28,7 @@ else
     qt = get_qoi_type( data, 'Flux', nm, ng );
 end
 % Allocate memory
-qoi = zeros(ng, nf);
+qoi = zeros(nm, ng, nf);
 % Loop through mesh cells
 totvol = 0;
 for c=1:mesh.TotalCells
@@ -40,7 +40,7 @@ for c=1:mesh.TotalCells
     M = FE.CellMassMatrix{c};
     for g=1:ng
         for f=1:nf
-            qoi(g,f) = qoi(g,f) + qt(matID,g)*sum(M*flux{g,f}(dc));
+            qoi(matID,g,f) = qoi(matID,g,f) + qt(matID,g)*sum(M*flux{g,f}(dc));
         end
     end
 end
@@ -63,6 +63,8 @@ switch(s)
         out = nd.FissionXS;
     case('Production')
         out = nd.FissionXS.*nd.NuBar;
+    case('Flux')
+        out = ones(nm, ng);
     otherwise
         out = ones(nm, ng);
 end

@@ -46,6 +46,7 @@ else
 end
 % ------------------------------------------------------------------------------
 % Solve diffusion system
+ttime = tic;
 if strcmpi(solve_meth, 'direct')
     if length(x) > glob.maxSparse
         if strcmpi(prec_meth, 'none')
@@ -84,6 +85,8 @@ x = vector_to_cell(x,DoF);
 varargout{1} = x;
 varargout{2} = A;
 varargout{3} = DSA_it;
+varargout{4} = toc(ttime);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
