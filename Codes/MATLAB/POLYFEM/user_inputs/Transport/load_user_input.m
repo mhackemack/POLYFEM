@@ -72,10 +72,10 @@ data.Neutronics.Transport.BCVals  = [0.0];
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = 'direct';
+data.Neutronics.Transport.DSASolveMethod = 'PCG';
 data.Neutronics.Transport.DSAPreconditioner = 'gs';
-data.Neutronics.Transport.DSATolerance = 1e-4;
-data.Neutronics.Transport.DSAMaxIterations = 1e4;
+data.Neutronics.Transport.DSATolerance = 1e-3;
+data.Neutronics.Transport.DSAMaxIterations = 1e3;
 data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
