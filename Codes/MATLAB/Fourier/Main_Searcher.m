@@ -33,22 +33,22 @@ data.Type = 'Search';
 % outputs
 data.Output.plotting_bool = true;
 data.Output.printing_bool = false;
-data.Output.file_bool = true;
+data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
 data.geometry_type = 'cart';
-x=[logspace(-3,0,55),logspace(0,2,141),logspace(2,3,45)];
-x=unique(x);
-% log_xmin = -2; log_xmax = 3; xnum = 51;
-% x = logspace(log_xmin, log_xmax, xnum);
-% dyz = [1];
-dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
+% x=[logspace(-3,0,55),logspace(0,2,141),logspace(2,3,45)];
+% x=unique(x);
+log_xmin = -2; log_xmax = 3; xnum = 51;
+x = logspace(log_xmin, log_xmax, xnum);
+dyz = [1];
+% dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
 % fem
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 data.problem.refineMesh = false;
-data.Neutronics.FEMDegree = 1;
-data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.FEMDegree = 2;
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.IP_Constant = 4;
@@ -58,7 +58,7 @@ data.Neutronics.Transport.FluxStabilization = 2;
 data.Neutronics.Transport.CurrentStabilization = 1;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4,8];
+data.Neutronics.Transport.SnLevels = [2,4];
 data.Neutronics.Transport.PnOrder = 0;
 % xs
 c = 0.9999; sigt = 1.0;
