@@ -153,7 +153,7 @@ for l=1:solvdat.maxIterations
     if glob.print_info, disp(['-> Perform Source-Driven Iteration: ',num2str(l)]); end
     
     tictime = tic;
-    [ndat, sol.flux, mat, extra_its] = fcall(ndat, solvdat, geometry, DoF, FE, sol.flux, mat);
+    [ndat, sol.flux, mat, extra_its, extra_time] = fcall(ndat, solvdat, geometry, DoF, FE, sol.flux, mat);
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
     [err_inf, norm_inf] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,inf);
     % Output iteration data
@@ -165,6 +165,7 @@ for l=1:solvdat.maxIterations
     % Check for Convergence
     toctime(l)   = toc(tictime);
     DSA_its(l)   = extra_its;
+    DSA_times(l) = extra_time;
     error_L2(l)  = err_L2;
     error_inf(l) = err_inf;
     n_L2(l)      = norm_L2;
@@ -209,7 +210,7 @@ for l=1:solvdat.maxIterations
     if glob.print_info, disp(['-> Perform Eigenvalue Iteration: ',num2str(l)]); end
     
     tictime = tic;
-    [ndat, sol.flux, mat, extra_its] = fcall(ndat,solvdat,geometry,DoF,FE,sol.flux,mat);
+    [ndat, sol.flux, mat, extra_its, extra_time] = fcall(ndat,solvdat,geometry,DoF,FE,sol.flux,mat);
     % Compute new keff and errors
     [keff,sol.flux] = estimate_new_keff(sol.flux,sol.flux0);
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
@@ -226,6 +227,7 @@ for l=1:solvdat.maxIterations
     % Check for Convergence
     toctime(l)   = toc(tictime);
     DSA_its(l)   = extra_its;
+    DSA_times(l) = extra_time;
     error_L2(l)  = err_L2;
     error_inf(l) = err_inf;
     n_L2(l)      = norm_L2;

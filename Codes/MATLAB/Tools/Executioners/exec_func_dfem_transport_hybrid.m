@@ -45,7 +45,7 @@ if ndat.Transport.performDSA
         fprintf([rev_str,msg]);
         rev_str = repmat(sprintf('\b'), 1, length(msg));
     end
-    [flux_out, A, DSA_iterations] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, flux_out, x, A);
+    [flux_out, A, DSA_iterations, DSA_time] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, flux_out, x, A);
 end
 % Set Outputs
 % ------------------------------------------------------------------------------
@@ -54,6 +54,7 @@ varargout{1} = ndat;
 varargout{2} = flux_out;
 if nout > 2, varargout{3} = A; end
 if nout > 3, varargout{4} = DSA_iterations; end
+if nout > 4, varargout{5} = DSA_time; end
 % Clear Command Line Text
 if glob.print_info, fprintf(rev_str); end
 

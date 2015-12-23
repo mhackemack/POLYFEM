@@ -163,18 +163,18 @@ for f=1:mesh.TotalBoundaryFaces
     ndat.Transport.IncomingCurrents{ff} = zeros(fdn,ng);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [x, A, DSA_it] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, x, x0, A)
+function [x, A, DSA_it, DSA_time] = perform_DSA_step(ndat, solvdat, mesh, DoF, FE, x, x0, A)
 % Form scalar flux differences
 for g=1:ndat.numberEnergyGroups
     x0{g} = x{g,1} - x0{g,1};
 end
 % Switch based on DSA type
 if strcmp(ndat.Transport.DSAType, 'MIP')
-    [x0, A, DSA_it] = perform_MIP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
+    [x0, A, DSA_it, DSA_time] = perform_MIP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 elseif strcmp(ndat.Transport.DSAType, 'IP')
-    [x0, A, DSA_it] = perform_IP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
+    [x0, A, DSA_it, DSA_time] = perform_IP_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 elseif strcmp(ndat.Transport.DSAType, 'M4S')
-    [x0, A, DSA_it] = perform_M4S_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
+    [x0, A, DSA_it, DSA_time] = perform_M4S_DSA(ndat, solvdat, mesh, DoF, FE, x0, A);
 end
 % Add DSA correction
 for g=1:ndat.numberEnergyGroups
