@@ -13,17 +13,25 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear; clc; close all; format long e;
-out_dir = 'outputs/Ang_Quads/';
+% Clear Project Space
+% -------------------
+if exist('pbool', 'var')
+    clearvars -except pbool
+else
+    clear; pbool = false;
+end
+clc; close all; format long e
+if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 
-alvls = [2,4,6,8];
-plvls = [4,6,8];
-snlvl = [2,4,8,16,24];
+alvls = [24];
+plvls = [1,2];
+snlvl = [2,4,8,16];
 
-dim = 3;
+dim = 2;
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.QuadType = 'PGLC';
 fname = data.Neutronics.Transport.QuadType;
+out_dir = 'outputs/Ang_Quads/';
 
 if strcmp(data.Neutronics.Transport.QuadType, 'PGLC')
     for i=1:length(plvls)
@@ -32,9 +40,10 @@ if strcmp(data.Neutronics.Transport.QuadType, 'PGLC')
             data.Neutronics.Transport.AzimuthalLevels = alvls(j);
             data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport, dim);
             draw_quadrature(data);
-            ffname = [out_dir,fname,num2str(alvls(j)),'_',num2str(plvls(i))];
-%             export_fig ffname -eps
-            saveas(gcf,ffname,'png');
+            ffname = [out_dir,fname,num2str(alvls(j)),'_',num2str(plvls(i)),'_',num2str(dim),'D'];
+            saveas(gcf,ffname,'fig');
+            print(gcf,ffname,'-depsc');
+            print(gcf,ffname,'-dpng');
             close all;
         end
     end
@@ -43,5 +52,10 @@ else
         data.Neutronics.Transport.SnLevels = snlvl(m);
         data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport, dim);
         draw_quadrature(data);
+        ffname = [out_dir,fname,num2str(snlvl(m)),'_',num2str(dim),'D'];
+        saveas(gcf,ffname,'fig');
+        print(gcf,ffname,'-depsc');
+        print(gcf,ffname,'-dpng');
+        close all;
     end
 end
