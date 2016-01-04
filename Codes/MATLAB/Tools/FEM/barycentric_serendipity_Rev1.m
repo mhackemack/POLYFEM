@@ -57,8 +57,8 @@ else
 end
 % Build Quadratic Serendipity Basis Function Space
 % ------------------------------------------------------------------------------
-% A = get_quad_pairing_transformation(nverts, scaled_verts, vind, diag_pairs);
-A = get_quad_pairing_transformation(ser_verts, ser_nodes, quad_pairs, diag_pairs, vind);
+A = get_quad_pairing_transformation(nverts, scaled_verts, vind, diag_pairs);
+% A = get_quad_pairing_transformation(ser_verts, ser_nodes, quad_pairs, diag_pairs, vind);
 q_vals = blin(:,quad_pairs(:,1)).*blin(:,quad_pairs(:,2));
 for q=1:nqx
     bout(q,:) = A*q_vals(q,:)';
@@ -210,109 +210,109 @@ end
 %     A(:,d) = t;
 % end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function A = get_quad_pairing_transformation(verts, ser_nodes, quad_pairs, diag_pairs, vind)
-nv = size(verts,1); nqp = size(diag_pairs,1);
-A = zeros(nv, nqp); A(1:nv,1:nv) = eye(nv);
-tL = zeros(6); tq = zeros(6,1);
-% Loop through interior diagonal pairs
-d = nv;
-for i=1:nqp
-    d = d + 1;
-    va = verts(quad_pairs(d,1),:);
-    vb = verts(quad_pairs(d,2),:);
-    tdp = diag_pairs(i,:);
-    L = tL; q = tq;
-    % c-constraint
-    L(1,1:2) = 1; L(1,3:end) = 1; q(1) = 2;
-    % x-constraint
-    L(2,:) = verts(tdp,1); L(2,3:end) = 2*L(2,3:end);
-    q(2) = (va(1) + vb(1));
-    % y-constraint
-    L(3,:) = verts(tdp,2); L(3,3:end) = 2*L(2,3:end);
-    q(3) = (va(2) + vb(2));
-    % x_x-constraint
-    L(4,:) = (verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),1))';
-    q(4) = va(1)*vb(1);
-    % y_y-constraint
-    L(5,:) = (verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),2))';
-    q(5) = va(2)*vb(2);
-    % x_y-constraint
-    L(6,:) = ((verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),2))')/2 + ...
-             ((verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),1))')/2;
-    q(6) = (va(1)*vb(2) + va(2)*vb(1))/2;
-    % Solve and apply constraint
-    t = L'*((L*L')\q); t(abs(t) < 1e-14) = 0;
-    A(tdp,d) = t;
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% function out = get_quad_pairing_transformation(nv, v, quad_pairs, diag_pairs)
-% nd = size(diag_pairs,1);
-% I = eye(2*nv);
-% out = [I,get_a_prime_matrix(nd, nv, v, quad_pairs, diag_pairs)];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% function out = get_a_prime_matrix(nd, nv, v, vind, diag_pairs)
-% out = zeros(2*nv, nd);
-% for i=1:nd
-%     cvec = zeros(6, 1);
-%     % get rotation information for each diagonal
-%     dp = diag_pairs(i,:);
-%     vind1 = vind(dp(1),:);
-%     vind2 = vind(dp(2),:);
-%     vm = mean(v(dp(1:2),:));
-%     len = norm(diff(v(dp(1:2),:)))/2;
-%     vv = [v(:,1)-vm(1),v(:,2)-vm(2)]; vvv = vv';
-%     thet = acos(vv(dp(1),1)/len);
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     %     |  
-%     %  4  |  3
-%     %     |
-%     %-----------
-%     %     |
-%     %  1  |  2
-%     %     |
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     if vv(dp(1),1) <= 0 && vv(dp(1),2) <= 0
-% %         t = -(pi-thet);
-%         thet = thet - pi;
-%     elseif vv(dp(1),1) > 0 && vv(dp(1),2) <= 0
-%         thet = thet + pi;
-%     elseif vv(dp(1),1) > 0 && vv(dp(1),2) > 0
-%         thet = pi - thet;
-%     elseif vv(dp(1),1) <= 0 && vv(dp(1),2) > 0
-%         thet = pi - thet;
-%     end
-%     tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
-% %     if thet1 > pi/2
-% %         tmat = [cos(thet1), -sin(thet1);  sin(thet1), cos(thet1)];
-% %     else
-% %         tmat = [cos(thet2), -sin(thet2);  sin(thet2), cos(thet2)];
-% %     end
-% %     vvt = tmat*vv(dp(1),:)';
-% %     thet = acos(vv(dp(2),1)/len);
-% %     tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
-% %     vvt = tmat*vvt';
-% %     if abs(vvt(2)) > 1e-14
-% %         thet = 2*pi - thet;
-% %         tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
-% %     end
-%     for j=1:nv
-%         vv(j,:) = (tmat*vvv(:,j))';
-%     end
-%     % determine submatrix coefficients
-%     da = (vv(vind1(1),1)*vv(vind1(2),2) - vv(vind1(1),2)*vv(vind1(2),1)) / (vv(vind1(1),2) - vv(vind1(2),2)) / len;
-%     db = (vv(vind2(2),1)*vv(vind2(1),2) - vv(vind2(2),2)*vv(vind2(1),1)) / (vv(vind2(1),2) - vv(vind2(2),2)) / len;
-%     s = 2 / (2 - (da + db));
-%     
-%     cvec(1) = -s*(1+da);
-%     cvec(2) = -s*(1+db);
-%     
-%     A34 = [1, 1; vv(vind1(1),2), vv(vind1(2),2)];
-%     A56 = [1, 1; vv(vind2(1),2), vv(vind2(2),2)];
-%     b34 = s*[1;da*vv(dp(1),2)];
-%     b56 = s*[1;db*vv(dp(2),2)];
-%     cvec(3:4) = A34\b34;
-%     cvec(5:6) = A56\b56;
-%     % set into global submatrix
-%     out(dp,i) = cvec;
+% function A = get_quad_pairing_transformation(verts, ser_nodes, quad_pairs, diag_pairs, vind)
+% nv = size(verts,1); nqp = size(diag_pairs,1);
+% A = zeros(nv, nqp); A(1:nv,1:nv) = eye(nv);
+% tL = zeros(6); tq = zeros(6,1);
+% % Loop through interior diagonal pairs
+% d = nv;
+% for i=1:nqp
+%     d = d + 1;
+%     va = verts(quad_pairs(d,1),:);
+%     vb = verts(quad_pairs(d,2),:);
+%     tdp = diag_pairs(i,:);
+%     L = tL; q = tq;
+%     % c-constraint
+%     L(1,1:2) = 1; L(1,3:end) = 1; q(1) = 2;
+%     % x-constraint
+%     L(2,:) = verts(tdp,1); L(2,3:end) = 2*L(2,3:end);
+%     q(2) = (va(1) + vb(1));
+%     % y-constraint
+%     L(3,:) = verts(tdp,2); L(3,3:end) = 2*L(2,3:end);
+%     q(3) = (va(2) + vb(2));
+%     % x_x-constraint
+%     L(4,:) = (verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),1))';
+%     q(4) = va(1)*vb(1);
+%     % y_y-constraint
+%     L(5,:) = (verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),2))';
+%     q(5) = va(2)*vb(2);
+%     % x_y-constraint
+%     L(6,:) = ((verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),2))')/2 + ...
+%              ((verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),1))')/2;
+%     q(6) = (va(1)*vb(2) + va(2)*vb(1))/2;
+%     % Solve and apply constraint
+%     t = L'*((L*L')\q); t(abs(t) < 1e-14) = 0;
+%     A(tdp,d) = t;
 % end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_quad_pairing_transformation(nv, v, quad_pairs, diag_pairs)
+nd = size(diag_pairs,1);
+I = eye(2*nv);
+out = [I,get_a_prime_matrix(nd, nv, v, quad_pairs, diag_pairs)];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_a_prime_matrix(nd, nv, v, vind, diag_pairs)
+out = zeros(2*nv, nd);
+for i=1:nd
+    cvec = zeros(6, 1);
+    % get rotation information for each diagonal
+    dp = diag_pairs(i,:);
+    vind1 = vind(dp(1),:);
+    vind2 = vind(dp(2),:);
+    vm = mean(v(dp(1:2),:));
+    len = norm(diff(v(dp(1:2),:)))/2;
+    vv = [v(:,1)-vm(1),v(:,2)-vm(2)]; vvv = vv';
+    thet = acos(vv(dp(1),1)/len);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     |  
+    %  4  |  3
+    %     |
+    %-----------
+    %     |
+    %  1  |  2
+    %     |
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if vv(dp(1),1) <= 0 && vv(dp(1),2) <= 0
+%         t = -(pi-thet);
+        thet = thet - pi;
+    elseif vv(dp(1),1) > 0 && vv(dp(1),2) <= 0
+        thet = thet + pi;
+    elseif vv(dp(1),1) > 0 && vv(dp(1),2) > 0
+        thet = pi - thet;
+    elseif vv(dp(1),1) <= 0 && vv(dp(1),2) > 0
+        thet = pi - thet;
+    end
+    tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+%     if thet1 > pi/2
+%         tmat = [cos(thet1), -sin(thet1);  sin(thet1), cos(thet1)];
+%     else
+%         tmat = [cos(thet2), -sin(thet2);  sin(thet2), cos(thet2)];
+%     end
+%     vvt = tmat*vv(dp(1),:)';
+%     thet = acos(vv(dp(2),1)/len);
+%     tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+%     vvt = tmat*vvt';
+%     if abs(vvt(2)) > 1e-14
+%         thet = 2*pi - thet;
+%         tmat = [cos(thet), -sin(thet);  sin(thet), cos(thet)];
+%     end
+    for j=1:nv
+        vv(j,:) = (tmat*vvv(:,j))';
+    end
+    % determine submatrix coefficients
+    da = (vv(vind1(1),1)*vv(vind1(2),2) - vv(vind1(1),2)*vv(vind1(2),1)) / (vv(vind1(1),2) - vv(vind1(2),2)) / len;
+    db = (vv(vind2(2),1)*vv(vind2(1),2) - vv(vind2(2),2)*vv(vind2(1),1)) / (vv(vind2(1),2) - vv(vind2(2),2)) / len;
+    s = 2 / (2 - (da + db));
+    
+    cvec(1) = -s*(1+da);
+    cvec(2) = -s*(1+db);
+    
+    A34 = [1, 1; vv(vind1(1),2), vv(vind1(2),2)];
+    A56 = [1, 1; vv(vind2(1),2), vv(vind2(2),2)];
+    b34 = s*[1;da*vv(dp(1),2)];
+    b56 = s*[1;db*vv(dp(2),2)];
+    cvec(3:4) = A34\b34;
+    cvec(5:6) = A56\b56;
+    % set into global submatrix
+    out(dp,i) = cvec;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

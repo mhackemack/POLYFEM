@@ -3,7 +3,7 @@ global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.Path = 'Transport/Searchlight';
-data.problem.Name = 'tri_Irr=1_type=0_tol=0.1';
+data.problem.Name = 'tri_uniform';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
@@ -12,8 +12,8 @@ data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 24;
-data.problem.refinementTolerance = 0.1;
+data.problem.refinementLevels = 6;
+data.problem.refinementTolerance = 0.0;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
@@ -23,8 +23,8 @@ data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MAXENT';
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.SpatialMethod = 'MV';
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties

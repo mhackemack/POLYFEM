@@ -28,10 +28,10 @@ data.Neutronics.numberEnergyGroups = 1;
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'single';
-data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 4;
-data.Neutronics.Transport.AzimuthalLevels = 14;
-data.Neutronics.Transport.PolarLevels = 2;
+data.Neutronics.Transport.QuadType = dat_in.QuadType;
+data.Neutronics.Transport.SnLevels = dat_in.SnLevels;
+data.Neutronics.Transport.AzimuthalLevels = dat_in.AzimuthalLevels;
+data.Neutronics.Transport.PolarLevels = dat_in.PolarLevels;
 % Sweep Operations
 data.Neutronics.Transport.performSweeps = 0;
 data.Neutronics.Transport.visualizeSweeping = 0;

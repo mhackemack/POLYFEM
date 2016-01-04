@@ -26,18 +26,18 @@ dat_in.GeometryType = 'cart';
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 1;
 % ---
-dat_in.QuadType = 'LS';
+dat_in.QuadType = 'PGLC';
 dat_in.SnLevels = 4;
-dat_in.AzimuthalLevels = 14;
-dat_in.PolarLevels = 2;
+dat_in.AzimuthalLevels = 24;
+dat_in.PolarLevels = 1;
 % ---
 dat_in.refinementLevels = 27;
-dat_in.AMRIrregularity = 1;
+dat_in.AMRIrregularity = 2;
 dat_in.refinementTolerance = 1/4;
 dat_in.projectSolution = 0;
 % ---
 dat_in.DSASolveMethod = 'PCG';
-dat_in.DSAPreconditioner = 'gs';
+dat_in.DSAPreconditioner = 'ilu';
 dat_in.DSATolerance = 1e-3;
 % Load data and perform error checking
 % ------------------------------------------------------------------------------
@@ -87,12 +87,8 @@ for rlvl=0:nr-1
     (fprintf(1,'Refinement Calculation: %d of %d.\n',rlvl,nr-1));
     cname = ['_',num2str(rlvl)];
     % Load data structures
-%     load([ddir,'_data',cname,'.mat']);
     load([ddir,'_geometry',cname,'.mat']);
-%     load([ddir,'_DoF',cname,'.mat']);
-%     load([ddir,'_FE',cname,'.mat']);
     load([ddir,'_sol',cname,'.mat']);
-%     flux = sol.flux{:};
     dofnum(rlvl+1) = sol.SpatialDoFs;
     cell_nums(rlvl+1) = geometry.TotalCells;
     iter = sol.iter;
@@ -116,6 +112,5 @@ end
 % Print outputs
 % ------------------------------------------------------------------------------
 dlmwrite([ddir,'_numcellverts','.dat'],out_cell_verts);
-% dlmwrite([ddir,'_iterdata','.dat'],[out_iters,out_DSA_iters,out_times],'precision','%18.14e');
 dlmwrite([ddir,'_outdata','.dat'],[cell_nums,dofnum,out_iters,out_DSA_iters,out_times,tot_flux,ave_flux],'precision','%18.14e');
 

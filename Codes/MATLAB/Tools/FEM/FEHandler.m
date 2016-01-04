@@ -14,6 +14,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef FEHandler < handle
+    % General FEHandler information
     properties (Access = public)
         Dimension
         Degree
@@ -22,6 +23,7 @@ classdef FEHandler < handle
         BasisType
         BasisName
     end
+    % Cell-wise data structures
     properties (Access = public)
         CellQuadNodes
         CellQuadWeights
@@ -32,6 +34,7 @@ classdef FEHandler < handle
         CellStiffnessMatrix
         CellFunctionMatrix
     end
+    % Face-wise data structures
     properties (Access = public)
         FaceCells
         FaceQuadNodes
@@ -65,18 +68,22 @@ classdef FEHandler < handle
         LDFaceRHSGradientMatrix
         LDFaceCouplingGradientMatrix
     end
+    % MMS information
     properties (Access = private)
         MMSBool = 0
         GaussOrder = []
     end
+    % General Mesh/DoF information
     properties (Access = private)
         MeshType
         IsOrthogonal
+        CellVertexNumbers
         TotalDoFs
         TotalCells
         TotalFaces
         TotalVertices
     end
+    % Function evaluation members
     properties (Access = private)
         increase_quad_degree = false
         use_only_poly_quad = false
@@ -297,110 +304,6 @@ classdef FEHandler < handle
                         end
                     end
                 end
-                
-                
-                
-%                 %
-%                 % Generate Cell-Wise Basis Space
-%                 % ------------------------------
-%                 if glob.print_info, disp('   -> Begin Cell-Wise Elementary Matrix Construction.'); end
-%                 for c=1:obj.TotalCells
-%                     % Print Current Cell Information
-%                     if glob.print_info
-%                         msg = sprintf('      -> Building Cell: %d of %d',c,obj.TotalCells);
-%                         fprintf([rev_str,msg]);
-%                         rev_str = repmat(sprintf('\b'), 1, length(msg));
-%                     end
-%                     
-%                     cv = varargin{2}.CellVertexNodes{c};
-%                     verts = varargin{2}.NodeLocations(cv,:);
-%                     nvverts = length(verts);
-%                     cind = varargin{2}.ConnectivityArray{c};
-%                     cfaces = varargin{1}.CellFaces{c}; nfaces = length(cfaces);
-%                     fcnodes = cell(nfaces,1);
-%                     for f=1:nfaces
-%                         ff = cfaces(f);
-%                         if varargin{1}.FaceCells(ff,1) == c
-%                             cfn = varargin{2}.FaceVertexNodes{ff,1};
-%                         else
-%                             cfn = varargin{2}.FaceVertexNodes{ff,2};
-%                         end
-% %                         cfn = varargin{2}.CellFaceNodes{c}{f};
-%                         tfn = zeros(1,length(cfn));
-%                         for i=1:length(tfn)
-%                             for j=1:length(cind)
-%                                 if cfn(i) == cind(j);
-% %                                 if cfn(i) == cind(j);
-%                                     tfn(i) = j;
-%                                     break
-%                                 end
-%                             end
-%                         end
-%                         fcnodes{f} = tfn;
-%                     end
-%                     % Retrieve volumetric matrices
-%                     if ~obj.volume_bools(2) && ~obj.volume_bools(3)
-%                         M = obj.volume_func(verts,fcnodes,[1,0,0],obj.Degree,nvverts);
-%                     elseif obj.volume_bools(2) && ~obj.volume_bools(3)
-%                         [M,K] = obj.volume_func(verts,fcnodes,[1,1,0],obj.Degree,nvverts);
-%                         obj.CellStiffnessMatrix{c} = K;
-%                     elseif ~obj.volume_bools(2) && obj.volume_bools(3)
-%                         [M,G] = obj.volume_func(verts,fcnodes,[1,0,1],obj.Degree,nvverts);
-%                         obj.CellGradientMatrix{c} = G;
-%                     elseif obj.volume_bools(2) && obj.volume_bools(3)
-%                         [M,K,G] = obj.volume_func(verts,fcnodes,[1,1,1],obj.Degree,nvverts);
-%                         obj.CellStiffnessMatrix{c} = K;
-%                         obj.CellGradientMatrix{c} = G;
-%                     end
-%                     % Set mass matrix - always get this one
-%                     obj.CellMassMatrix{c} = M;
-%                     obj.CellFunctionMatrix{c} = M*ones(size(M,1),1);
-%                     % Generate Quadrature for MMS
-%                     if obj.MMSBool
-%                         [qx,qw,qb] = obj.quadrature_func(verts,obj.GaussOrder,fcnodes,obj.Degree,nvverts);
-%                         obj.CellQuadNodes{c} = qx;
-%                         obj.CellQuadWeights{c} = qw;
-%                         obj.CellBasisValues{c} = qb;
-%                     end
-%                     % Generate Face-Wise Basis Space Within Cell
-%                     % ------------------------------------------
-%                     g2 = cell(nfaces, 1); g3 = cell(nfaces, 1); g4 = cell(nfaces, 1);
-%                     if obj.surface_bools(2) && obj.surface_bools(3) && obj.surface_bools(4)
-%                         [m, g2, g3, g4] = obj.surface_func(verts,fcnodes,[1,1,1,1],obj.Degree,nvverts);
-%                     elseif obj.surface_bools(2)
-%                         [m, g2] = obj.surface_func(verts,fcnodes,[1,1,0,0],obj.Degree,nvverts);
-%                     else
-%                         m = obj.surface_func(verts,fcnodes,[1,0],obj.Degree,nvverts);
-%                     end
-%                     cfnodes = varargin{2}.CellFaceNodes{c};
-%                     for f=1:nfaces
-%                         ff = cfaces(f);
-%                         nvf = length(cfnodes{f});
-%                         fcells = varargin{1}.FaceCells(ff,:);
-%                         if fcells(1) == c
-%                             obj.FaceMassMatrix{ff,1} = m{f};
-%                             obj.FaceFunctionMatrix{ff,1} = m{f}*ones(nvf, 1);
-%                             obj.FaceConformingMassMatrix{ff,1} = m{f}(:,varargin{2}.ConformingFaceNodeNumbering{ff,1});
-%                             obj.FaceGradientMatrix{ff,1} = g2{f};
-%                             obj.FaceGradNormalMatrix{ff,1} = g3{f};
-%                             obj.FaceStiffnessMatrix{ff,1} = g4{f};
-%                         elseif fcells(2) == c
-%                             obj.FaceMassMatrix{ff,2} = m{f};
-%                             obj.FaceFunctionMatrix{ff,2} = m{f}*ones(nvf, 1);
-%                             obj.FaceConformingMassMatrix{ff,2} = m{f}(:,varargin{2}.ConformingFaceNodeNumbering{ff,2});
-%                             obj.FaceGradientMatrix{ff,2} = g2{f};
-%                             obj.FaceGradNormalMatrix{ff,2} = g3{f};
-%                             obj.FaceStiffnessMatrix{ff,2} = g4{f};
-%                         end
-%                     end
-%                 end
-                
-                
-                
-                
-                
-                
-                
                 % Generate Coupling Face Gradient Terms
                 % -------------------------------------
                 if glob.print_info, fprintf(rev_str); rev_str = []; end
