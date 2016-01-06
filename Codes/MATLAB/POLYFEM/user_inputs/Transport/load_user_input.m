@@ -33,9 +33,9 @@ data.Neutronics.numberEnergyGroups = 1;
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'all';
-data.Neutronics.Transport.QuadType = 'LS';
+data.Neutronics.Transport.QuadType = 'PGLC';
 data.Neutronics.Transport.SnLevels = 8;
-data.Neutronics.Transport.AzimuthalLevels = 14;
+data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
