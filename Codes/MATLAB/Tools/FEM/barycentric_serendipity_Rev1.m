@@ -41,8 +41,9 @@ bout = zeros(nqx, ntot); gout = zeros(ntot,dim,nqx);
 % Get Problem Preliminaries
 % ------------------------------------------------------------------------------
 if nout > 1, grad_bool = true; end
-h = get_max_diamter( verts ); h0 = eye(dim)/h;
-scaled_verts = (h0*verts')'; qx = (h0*qx')';
+% h = get_max_diamter( verts ); h0 = eye(dim)/h;
+% scaled_verts = (h0*verts')'; qx = (h0*qx')';
+scaled_verts = verts;
 vind = get_adjacent_vertices(nverts);
 [ser_verts, ser_nodes] = get_serendipity_nodes(nverts, scaled_verts, faces);
 % rva = get_vertex_differences( scaled_verts, qx );
@@ -223,25 +224,25 @@ end
 %     tdp = diag_pairs(i,:);
 %     L = tL; q = tq;
 %     % c-constraint
-%     L(1,1:2) = 1; L(1,3:end) = 1; q(1) = 2;
+%     L(1,1:2) = 1; L(1,3:end) = 2; q(1) = 2;
 %     % x-constraint
 %     L(2,:) = verts(tdp,1); L(2,3:end) = 2*L(2,3:end);
 %     q(2) = (va(1) + vb(1));
 %     % y-constraint
-%     L(3,:) = verts(tdp,2); L(3,3:end) = 2*L(2,3:end);
+%     L(3,:) = verts(tdp,2); L(3,3:end) = 2*L(3,3:end);
 %     q(3) = (va(2) + vb(2));
 %     % x_x-constraint
-%     L(4,:) = (verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),1))';
-%     q(4) = va(1)*vb(1);
+%     L(4,:) = (verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),1))'; L(4,3:end) = 2*L(4,3:end);
+%     q(4) = 2*va(1)*vb(1);
 %     % y_y-constraint
-%     L(5,:) = (verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),2))';
-%     q(5) = va(2)*vb(2);
+%     L(5,:) = (verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),2))'; L(5,3:end) = 2*L(5,3:end);
+%     q(5) = 2*va(2)*vb(2);
 %     % x_y-constraint
-%     L(6,:) = ((verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),2))')/2 + ...
-%              ((verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),1))')/2;
-%     q(6) = (va(1)*vb(2) + va(2)*vb(1))/2;
+%     L(6,:) = 2*((verts(ser_nodes(tdp,1),1).*verts(ser_nodes(tdp,2),2))') + ...
+%              2*((verts(ser_nodes(tdp,1),2).*verts(ser_nodes(tdp,2),1))');
+%     q(6) = 2*(va(1)*vb(2) + va(2)*vb(1));
 %     % Solve and apply constraint
-%     t = L'*((L*L')\q); t(abs(t) < 1e-14) = 0;
+%     t = (L'*inv(L*L'))*q; t(abs(t) < 1e-14) = 0;
 %     A(tdp,d) = t;
 % end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
