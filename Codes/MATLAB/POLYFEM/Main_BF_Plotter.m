@@ -65,11 +65,11 @@ p = 1;
 % BF(p).Degree = 2;
 % BF(p).BasisFunction = @mean_value_basis_functions;
 % p = p + 1;
-% % BF7
-% BF(p).Name = 'MAXENT';
-% BF(p).Degree = 1;
-% BF(p).BasisFunction = @max_entropy_basis_functions;
-% p = p + 1;
+% BF7
+BF(p).Name = 'MAXENT';
+BF(p).Degree = 1;
+BF(p).BasisFunction = @max_entropy_basis_functions;
+p = p + 1;
 % % BF8
 % BF(p).Name = 'MAXENT';
 % BF(p).Degree = 2;
@@ -100,14 +100,14 @@ Geometry(p).Quad = qxs;
 Geometry(p).QuadGrid = {xs, ys};
 Geometry(p).QuadPerDim = ns;
 p = p + 1;
-% % Geometry2
-% Geometry(p).Name = 'deg_square';
-% Geometry(p).Vertices = [0,0;1,0;1,1;.5,1;0,1];
-% Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,1]};
-% Geometry(p).Quad = qxs;
-% Geometry(p).QuadGrid = {xs, ys};
-% Geometry(p).QuadPerDim = ns;
-% p = p + 1;
+% Geometry2
+Geometry(p).Name = 'deg_square';
+Geometry(p).Vertices = [0,0;1,0;1,1;.5,1;0,1];
+Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,1]};
+Geometry(p).Quad = qxs;
+Geometry(p).QuadGrid = {xs, ys};
+Geometry(p).QuadPerDim = ns;
+p = p + 1;
 % % Geometry3
 % Geometry(p).Name = 'L-domain';
 % Geometry(p).Vertices = [0,0;1,0;1,0.5;0.5,0.5;0.5,1;0,1];

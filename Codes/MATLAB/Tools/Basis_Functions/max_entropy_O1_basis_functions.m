@@ -24,13 +24,14 @@ qx = varargin{2};
 faces = varargin{3};
 order = varargin{4};
 nverts = varargin{5};
-% Quick Error Checking
-% --------------------
-if order ~= 1, error('Should only be 1st order in this functor.'); end
 % Prepare Vertices and Dimensional Space
 % --------------------------------------
 dim = size(verts, 2);
 nqx = size(qx, 1);
+% Quick Error Checking
+% --------------------
+if order ~= 1, error('Should only be 1st order in this functor.'); end
+if dim ~= 2, error('We enforce only 2D MAXENT coordinates at this time.'); end
 % Allocate Matrix Memory
 % ----------------------
 if nout > 1, grad_bool = true; end
@@ -44,17 +45,15 @@ scaled_verts = (h0*verts')'; qx = (h0*qx')';
 h_n = get_min_nodal_spacing( scaled_verts );
 rva = get_vertex_differences( scaled_verts, qx );
 [ef, efder] = get_face_functions(scaled_verts, nverts, qx, dim, faces);
-
-% h_n = get_min_nodal_spacing( verts );
-% rva = get_vertex_differences( verts, qx );
-% [ef, efder] = get_face_functions(verts, nverts, qx, dim, faces);
 [pf, pfder] = get_prior_functions( h_n, rva, dim, ef, efder );
 dpx = get_number_lagrange_points( dim, order ); dpxz = zeros(dpx, 1);
+[inp, onp] = inpolygon(qx(:,1), qx(:,2), scaled_verts(:,1), scaled_verts(:,2));
 % Perform all Newton Iterations
 % -----------------------------
 iters = zeros(nqx, 1);
-% Loop through Quadrature Nodes
+% Loop through Quadrature Nodes - only evaluate interior nodes
 for q=1:nqx
+    if ~inp(q) || onp(q), continue; end
     xx = dpxz; converged = false;
     % Perform Newton Iterations
     while ~converged
@@ -79,11 +78,28 @@ for q=1:nqx
     Z = get_Z( xx, rva, pf,q )';
     bout(q,:) = Z/sum(Z);
 end
+% Evaluate boundary nodes
+if sum(onp) > 0
+    for f=1:length(faces)
+        fv = faces{f};
+        f1 = scaled_verts(fv(1),:); f2 = scaled_verts(fv(2),:);
+        len = norm(f2 - f1);
+        for q=1:nqx
+            if onp(q)
+                tqx = qx(q,:);
+                d1 = norm(f1-tqx); d2 = norm(f2-tqx);
+                if abs(d1+d2-len) < 1e-12
+                    bout(q,fv) = [d2,d1]/len;
+                    onp(q) = false;
+                end
+            end
+        end
+    end
+end
 % Create Basis Function Gradients
 % -------------------------------
 if grad_bool
     gout = get_basis_gradients( scaled_verts, pf, pfder, rva, bout, faces );
-%     gout = get_basis_gradients( verts, pf, pfder, rva, bout, faces );
     for q=1:nqx
         gout(:,:,q) = gout(:,:,q)*h0;
     end
