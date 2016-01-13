@@ -37,6 +37,11 @@ out.NuBar = [];
 out.FissSpec = [];
 out.ExtSource = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = add_comp_contribution(XS, xs_dir, density)
+function XS = add_comp_contribution(XS, xs_dir, density)
 % Total XS contribution
+if ~exist([xs_dir,'MT_1.mat'], 'file'), error(''); end
+% Scattering XS contribution
+
+% Absorption XS contribution
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
