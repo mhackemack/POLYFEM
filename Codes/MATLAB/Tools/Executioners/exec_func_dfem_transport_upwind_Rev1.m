@@ -35,13 +35,6 @@ for m=1:nas
     flux_out = add_to_flux(data.Quadrature(qid),ang_sets{m},groups,ndof,y,flux_out);
     data = add_reflecting_angular_fluxes(data,qid,xsid,mesh,DoF,ang_sets{m},groups,y);
 end
-% Add flux back into array
-% ------------------------------------------------------------------------------
-% for g=1:length(groups)
-%     for m=1:nm
-%         data.Fluxes.Phi{groups(g),m} = flux_out{g,m};
-%     end
-% end
 % Set Outputs
 % ------------------------------------------------------------------------------
 varargout{1} = data;

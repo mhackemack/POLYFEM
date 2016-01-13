@@ -17,18 +17,20 @@ accel = data.Acceleration.Info(accel_id);
 a_type = accel.AccelerationType;
 % Utilize residual contribution based on acceleration type
 % ------------------------------------------------------------------------------
-if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG
-    res = get_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,phi,phi0);
-%     res = get_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG || ...
+   a_type == glob.Accel_AGS_MTG
+    res = get_dsa_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,phi,phi0);
     data.Acceleration.Residual{accel_id} = res;
 elseif a_type == glob.Accel_Fission_DSA
+    
+elseif a_type == glob.Accel_AGS_TTG || a_type == glob.Accel_AGS_MTTG
     
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Function Listing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = get_scattering_residual_contribution(accel,XS,mesh,DoF,FE,x,x0)
+function out = get_dsa_scattering_residual_contribution(accel,XS,mesh,DoF,FE,x,x0)
 % Get some data
 [gb,ge,ggb,gge] = get_group_bounds(accel);
 ndof = DoF.TotalDoFs; out = zeros(ndof,1);
@@ -53,11 +55,14 @@ global glob
 ng = length(accel.Groups);
 if accel.AccelerationType == glob.Accel_WGS_DSA
     gb = 1; ge = ng;
-    ggb = ones(ng,1); 
-    gge = ng*ones(ng,1);
-elseif accel.AccelerationType == glob.Accel_AGS_TG
+    ggb = ones(ng,1); gge = ng*ones(ng,1);
+elseif accel.AccelerationType == glob.Accel_AGS_TG || ...
+       accel.AccelerationType == glob.Accel_AGS_TTG
     gb = 1; ge = ng;
-    gge = ng*ones(ng,1);
-    ggb = 1 + (1:ng);
+    ggb = 1 + (1:ng); gge = ng*ones(ng,1);
+elseif accel.AccelerationType == glob.Accel_AGS_MTG || ...
+       accel.AccelerationType == glob.Accel_AGS_MTTG
+    gb = 1; ge = ng;
+    ggb = (1:ng); gge = ng*ones(ng,1);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

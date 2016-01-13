@@ -47,8 +47,7 @@ data.Quadrature(1).AzimuthalLevels = 4;
 data.Fluxes.StartingSolution = 'zero';
 % Retrieve All Physical Properties
 data = get_69G_Graphite_XS(data, data.Transport.PnOrder);
-data.XS(1).ExtSource = zeros(1,data.Groups.NumberEnergyGroups);
-data.XS(1).ExtSource(1,1) = 1.0;
+data.XS(1).ExtSource = rand(1,data.Groups.NumberEnergyGroups);
 data.XS(1).BCFlags = [glob.Vacuum];
 data.XS(1).BCVals{1} = 0;
 % Construct Group Set Information
@@ -61,11 +60,11 @@ end
 data = collapse_two_grid_xs(data);
 % Acceleration Properties
 % ------------------------------------------------------------------------------
-data.Acceleration.WGSAccelerationBool = [false(data.Groups.NumberGroupSets-2,1);true;true];
+data.Acceleration.WGSAccelerationBool = false(data.Groups.NumberGroupSets,1);
 data.Acceleration.AGSAccelerationBool = true;
 data.Acceleration.WGSAccelerationResidual = false(data.Groups.NumberGroupSets,1);
 data.Acceleration.AGSAccelerationResidual = false;
-data.Acceleration.WGSAccelerationID = [zeros(data.Groups.NumberGroupSets-2,1);2;3];
+data.Acceleration.WGSAccelerationID = zeros(data.Groups.NumberGroupSets,1);
 data.Acceleration.AGSAccelerationID = 1;
 data.Acceleration.Info(1).AccelerationType = glob.Accel_AGS_TG;
 data.Acceleration.Info(1).DiscretizationType = glob.Accel_DSA_MIP;
@@ -73,27 +72,9 @@ data.Acceleration.Info(1).IP_Constant = 4;
 data.Acceleration.Info(1).Groups = data.Groups.ThermalGroups;
 data.Acceleration.Info(1).Moments = 1;
 data.Acceleration.Info(1).XSID = 2;
-% Group 68 Acceleration
-data.Acceleration.Info(2).AccelerationType = glob.Accel_WGS_DSA;
-data.Acceleration.Info(2).DiscretizationType = glob.Accel_DSA_MIP;
-data.Acceleration.Info(2).IP_Constant = 4;
-data.Acceleration.Info(2).Groups = data.Groups.GroupSets{end-1};
-data.Acceleration.Info(2).Moments = 1;
-data.Acceleration.Info(2).XSID = 3;
-data.Acceleration.Info(2).ErrorShape = ones(data.problem.NumberMaterials,1);
-data = set_within_group_DSA_XS(data, data.Acceleration.Info(2).Groups);
-% Group 69 Acceleration
-data.Acceleration.Info(3).AccelerationType = glob.Accel_WGS_DSA;
-data.Acceleration.Info(3).DiscretizationType = glob.Accel_DSA_MIP;
-data.Acceleration.Info(3).IP_Constant = 4;
-data.Acceleration.Info(3).Groups = data.Groups.GroupSets{end};
-data.Acceleration.Info(3).Moments = 1;
-data.Acceleration.Info(3).XSID = 4;
-data.Acceleration.Info(3).ErrorShape = ones(data.problem.NumberMaterials,1);
-data = set_within_group_DSA_XS(data, data.Acceleration.Info(3).Groups);
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.AGSMaxIterations = 1;
+data.solver.AGSMaxIterations = 100;
 data.solver.WGSMaxIterations = 1e3*ones(data.Groups.NumberGroupSets,1);
 data.solver.AGSRelativeTolerance = 1e-4;
 data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
@@ -102,7 +83,7 @@ data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;
-L = 1e3; ncells = 10;
+L = 1e3; ncells = 20;
 % L = 30*6.953164954422388e-02; ncells = 20;
 
 x=linspace(0,L,ncells+1);

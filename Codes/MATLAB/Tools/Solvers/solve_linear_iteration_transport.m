@@ -124,7 +124,6 @@ for m=1:ags_maxits
                 end
                 % Perform Acceleration Here
                 data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
-%                 data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE);
                 [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
                 data.Acceleration.Residual{ActiveAccelID} = [];
             end
@@ -166,7 +165,6 @@ for m=1:ags_maxits
         end
         % Perform Acceleration Here
         data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,AGS_OldPhi);
-%         data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE);
         [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
         data.Acceleration.Residual{ActiveAccelID} = [];
     end

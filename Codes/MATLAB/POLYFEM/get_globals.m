@@ -35,6 +35,7 @@ out.output_path = '../Outputs/';
 out.geom_path = 'geometry_inputs/precompiled/';
 out.geom_raw_tri_tet_path = 'geometry_inputs/raw_tri_tet_files/';
 out.geom_raw_dg_path = 'geometry_inputs/raw_dg_files/';
+out.xs_dir = '../XSFiles/';
 out.directory = [];
 out.print_info = true;
 out.plot_counter = 0;
@@ -60,8 +61,10 @@ out.IncidentBeam = 5;
 out.Accel_WGS_DSA = 1;
 out.Accel_WGS_TSA = 2;
 out.Accel_AGS_TG  = 3;
-out.Accel_AGS_TTG = 4;
-out.Accel_Fission_DSA = 5;
+out.Accel_AGS_MTG  = 4;
+out.Accel_AGS_TTG = 5;
+out.Accel_AGS_MTTG = 6;
+out.Accel_Fission_DSA = 7;
 % Acceleration Discretizations
 % ----------------------------
 out.Accel_DSA_MIP = 1;
