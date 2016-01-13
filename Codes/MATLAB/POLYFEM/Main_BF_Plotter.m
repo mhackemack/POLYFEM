@@ -35,45 +35,46 @@ out_dir = 'outputs/BF_Plots/';
 % Basis function information
 % --------------------------
 p = 1;
-% % BF1
-% BF(p).Name = 'PWLD';
-% BF(p).Degree = 1;
-% BF(p).BasisFunction = @PWLD_basis_functions;
-% p = p + 1;
-% % BF2
-% BF(p).Name = 'PWLD';
-% BF(p).Degree = 2;
-% BF(p).BasisFunction = @PWLD_basis_functions;
-% p = p + 1;
-% % BF3
-% BF(p).Name = 'WACHSPRESS';
-% BF(p).Degree = 1;
-% BF(p).BasisFunction = @wachspress_basis_functions;
-% p = p + 1;
-% % BF4
-% BF(p).Name = 'WACHSPRESS';
-% BF(p).Degree = 2;
-% BF(p).BasisFunction = @wachspress_basis_functions;
-% p = p + 1;
-% % BF5
-% BF(p).Name = 'MV';
-% BF(p).Degree = 1;
-% BF(p).BasisFunction = @mean_value_basis_functions;
-% p = p + 1;
-% % BF6 
-% BF(p).Name = 'MV';
-% BF(p).Degree = 2;
-% BF(p).BasisFunction = @mean_value_basis_functions;
-% p = p + 1;
+% BF1
+BF(p).Name = 'PWLD';
+BF(p).Degree = 1;
+BF(p).BasisFunction = @PWLD_basis_functions;
+p = p + 1;
+% BF2
+BF(p).Name = 'PWLD';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @PWLD_basis_functions;
+p = p + 1;
+% BF3
+BF(p).Name = 'WACHSPRESS';
+BF(p).Degree = 1;
+BF(p).BasisFunction = @wachspress_basis_functions;
+p = p + 1;
+% BF4
+BF(p).Name = 'WACHSPRESS';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @wachspress_basis_functions;
+p = p + 1;
+% BF5
+BF(p).Name = 'MV';
+BF(p).Degree = 1;
+BF(p).BasisFunction = @mean_value_basis_functions;
+p = p + 1;
+% BF6 
+BF(p).Name = 'MV';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @mean_value_basis_functions;
+p = p + 1;
 % BF7
 BF(p).Name = 'MAXENT';
 BF(p).Degree = 1;
 BF(p).BasisFunction = @max_entropy_basis_functions;
 p = p + 1;
-% % BF8
-% BF(p).Name = 'MAXENT';
-% BF(p).Degree = 2;
-% BF(p).BasisFunction = @max_entropy_basis_functions;
+% BF8
+BF(p).Name = 'MAXENT';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @max_entropy_basis_functions;
+p = p + 1;
 % % BF9
 % BF(p).Name = 'LAGRANGE';
 % BF(p).Degree = 1;
@@ -164,7 +165,7 @@ for g=1:ng
             axis square;
             % Save contour plot
             saveas(gcf, [out_dir,out_name,'_contour_b',num2str(i)], 'fig');
-            saveas(gcf, [out_dir,out_name,'_contour_b',num2str(i)], 'png');
+            print(gcf,'-dpng',[out_dir,out_name,'_contour_b',num2str(i)]);
             print(gcf,'-depsc',[out_dir,out_name,'_contour_b',num2str(i)]);
             % Generate surf plot
             clf; hold on; ax = gca;
@@ -175,7 +176,7 @@ for g=1:ng
             axis square;
             % Save surf plot
             saveas(gcf, [out_dir,out_name,'_surf_b',num2str(i)], 'fig');
-            saveas(gcf, [out_dir,out_name,'_surf_b',num2str(i)], 'png');
+            print(gcf,'-dpng',[out_dir,out_name,'_surf_b',num2str(i)]);
             print(gcf,'-depsc',[out_dir,out_name,'_surf_b',num2str(i)]);
         end
         % Save aggregate basis function output

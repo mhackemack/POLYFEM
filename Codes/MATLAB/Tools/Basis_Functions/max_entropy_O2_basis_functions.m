@@ -41,18 +41,20 @@ bout = zeros(nqx, ntot); pm_full = zeros(nqx, ntot); pp_full = zeros(nqx, ntot);
 % -------------------------
 tol = 1e-13;
 h = get_max_diamter( verts ); h0 = eye(dim)/h;
+f_dofs = get_face_dofs(nverts);
 scaled_verts = (h0*verts')'; qx = (h0*qx')';
 rva = get_vertex_differences( scaled_verts, qx );
 [ca, dca, qa] = get_constraint_matrix(scaled_verts, rva, qx);
 [ef, efder] = get_face_functions( nverts, qx, dim, rva );
 [pf, pfder] = get_prior_functions( rva, dim, ef, efder, nverts );
 dpx = get_number_lagrange_points( dim, order ); dpxz = zeros(dpx, 1);
+[inp, onp] = inpolygon(qx(:,1), qx(:,2), scaled_verts(:,1), scaled_verts(:,2));
 % Perform all Newton Iterations
 % -----------------------------
-iters = zeros(nqx, 1);
-lam = zeros(nqx, dpx);
-
+iters = zeros(nqx, 1); lam = zeros(nqx, dpx);
+% Loop through Quadrature Nodes - only evaluate interior nodes
 for q=1:nqx
+    if ~inp(q) || onp(q), continue; end
     xx = dpxz; converged = false;
     % Perform Newton Iterations
     while ~converged && iters(q) < 200
@@ -80,7 +82,24 @@ for q=1:nqx
     bout(q,:) = pp - pm;
 %     bout(q,:) = bout(q,:) / sum(bout(q,:));
 end
-
+% Evaluate boundary nodes
+if sum(onp) > 0
+    for f=1:length(faces)
+        fv = faces{f};
+        f1 = scaled_verts(fv(1),:); f2 = scaled_verts(fv(2),:);
+        len = norm(f2 - f1);
+        for q=1:nqx
+            if onp(q)
+                tqx = qx(q,:);
+                d1 = norm(f1-tqx); d2 = norm(f2-tqx);
+                if abs(d1+d2-len) < 1e-12
+                    bout(q,f_dofs{f}) = [(1-d1/len)^2,(d1/len)^2,2*d1/len*(1-d1/len)];
+                    onp(q) = false;
+                end
+            end
+        end
+    end
+end
 % Create Basis Function Gradients
 % -------------------------------
 if grad_bool
@@ -93,7 +112,6 @@ end
 % --------------------
 varargout{1} = bout;
 if grad_bool, varargout{2} = gout; end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function List
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,6 +125,12 @@ for i=1:nv
         h = norm(verts(j,:) - vi);
         if h > out_max, out_max = h; end
     end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_face_dofs(nv)
+out = cell(nv,1);
+for f=1:nv
+    out{f} = [f,mod(f,nv)+1,f+nv];
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function rv = get_vertex_differences( verts, qx )
