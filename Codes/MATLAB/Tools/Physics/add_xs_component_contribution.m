@@ -26,6 +26,10 @@ end
 % Check if XS Files exist
 % ------------------------------------------------------------------------------
 xs_dir = [glob.xs_dir, xs_name];
+if ~exist(xs_dir, 'dir'), error('XS component does not exist.'); end
+% Add XS contribution
+% ------------------------------------------------------------------------------
+data.XS(XSID) = add_comp_contribution(data.XS(XSID),xs_dir,matid,density);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Auxiliary Functions
@@ -38,23 +42,57 @@ out.FissionXS = zeros(nm,ng);
 out.NuBar = zeros(nm,ng);
 out.FissSpec = zeros(nm,ng);
 out.ExtSource = [];
+out.BCFlags = [];
+out.BCVals = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function XS = add_comp_contribution(XS, xs_dir, density)
+function XS = add_comp_contribution(XS, xs_dir, matid, density)
 % Total XS contribution - MT1
-if ~exist([xs_dir,'MT_1.mat'], 'file'), error(''); end
+if exist([xs_dir,'/MT_1.mat'], 'file')
+    T=retrieve_xs_component_from_file([xs_dir,'/MT_1.mat']);
+    if size(T,1) > size(T,2), T = T'; end
+    XS.TotalXS(matid,:) = XS.TotalXS(matid,:) + density*T;
+end
 % Scattering XS contribution
-
+if exist([xs_dir,'/MT_2500.mat'], 'file')
+    
+elseif exist([xs_dir,'/MT_2501.mat'], 'file')
+    
+end
 % Absorption XS contribution - check if MT27 exists, otherwise build it from the
 % the total and scattering cross sections
-if ~exist([xs_dir,'MT_27.mat'], 'file')
-    
+if exist([xs_dir,'/MT_27.mat'], 'file')
+    T=retrieve_xs_component_from_file([xs_dir,'/MT_27.mat']);
+    if size(T,1) > size(T,2), T = T'; end
+    XS.AbsorbXS(matid,:) = XS.AbsorbXS(matid,:) + density*T;
 else
     
 end
 % Fission XS - MT18
-
+if exist([xs_dir,'/MT_18.mat'], 'file')
+    T=retrieve_xs_component_from_file([xs_dir,'/MT_18.mat']);
+    if size(T,1) > size(T,2), T = T'; end
+    XS.FissionXS(matid,:) = XS.FissionXS(matid,:) + density*T;
+end
 % Nu-Bar - MT452
-
+if exist([xs_dir,'/MT_452.mat'], 'file')
+    T=retrieve_xs_component_from_file([xs_dir,'/MT_452.mat']);
+    if size(T,1) > size(T,2), T = T'; end
+    XS.NuBar(matid,:) = XS.NuBar(matid,:) + density*T;
+end
 % Fission spectrum (Chi) - MT1018
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = retrieve_xs_component_from_file(xs_file_name)
+M = open(xs_file_name);
+if isnumeric(M)
+    out = M;
+elseif isstruct(M)
+    if isfield(M,'mat'), out = M.mat;
+    else error('Cannot determine xs field.');
+    end
+elseif isempty(M)
+    error('No data is present in the xs file.');
+else
+    error('Cannot determine xs file organization.');
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
