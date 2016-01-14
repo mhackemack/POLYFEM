@@ -32,6 +32,6 @@ out.J_to_MeV = 6.2415065e12;
 % ------------------------------------------------------------------------------
 out.input_path = 'inputs/';
 out.output_path = 'outputs/';
-out.XS_path = 'XSFiles/';
+out.XS_path = '../XSFiles/';
 out.print_info = true;
 
