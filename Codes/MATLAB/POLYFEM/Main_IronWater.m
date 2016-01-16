@@ -26,7 +26,7 @@ dat_in.GeometryType = 'cart';
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 1;
 % ---
-dat_in.QuadType = 'LS';
+dat_in.QuadType = 'PGLC';
 dat_in.SnLevels = 4;
 dat_in.AzimuthalLevels = 24;
 dat_in.PolarLevels = 1;
@@ -37,7 +37,7 @@ dat_in.refinementTolerance = 1/4;
 dat_in.projectSolution = 1;
 % ---
 dat_in.DSASolveMethod = 'PCG';
-dat_in.DSAPreconditioner = 'eisenstat';
+dat_in.DSAPreconditioner = 'ilu';
 dat_in.DSATolerance = 1e-3;
 % Load data and perform error checking
 % ------------------------------------------------------------------------------
