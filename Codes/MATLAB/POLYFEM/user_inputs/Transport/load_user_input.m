@@ -33,8 +33,8 @@ data.Neutronics.numberEnergyGroups = 1;
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'all';
-data.Neutronics.Transport.QuadType = 'PGLC';
-data.Neutronics.Transport.SnLevels = 8;
+data.Neutronics.Transport.QuadType = 'LS';
+data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -49,7 +49,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e1; c = 0.9999;
+txs = 1e2; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -89,7 +89,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 20;
+L = 1; ncells = 1;
 % gname = 'PolyMesh_SqDomain_L1_n1024';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
