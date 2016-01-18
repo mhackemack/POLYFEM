@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LAGRANGE';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
@@ -72,7 +72,7 @@ data.Neutronics.Transport.BCVals  = [0.0];
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = 'PCG';
+data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'gs';
 data.Neutronics.Transport.DSATolerance = 1e-3;
 data.Neutronics.Transport.DSAMaxIterations = 1e3;
