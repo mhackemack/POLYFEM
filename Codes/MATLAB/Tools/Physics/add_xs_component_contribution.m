@@ -15,8 +15,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = add_xs_component_contribution(data,XSID,matid,xs_name,density)
 global glob
-% Get some problem 
-
+% Quick Input Checking
+% ------------------------------------------------------------------------------
+if nargin < 4, error('Not engough input arguments.'); end
+if nargin < 5, density = 1.0; end
 % Check if XS field has been built
 % ------------------------------------------------------------------------------
 if ~isfield(data, 'XS'), data.XS = make_empty_XS_field(); end
@@ -54,9 +56,11 @@ if exist([xs_dir,'/MT_1.mat'], 'file')
 end
 % Scattering XS contribution
 if exist([xs_dir,'/MT_2500.mat'], 'file')
-    
+    S=retrieve_xs_component_from_file([xs_dir,'/MT_2500.mat']);
+    XS.ScatteringXS(matid,:,:,:) = XS.ScatteringXS(matid,:,:,:) + density*S;
 elseif exist([xs_dir,'/MT_2501.mat'], 'file')
-    
+    S=retrieve_xs_component_from_file([xs_dir,'/MT_2501.mat']);
+    XS.ScatteringXS(matid,:,:,:) = XS.ScatteringXS(matid,:,:,:) + density*S;
 end
 % Absorption XS contribution - check if MT27 exists, otherwise build it from the
 % the total and scattering cross sections

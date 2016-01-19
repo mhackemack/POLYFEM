@@ -29,7 +29,7 @@ glob = get_globals('Office');
 % Specify User-Specific Input Folder Location
 % -------------------------------------------
 % inp = 'Diffusion';
-inp = 'Transport_TG';
+inp = 'Transport_MTG';
 % Populate path with additional folders
 % -------------------------------------
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
