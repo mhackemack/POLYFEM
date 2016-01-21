@@ -21,6 +21,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = dat_in.SpatialMethod;
+data.Neutronics.FEMLumping = dat_in.FEMLumping;
 data.Neutronics.FEMDegree = dat_in.FEMDegree;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties

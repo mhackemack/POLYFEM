@@ -22,6 +22,7 @@ classdef FEHandler < handle
         FEMName
         BasisType
         BasisName
+        FEMLumpBool = false
     end
     % Cell-wise data structures
     properties (Access = public)
@@ -121,12 +122,13 @@ classdef FEHandler < handle
                 % 1) class     GeneralGeometry/Cartesian Geometry
                 % 2) class     DoFHandler
                 % 3) string    Basis Name
-                % 4) logicals  Volume Booleans 
-                % 5) logicals  Surface Booleans
+                % 4) logical   Lumping Boolean
+                % 5) logicals  Volume Booleans 
+                % 6) logicals  Surface Booleans
                 %
                 % optional:
-                % 6) logical MMS Boolean
-                % 7) integer Sub-cell gauss order
+                % 7) logical MMS Boolean
+                % 8) integer Sub-cell gauss order
                 %----------------------------------------------
                 obj.Dimension     = varargin{1}.Dimension;
                 obj.MeshType      = varargin{1}.MeshType;
@@ -138,17 +140,18 @@ classdef FEHandler < handle
                 obj.FEMType       = varargin{2}.FEMType;
                 obj.FEMName       = varargin{2}.FEMName;
                 obj.BasisName     = varargin{3};
-                obj.volume_bools  = varargin{4};
-                obj.surface_bools = varargin{5};
-                if n > 5
-                    obj.MMSBool = varargin{6};
+                obj.FEMLumpBool   = varargin{4};
+                obj.volume_bools  = varargin{5};
+                obj.surface_bools = varargin{6};
+                if n > 6
+                    obj.MMSBool = varargin{7};
                 end
                 if obj.MMSBool
-                    if n > 6
-                        if varargin{7} < 1
+                    if n > 7
+                        if varargin{8} < 1
                             error(['Gauss quadrature less than 1, input = ',num2str(varargin{5})])
-                        elseif varargin{7} >= 2
-                            obj.GaussOrder = varargin{7};
+                        elseif varargin{8} >= 1
+                            obj.GaussOrder = varargin{8};
                         else
                             error('Unexpected error on FEHandler Input.')
                         end
@@ -220,7 +223,7 @@ classdef FEHandler < handle
                     end
                     % Retrieve cell-wise matrices and quadrature
                     % ----------------------------------------------------------
-                    [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.volume_bools,obj.surface_bools,obj.MMSBool,obj.GaussOrder);
+                    [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.FEMLumpBool,obj.volume_bools,obj.surface_bools,obj.MMSBool,obj.GaussOrder);
                     % Assign volumetric matrices
                     obj.CellMassMatrix{c}      = MV{1};
                     obj.CellFunctionMatrix{c}  = MV{1}*ones(size(MV{1},1),1);

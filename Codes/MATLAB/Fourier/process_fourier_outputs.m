@@ -23,6 +23,11 @@ sdm      = data.Neutronics.SpatialMethod;
 fdeg     = data.Neutronics.FEMDegree;
 t_type   = [data.Neutronics.TransportMethod,'_',data.Neutronics.Transport.transportType];
 dsa_type = data.Neutronics.DSAType;
+if data.Neutronics.FEMLumping
+    lump = 'L';
+else
+    lump = 'U';
+end
 % Adjust IP/MIP Name with IP coefficient
 if strcmp(dsa_type,'MIP') ||strcmp(dsa_type,'IP')
     dsa_type = [dsa_type,'_C=',num2str(data.Neutronics.IP_Constant)];
@@ -76,7 +81,7 @@ for m=1:n_sn
                 leg_names{plot_counter} = ['S',num2str(mm),', X/Y = ',num2str(inputs.yz(j))];
             end
             % Print here
-            fname = [dn,f_name,quad_name,'_',sdm,'_k',num2str(fdeg),'_XY=',num2str(inputs.yz(j))];
+            fname = [dn,f_name,quad_name,'_',lump,sdm,'_k',num2str(fdeg),'_XY=',num2str(inputs.yz(j))];
             if data.Output.file_bool, dlmwrite([fname,'.dat'],[mfp,te],'precision','%14.8e'); end
         end
     % Dimension = 3
@@ -97,7 +102,7 @@ for m=1:n_sn
                 leg_names{plot_counter} = ['S',num2str(mm),', X/YZ = ',num2str(inputs.yz(j))];
             end
             % Print here
-            fname = [dn,f_name,quad_name,'_',sdm,'_k',num2str(fdeg),'_XYZ=',num2str(inputs.yz(j))];
+            fname = [dn,f_name,quad_name,'_',lump,sdm,'_k',num2str(fdeg),'_XYZ=',num2str(inputs.yz(j))];
             if data.Output.file_bool, dlmwrite([fname,'.dat'],[mfp,te],'precision','%14.8e'); end
         end
     end

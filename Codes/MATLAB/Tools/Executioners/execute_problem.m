@@ -23,7 +23,7 @@ geometry = createAMRMesh(data, geometry);
 DoF = DoFHandler(geometry, data.Neutronics.FEMDegree, data.Neutronics.FEMType, data.Neutronics.DoFType);
 % Get FEHandler based on MMS - this is necessary so that FEHandler
 % generates Quadrature Sets for the Polygonal/Polyhedral cells
-FE = FEHandler(geometry, DoF, data.Neutronics.SpatialMethod, data.Neutronics.FEMVolumeBools, data.Neutronics.FEMSurfaceBools, mms, deg);
+FE = FEHandler(geometry, DoF, data.Neutronics.SpatialMethod, data.Neutronics.FEMLumping, data.Neutronics.FEMVolumeBools, data.Neutronics.FEMSurfaceBools, mms, deg);
 % Allocate Solution Space - gets reallocated after a mesh refinement
 data = prepare_problem_execution(data, geometry);
 [data.Neutronics, sol] = solution_allocation(data.Neutronics, geometry, DoF);
@@ -83,7 +83,7 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         % Form new mesh/DoFHandler/FEHandler
         refine_problem_mesh(data, geometry, DoF, FE, sol{r-1}.flux); % This works because of pass-by-reference
         DoF = DoFHandler(geometry, data.Neutronics.FEMDegree, data.Neutronics.FEMType, data.Neutronics.DoFType);
-        FE = FEHandler(geometry, DoF, data.Neutronics.SpatialMethod, data.Neutronics.FEMVolumeBools, data.Neutronics.FEMSurfaceBools, mms, deg);
+        FE = FEHandler(geometry, DoF, data.Neutronics.SpatialMethod, data.Neutronics.FEMLumping, data.Neutronics.FEMVolumeBools, data.Neutronics.FEMSurfaceBools, mms, deg);
         data = prepare_problem_execution(data, geometry);
         [data.Neutronics, sol{r}] = solution_allocation(data.Neutronics, geometry, DoF);
         % Interpolate flux solutions to next refinement level

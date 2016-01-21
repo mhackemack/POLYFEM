@@ -19,6 +19,9 @@ if ~isfield(data.Neutronics, 'IP_Constant')
     data.Neutronics.IP_Constant = 4.0;
 end
 data = get_spatial_method(data);
+if ~isfield(data.Neutronics, 'FEMLumping')
+    data.Neutronics.FEMLumping = false;
+end
 % Specific Transport Method Input
 % -------------------------------
 % Diffusion

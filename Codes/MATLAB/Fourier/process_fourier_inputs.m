@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [data, inputs] = process_fourier_inputs( data, varargin )
 % Build Input Space
-% -----------------
+% ------------------------------------------------------------------------------
 x = varargin{1}; nx = length(x);
 if length(varargin) == 2
     yz = varargin{2};
@@ -34,7 +34,7 @@ inputs.meshes = cell(ntot, 1);
 inputs.dofs = cell(ntot, 1);
 inputs.fes = cell(ntot, 1);
 % Build Meshes
-% ------------
+% ------------------------------------------------------------------------------
 if data.problem.Dimension == 1
     for i=1:nx
         inputs.meshes{i} = CartesianGeometry(1, [0,x(i)]);
@@ -83,10 +83,11 @@ elseif data.problem.Dimension == 3
     end
 end
 % Build DoFs and FEs
-% ------------------
-deg = data.Neutronics.FEMDegree;
-fem = data.Neutronics.FEMType;
-sdm = data.Neutronics.SpatialMethod;
+% ------------------------------------------------------------------------------
+deg  = data.Neutronics.FEMDegree;
+fem  = data.Neutronics.FEMType;
+sdm  = data.Neutronics.SpatialMethod;
+lump = data.Neutronics.FEMLumping;
 if strcmpi(sdm, 'lagrange')
     dtype = 1;
 else
@@ -94,10 +95,10 @@ else
 end
 for i=1:ntot
     inputs.dofs{i} = DoFHandler(inputs.meshes{i}, deg, fem, dtype);
-    inputs.fes{i} = FEHandler(inputs.meshes{i}, inputs.dofs{i}, sdm, [1,1,1], [1,1,0,0]);
+    inputs.fes{i} = FEHandler(inputs.meshes{i}, inputs.dofs{i}, sdm, lump, [1,1,1], [1,1,0,0]);
 end
 % Get Angular Quadrature
-% ----------------------
+% ------------------------------------------------------------------------------
 mdir = data.Neutronics.Transport.SnLevels; m_num = length(mdir);
 data.Neutronics.Transport.NumSnLevels = m_num;
 inputs.quadrature = cell(m_num, 1);

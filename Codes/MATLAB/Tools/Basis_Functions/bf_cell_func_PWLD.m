@@ -16,10 +16,11 @@
 %                   2) Vertices
 %                   3) Face Vertices
 %                   4) FEM Order
-%                   5) Volumetric Matrix Flags
-%                   6) Surface Matrix Flags
-%                   7) Quadrature boolean
-%                   8) Quadrature Order (Optional)
+%                   5) FEM Lumping Boolean
+%                   6) Volumetric Matrix Flags
+%                   7) Surface Matrix Flags
+%                   8) Quadrature boolean
+%                   9) Quadrature Order (Optional)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = bf_cell_func_PWLD( varargin )
@@ -30,12 +31,13 @@ nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
 faces = varargin{3}; nf = length(faces);
 ord = varargin{4};
-v_flags = varargin{5};
-s_flags = varargin{6};
-q_bool = varargin{7};
+lump_bool = varargin{5};
+v_flags = varargin{6};
+s_flags = varargin{7};
+q_bool = varargin{8};
 q_ord = ord+2;
-if nargin > 7
-    if ~isempty(varargin{8}),q_ord = varargin{8};end
+if nargin > 8
+    if ~isempty(varargin{8}),q_ord = varargin{9};end
 end
 % Prepare Vertices and Dimensional Space
 % ------------------------------------------------------------------------------
@@ -62,7 +64,7 @@ if dim == 2
 else
     i_offset = 0;
 end
-[mv, ms] = get_ref_mass_matrix(dim);
+[mv, ms] = get_ref_mass_matrix(dim,lump_bool);
 [bv, bs, db] = get_ref_basis(dim);
 nsides = get_total_sides(dim, faces);
 side_areas = get_face_side_areas(dim, verts, faces);
@@ -339,13 +341,23 @@ else
                0     0     1];
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [m, ms] = get_ref_mass_matrix(dim)
-if dim == 2
-    m = [2,1,1;1,2,1;1,1,2]./12;
-    ms = [2,1,0;1,2,0;0,0,0]/6;
+function [m, ms] = get_ref_mass_matrix(dim,lump)
+if ~lump
+    if dim == 2
+        m = [2,1,1;1,2,1;1,1,2]./12;
+        ms = [2,1,0;1,2,0;0,0,0]./6;
+    else
+        m = [2,1,1,1;1,2,1,1;1,1,2,1;1,1,1,2]./20;
+        ms = [2,1,1,0;1,2,1,0;1,1,2,0;0,0,0,0]./12;
+    end
 else
-    m = [2,1,1,1;1,2,1,1;1,1,2,1;1,1,1,2]./20;
-    ms = [2,1,1,0;1,2,1,0;1,1,2,0;0,0,0,0]./12;
+    if dim == 2
+        m = [1,0,0;0,1,0;0,0,1]./3;
+        ms = [1,0,0;0,1,0;0,0,0]./2;
+    else
+        m = [1,0,0,0;0,1,0,0;0,0,1,0;0,0,0,1]./4;
+        ms = [1,0,0,0;0,1,0,0;0,0,1,0;0,0,0,0]./3;
+    end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_total_sides(dim, faces)

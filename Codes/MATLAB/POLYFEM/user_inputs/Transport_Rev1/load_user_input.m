@@ -23,6 +23,7 @@ data.problem.PowerLevel = 1.0;
 data.problem.TransportMethod = 'Transport';
 data.problem.FEMType = 'DFEM';
 data.problem.SpatialMethod = 'PWLD';
+data.Neutronics.FEMLumping = false;
 data.problem.FEMDegree = 1;
 % Transport Properties
 % ------------------------------------------------------------------------------

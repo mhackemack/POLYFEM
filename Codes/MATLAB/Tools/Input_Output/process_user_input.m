@@ -48,6 +48,9 @@ if strcmpi(data.problem.SpatialMethod, 'lagrange')
 else
     data.problem.DoFType = 2;
 end
+if ~isfield(data.problem, 'FEMLumping')
+    data.problem.FEMLumping = false;
+end
 % Check AMR Data
 % ------------------------------------------------------------------------------
 data = process_amr_data(data);

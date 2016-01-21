@@ -17,6 +17,7 @@ data.problem.plotSolution = 0;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = bf;
+data.Neutronics.FEMLumping = false;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties

@@ -46,6 +46,7 @@ dyz = [1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
+data.Neutronics.FEMLumping = 0;
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';

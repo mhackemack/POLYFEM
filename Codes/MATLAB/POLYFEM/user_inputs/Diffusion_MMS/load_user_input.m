@@ -24,6 +24,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Diffusion';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 

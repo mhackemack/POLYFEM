@@ -25,6 +25,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'WACHSPRESS';
+data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 2;
 data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties

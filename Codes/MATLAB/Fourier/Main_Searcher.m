@@ -32,7 +32,6 @@ glob.print_info = false;
 data.Type = 'Search';
 % outputs
 data.Output.plotting_bool = true;
-data.Output.printing_bool = false;
 data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
@@ -47,7 +46,8 @@ dyz = [1];
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 data.problem.refineMesh = false;
-data.Neutronics.FEMDegree = 2;
+data.Neutronics.FEMDegree = 1;
+data.Neutronics.FEMLumping = 1;
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
@@ -58,7 +58,7 @@ data.Neutronics.Transport.FluxStabilization = 2;
 data.Neutronics.Transport.CurrentStabilization = 1;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4];
+data.Neutronics.Transport.SnLevels = [4];
 data.Neutronics.Transport.PnOrder = 0;
 % xs
 c = 0.9999; sigt = 1.0;

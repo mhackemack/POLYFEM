@@ -25,6 +25,7 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 dat_in.GeometryType = 'cart';
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 1;
+dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'LS';
 dat_in.SnLevels = 8;

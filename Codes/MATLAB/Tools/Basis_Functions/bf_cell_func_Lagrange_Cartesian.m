@@ -17,29 +17,31 @@
 %                   2) Vertices
 %                   3) Face Vertices
 %                   4) FEM Order
-%                   5) Volumetric Matrix Flags
-%                   6) Surface Matrix Flags
-%                   7) Quadrature boolean
-%                   8) Quadrature Order (Optional)
+%                   5) FEM Lumping Boolean
+%                   6) Volumetric Matrix Flags
+%                   7) Surface Matrix Flags
+%                   8) Quadrature boolean
+%                   9) Quadrature Order (Optional)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = bf_cell_func_Lagrange_Cartesian( varargin )
 % Collect Input/Output Arguments
-% ------------------------------
+% ------------------------------------------------------------------------------
 nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
 faces = varargin{3}; nf = length(faces);
 ord = varargin{4};
-v_flags = varargin{5};
-s_flags = varargin{6};
-q_bool = varargin{7};
+lump_bool = varargin{5};
+v_flags = varargin{6};
+s_flags = varargin{7};
+q_bool = varargin{8};
 q_ord = ord+2;
-if nargin > 7
-    if ~isempty(varargin{8}),q_ord = varargin{8};end
+if nargin > 8
+    if ~isempty(varargin{8}),q_ord = varargin{9};end
 end
 % Prepare Vertices and Dimensional Space
-% --------------------------------------
+% ------------------------------------------------------------------------------
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
