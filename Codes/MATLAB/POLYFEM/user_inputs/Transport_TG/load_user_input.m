@@ -84,7 +84,7 @@ data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;
-L = 1e3; ncells = 20;
+L = 1e3; ncells = 10;
 % L = 30*6.953164954422388e-02; ncells = 20;
 
 x=linspace(0,L,ncells+1);
@@ -103,7 +103,7 @@ grps = data.Groups.ThermalGroups; ngrps = length(grps);
 txs = data.XS(1).TotalXS(:,grps);
 sxs = data.XS(1).ScatteringXS(:,grps,grps,1);
 data.Acceleration.Info(1).ErrorShape = zeros(nm,ngrps);
-% Generate Eigenshape for energy collaps
+% Generate Eigenshape for energy collapse
 y = cell(nm,1);
 for m=1:nm
     A = (diag(txs(m,:)) - tril(squeeze(sxs(m,:,:))))\triu(squeeze(sxs(m,:,:)),1);
@@ -140,25 +140,4 @@ end
 data.XS(2).ScatteringXS = data.XS(1).ScatteringXS;
 data.XS(2).BCFlags = data.XS(1).BCFlags; 
 data.XS(2).BCVals  = data.XS(1).BCVals;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = set_within_group_DSA_XS(data, grp)
-n = length(data.XS)+1;
-nm = data.problem.NumberMaterials;
-data.XS(n).TotalXS = data.XS(1).TotalXS(:,grp);
-data.XS(n).AbsorbXS = data.XS(1).AbsorbXS(:,grp);
-data.XS(n).ScatteringXS = data.XS(1).ScatteringXS(:,:,:,1);
-data.XS(n).DiffXS = zeros(nm,1);
-for m=1:nm
-    if data.Transport.PnOrder == 0
-        data.XS(n).DiffXS(m) = 1/3/data.XS(n).TotalXS(m);
-    elseif data.Transport.PnOrder > 1
-        tt = 0;
-        for g=1:data.Groups.NumberEnergyGroups
-            tt = tt + data.XS(n).ScatteringXS(m,g,grp);
-        end
-        data.XS(n).DiffXS(m) = 1/3/(data.XS(n).TotalXS(m)-tt);
-    end
-end
-data.XS(n).BCFlags = data.XS(1).BCFlags; 
-data.XS(n).BCVals  = data.XS(1).BCVals;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

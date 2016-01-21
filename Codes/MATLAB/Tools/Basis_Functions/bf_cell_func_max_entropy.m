@@ -37,7 +37,7 @@ s_flags = varargin{7};
 q_bool = varargin{8};
 q_ord = ord+2;
 if nargin > 8
-    if ~isempty(varargin{8}),q_ord = varargin{9};end
+    if ~isempty(varargin{9}),q_ord = varargin{9};end
 end
 % Prepare Vertices and Dimensional Space
 % ------------------------------------------------------------------------------

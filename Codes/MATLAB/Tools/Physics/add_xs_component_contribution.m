@@ -19,11 +19,14 @@ global glob
 % ------------------------------------------------------------------------------
 if nargin < 4, error('Not engough input arguments.'); end
 if nargin < 5, density = 1.0; end
+nm   = data.problem.NumberMaterials;
+ng   = data.Groups.NumberEnergyGroups;
+nmom = data.Transport.PnOrder+1;
 % Check if XS field has been built
 % ------------------------------------------------------------------------------
-if ~isfield(data, 'XS'), data.XS = make_empty_XS_field(); end
+if ~isfield(data, 'XS'), data.XS = make_empty_XS_field(nm,ng,nmom); end
 if length(data.XS) < XSID
-    for i=length(data.XS)+1:XSID, data.XS(i) = make_empty_XS_field(); end
+    for i=length(data.XS)+1:XSID, data.XS(i) = make_empty_XS_field(nm,ng,nmom); end
 end
 % Check if XS Files exist
 % ------------------------------------------------------------------------------
@@ -55,12 +58,13 @@ if exist([xs_dir,'/MT_1.mat'], 'file')
     XS.TotalXS(matid,:) = XS.TotalXS(matid,:) + density*T;
 end
 % Scattering XS contribution
+nsxs = size(XS.ScatteringXS,4);
 if exist([xs_dir,'/MT_2500.mat'], 'file')
     S=retrieve_xs_component_from_file([xs_dir,'/MT_2500.mat']);
-    XS.ScatteringXS(matid,:,:,:) = XS.ScatteringXS(matid,:,:,:) + density*S;
+    XS.ScatteringXS(matid,:,:,:) = squeeze(XS.ScatteringXS(matid,:,:,:)) + density*S(:,:,1:nsxs);
 elseif exist([xs_dir,'/MT_2501.mat'], 'file')
     S=retrieve_xs_component_from_file([xs_dir,'/MT_2501.mat']);
-    XS.ScatteringXS(matid,:,:,:) = XS.ScatteringXS(matid,:,:,:) + density*S;
+    XS.ScatteringXS(matid,:,:,:) = squeeze(XS.ScatteringXS(matid,:,:,:)) + density*S(:,:,1:nsxs);
 end
 % Absorption XS contribution - check if MT27 exists, otherwise build it from the
 % the total and scattering cross sections

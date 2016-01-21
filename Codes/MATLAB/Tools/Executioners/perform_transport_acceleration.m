@@ -24,7 +24,8 @@ if is_dsa
     % Get DSA system matrix if not set
     if isempty(A), A = a_handle(data,accel_id,xsid,mesh,DoF,FE); end
     % Compute error and apply correction based on DSA type
-    if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG
+    if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG || ...
+       a_type == glob.Accel_AGS_MTG
         dx = A\data.Acceleration.Residual{accel_id};
         data = update_DSA_solutions(data, accel_id, mesh, DoF, dx);
     elseif a_type == glob.Accel_Fission_DSA
@@ -50,6 +51,7 @@ accel_disc = accel.DiscretizationType;
 % Search through acceleration types
 if      accel_type == glob.Accel_WGS_DSA || ...
         accel_type == glob.Accel_AGS_TG  || ...
+        accel_type == glob.Accel_AGS_MTG  || ...
         accel_type == glob.Accel_Fission_DSA
     is_dsa = true;
     % Switch between diffusion discretizations
@@ -63,7 +65,8 @@ if      accel_type == glob.Accel_WGS_DSA || ...
         a_handle = @exec_func_LHS_DSA_M4S;
     end
 elseif  accel_type == glob.Accel_WGS_TSA || ...
-        accel_type == glob.Accel_AGS_TTG
+        accel_type == glob.Accel_AGS_TTG || ...
+        accel_type == glob.Accel_AGS_MTTG  
     is_dsa = false;
     if accel_disc == glob.Accel_TSA_DFEM
         a_handle = @exec_func_DFEM_TSA;
