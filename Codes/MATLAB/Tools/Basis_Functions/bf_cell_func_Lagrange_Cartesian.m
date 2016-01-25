@@ -76,6 +76,7 @@ if dim == 2
     svol = polygonArea(verts);
 elseif dim == 3
     ref_x = [0,0,0;1,0,0;1,1,0;0,1,0;0,0,1;1,0,1;1,1,1;0,1,1];
+    [~,svol] = convhull(verts);
 end
 [rqx_V, rqw_V] = get_ref_quadrature(dim, q_ord);   nq_V = length(rqw_V);
 [rqx_S, rqw_S] = get_ref_quadrature(dim-1, q_ord); nq_S = length(rqw_S);

@@ -90,7 +90,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 2;
+L = 1; ncells = 1;
 % gname = 'PolyMesh_SqDomain_L1_n1024';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
@@ -115,7 +115,7 @@ L = 1; ncells = 2;
 % tri = delaunayTriangulation(x,y,z);
 % geometry = GeneralGeometry(3, 'Delaunay', tri);
 
-x=linspace(0,10*L,ncells+1);
+x=linspace(0,L,ncells+1);
 y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);

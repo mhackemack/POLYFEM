@@ -46,19 +46,35 @@ data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
 data.Fluxes.StartingSolution = 'zero';
-% Retrieve All Physical Properties
-data = get_69G_Graphite_XS(data, data.Transport.PnOrder);
-data.XS(1).ExtSource = rand(1,data.Groups.NumberEnergyGroups);
-data.XS(1).BCFlags = [glob.Vacuum];
-data.XS(1).BCVals{1} = 0;
 % Construct Group Set Information
+data.Groups.NumberEnergyGroups = 99;
+data.Groups.FastGroups = 1:42;
+data.Groups.ThermalGroups = 43:99;
 data.Groups.NumberGroupSets = data.Groups.NumberEnergyGroups;
 data.Groups.GroupSets = cell(data.Groups.NumberGroupSets,1);
 data.Groups.GroupSetUpscattering = [false(length(data.Groups.FastGroups),1);true(length(data.Groups.ThermalGroups),1)];
-for g=1:data.Groups.NumberGroupSets
-    data.Groups.GroupSets{g} = g;
-end
-data = collapse_two_grid_xs(data);
+for g=1:data.Groups.NumberGroupSets, data.Groups.GroupSets{g} = g; end
+% Retrieve All Physical Properties
+% ------------------------------------------------------------------------------
+% Graphite
+data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
+data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 2.4335449e-06);
+% Air
+% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
+% data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
+% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
+% data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+% HDPE
+% data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
+% BHDPE
+% data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 5.0859E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 2.5429E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 6.6256E-3);
+% data = add_xs_component_contribution(data, 1, 1, 'B11_99G', 2.6669E-2);
+data.XS(1).ExtSource = rand(data.problem.NumberMaterials,data.Groups.NumberEnergyGroups);
+data.XS(1).BCFlags = [glob.Vacuum];
+data.XS(1).BCVals{1} = 0;
 % Acceleration Properties
 % ------------------------------------------------------------------------------
 data.Acceleration.WGSAccelerationBool = false(data.Groups.NumberGroupSets,1);
@@ -73,71 +89,26 @@ data.Acceleration.Info(1).IP_Constant = 4;
 data.Acceleration.Info(1).Groups = data.Groups.ThermalGroups;
 data.Acceleration.Info(1).Moments = 1;
 data.Acceleration.Info(1).XSID = 2;
+data = collapse_tg_xs(data,1,2,1);
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.AGSMaxIterations = 100;
-data.solver.WGSMaxIterations = 1e3*ones(data.Groups.NumberGroupSets,1);
+data.solver.AGSMaxIterations = 1e4;
+data.solver.WGSMaxIterations = 1e4*ones(data.Groups.NumberGroupSets,1);
 data.solver.AGSRelativeTolerance = 1e-4;
-data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 data.solver.AGSAbsoluteTolerance = 1e-4;
+data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
-L = 1e3; ncells = 10;
+data.problem.Dimension = 2;
+L = 1e3; ncells = 4;
 % L = 30*6.953164954422388e-02; ncells = 20;
 
 x=linspace(0,L,ncells+1);
-y=linspace(0,L,ncells+1);
+y=linspace(0,1e3*L,ncells+1);
 z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(1,x);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.set_face_flag_on_surface(2,0.0);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = collapse_two_grid_xs(data)
-nm = data.problem.NumberMaterials;
-grps = data.Groups.ThermalGroups; ngrps = length(grps);
-txs = data.XS(1).TotalXS(:,grps);
-sxs = data.XS(1).ScatteringXS(:,grps,grps,1);
-data.Acceleration.Info(1).ErrorShape = zeros(nm,ngrps);
-% Generate Eigenshape for energy collapse
-y = cell(nm,1);
-for m=1:nm
-    A = (diag(txs(m,:)) - tril(squeeze(sxs(m,:,:))))\triu(squeeze(sxs(m,:,:)),1);
-    [y{m},~,~] = power_method(A,ones(ngrps,1),2000,1e-15);
-    y{m} = y{m} / sum(y{m});
-    data.Acceleration.Info(1).ErrorShape(m,:) = y{m};
-end
-% Populate Acceleration XS
-for m=1:nm
-    data.XS(2).TotalXS(m) = 0;
-    data.XS(2).DiffXS(m) = 0;
-    data.XS(2).AbsorbXS(m) = 0;
-    for g=1:ngrps
-        data.XS(2).TotalXS(m) = data.XS(2).TotalXS(m) + y{m}(g)*txs(m,g);
-        data.XS(2).AbsorbXS(m) = data.XS(2).AbsorbXS(m) + y{m}(g)*txs(m,g);
-        for gg=1:ngrps
-            data.XS(2).AbsorbXS(m) = data.XS(2).AbsorbXS(m) - sxs(m,g,gg,1)*y{m}(gg);
-        end
-    end
-    if data.Transport.PnOrder == 0
-        for g=1:ngrps
-            data.XS(2).DiffXS(m) = data.XS(2).DiffXS(m) + y{m}(g)/txs(m,g)/3;
-        end
-    elseif data.Transport.PnOrder > 0
-        for g=1:ngrps
-            tt = 0;
-            for gg=1:ngrps
-                tt = tt + sxs(m,gg,g,2);
-            end
-            data.XS(2).DiffXS(m) = data.XS(2).DiffXS(m) + y{m}(g)/(txs(m,g)-tt)/3;
-        end
-    end
-end
-data.XS(2).ScatteringXS = data.XS(1).ScatteringXS;
-data.XS(2).BCFlags = data.XS(1).BCFlags; 
-data.XS(2).BCVals  = data.XS(1).BCVals;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
