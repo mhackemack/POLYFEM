@@ -41,7 +41,7 @@ data.Transport.CurrentStabilization = 1.0;
 data.Quadrature(1).PnOrder = data.Transport.PnOrder;
 data.Quadrature(1).AngleAggregation = 'all';
 data.Quadrature(1).QuadType = 'LS';
-data.Quadrature(1).SnLevels = 4;
+data.Quadrature(1).SnLevels = 8;
 data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
@@ -56,14 +56,14 @@ data.Groups.GroupSetUpscattering = [false(length(data.Groups.FastGroups),1);true
 for g=1:data.Groups.NumberGroupSets, data.Groups.GroupSets{g} = g; end
 % Retrieve All Physical Properties
 % ------------------------------------------------------------------------------
-% Graphite
-% data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 2.4335449e-06);
 % Air
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
 % data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
 % data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
 % data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+% Graphite
+% data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
+% data = add_xs_component_contribution(data, 1, 2, 'B10_99G', 2.4335449e-06);
 % HDPE
 data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
 data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
@@ -72,9 +72,14 @@ data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 2.5429E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 6.6256E-3);
 % data = add_xs_component_contribution(data, 1, 1, 'B11_99G', 2.6669E-2);
+% AmBe
+% data = add_xs_component_contribution(data, 1, 4, 'Am241_99G', 1.1649E-3);
+% data = add_xs_component_contribution(data, 1, 4, 'Be9_99G', 1.9077E-1);
+% data = add_xs_component_contribution(data, 1, 4, 'O16_99G', 1.0511E-5);
 data.XS(1).ExtSource = rand(data.problem.NumberMaterials,data.Groups.NumberEnergyGroups);
-data.XS(1).BCFlags = [glob.Vacuum];
+data.XS(1).BCFlags = [glob.Vacuum, glob.Reflecting];
 data.XS(1).BCVals{1} = 0;
+data.XS(1).BCVals{2} = 0;
 % Acceleration Properties
 % ------------------------------------------------------------------------------
 data.Acceleration.WGSAccelerationBool = false(data.Groups.NumberGroupSets,1);
@@ -100,15 +105,14 @@ data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
-L = 1e3; ncells = 20;
-% L = 30*6.953164954422388e-02; ncells = 20;
+data.problem.Dimension = 2;
+Lx = 35; Ly = 45;
+xd = [0,1,20,35];
+yd = [0,3,35,45];
+x = [linspace(xd(1),xd(2),2),linspace(xd(2),xd(3),6),linspace(xd(3),xd(4),4)];
+y = [linspace(yd(1),yd(2),2),linspace(yd(2),yd(3),6),linspace(yd(3),yd(4),4)];
+geometry = CartesianGeometry(2,unique(x),unique(y));
+% Set material regions
 
-x=linspace(0,L,ncells+1);
-% y=linspace(0,L,ncells+1);
-% z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
-% geometry = CartesianGeometry(3,x,y,z);
-
-% geometry.set_face_flag_on_surface(2,0.0);
+% Set boundary conditions
+geometry.set_face_flag_on_surface(2,[0,0;0,Ly]);
