@@ -22,6 +22,7 @@ inp = 'InfMedium_AllComponents';
 addpath(['inputs/',inp]); % This one must be last to properly switch input files
 % ------------------------------------------------------------------------------
 data = load_user_input();
+ng = data.Energy.NumberEngeryGroups;
 % ------------------------------------------------------------------------------
 % Loop through materials to analyze and perform analysis
 GSPI_str_out = cell(length(data.Energy.ThermalGroups)+1,data.NumberMaterialsToAnalyze);
@@ -40,17 +41,17 @@ for m=1:data.NumberMaterialsToAnalyze
     tcompdens = data.Materials{m}.ComponentDensities;
     % Get energy bounds from first component in material
     load([glob.XS_path,tcompnames{1},'/Energy_Bounds.mat']); E = mat;
-    Eave = (E(1:99) + E(2:100))./2; Ediff = E(1:99) - E(2:100);
+    Eave = (E(1:ng) + E(2:(ng+1)))./2; Ediff = E(1:ng) - E(2:(ng+1));
     % Zero out total and scattering cross sections
     T = zeros(data.Energy.NumberEngeryGroups);
     S0 = zeros(data.Energy.NumberEngeryGroups);
     % Loop through components within the material
     for c=1:data.Materials{m}.NumberComponents
         % Add total xs contribution
-        load([glob.XS_path,tcompnames{1},'/MT_1.mat']);
+        load([glob.XS_path,tcompnames{c},'/MT_1.mat']);
         T = T + tcompdens(c)*diag(mat);
         % Add P0 scattering xs contribution
-        load([glob.XS_path,tcompnames{1},'/MT_2500.mat']);
+        load([glob.XS_path,tcompnames{c},'/MT_2500.mat']);
         S0 = S0 + tcompdens(c)*mat(:,:,1);
     end
     % Generate Infinite Medium EigenSpectrums
