@@ -25,7 +25,7 @@ g_offset = (1:ng)*ndof*na - ndof*na;
 % Allocate Memory Space
 % ---------------------
 if ntot > glob.maxMatrix
-    L = get_sparse_matrix(data, mesh, DoF, FE, angs, groups);
+    L = get_sparse_matrix(data,xsid,qid,angs,groups,mesh,DoF,FE);
     return
 end
 L = zeros(ntot);

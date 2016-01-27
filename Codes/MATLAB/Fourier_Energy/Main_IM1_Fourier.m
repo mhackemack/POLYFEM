@@ -17,13 +17,13 @@ clear; clc; close all; format long e
 % Clear Project Space
 % ------------------------------------------------------------------------------
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Office');
+global glob; glob = get_globals('Home');
 inp = 'IM1_AllComponents';
 addpath(['inputs/',inp]); % This one must be last to properly switch input files
 % ------------------------------------------------------------------------------
 data = load_user_input();
 % ------------------------------------------------------------------------------
-ny = 2e2; x = linspace(1e-8,4*pi,ny)';
+ny = 4e2; x = linspace(1e-8,4*pi,ny)';
 nm = data.NumberMaterialsToAnalyze;
 ng = data.Energy.NumberEngeryGroups;
 nmom = data.Energy.PnOrder+1;
@@ -84,10 +84,24 @@ for m=1:data.NumberMaterialsToAnalyze
         y_P1_noaccel(i,m) = func_P1_noaccel(x(i), T, S);
         y_P1_accel(i,m)   = func_P1_accel(x(i), T, S, D1, V);
         % Place fourier results into global data structures
-        
+        P0_noaccel_out{1+i,m+1} = num2str(y_P0_noaccel(i,m),'%16.8e');
+        P0_accel_out{1+i,m+1}   = num2str(y_P0_accel(i,m),'%16.8e');
+        P1_noaccel_out{1+i,m+1} = num2str(y_P1_noaccel(i,m),'%16.8e');
+        P1_accel_out{1+i,m+1}   = num2str(y_P1_accel(i,m),'%16.8e');
     end
+end
+% ------------------------------------------------------------------------------
+for i=1:ny
+    P0_noaccel_out{1+i,1} = num2str(x(i),'%16.8e');
+    P0_accel_out{1+i,1}   = num2str(x(i),'%16.8e');
+    P1_noaccel_out{1+i,1} = num2str(x(i),'%16.8e');
+    P1_accel_out{1+i,1}   = num2str(x(i),'%16.8e');
 end
 % ------------------------------------------------------------------------------
 % Check if output directory exists
 if ~isequal(exist([glob.output_path,data.OutputName], 'dir'),7),mkdir([glob.output_path,data.OutputName]); end
-
+% Print output files
+cell2csv([glob.output_path,data.OutputName,'/Fourier_P0_noaccel'],P0_noaccel_out);
+cell2csv([glob.output_path,data.OutputName,'/Fourier_P0_accel'],P0_accel_out);
+cell2csv([glob.output_path,data.OutputName,'/Fourier_P1_noaccel'],P1_noaccel_out);
+cell2csv([glob.output_path,data.OutputName,'/Fourier_P1_accel'],P1_accel_out);
