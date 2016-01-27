@@ -129,12 +129,15 @@ for m=1:ags_maxits
             end
             % Retreive convergence criteria
             [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,2);
-            [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,inf);
+%             [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,inf);
+            [err_pw, norm_pw] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,'pdt_pw');
             if err_L2 / norm_L2 < wgs_rel_tol(gs), wgs_rel_converged = true; else wgs_rel_converged = false; end
-            if err_inf < wgs_abs_tol(gs), wgs_abs_converged = true; else wgs_abs_converged = false; end
+            if err_pw < wgs_abs_tol(gs), wgs_abs_converged = true; else wgs_abs_converged = false; end
+%             if err_inf < wgs_abs_tol(gs), wgs_abs_converged = true; else wgs_abs_converged = false; end
             % Print WGS Iteration Information
             if data.IO.PrintIterationInfo
-                msg = sprintf('      (%d) WGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',gs,it,err_L2 / norm_L2,err_inf);
+                msg = sprintf('      (%d) WGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',gs,it,err_L2 / norm_L2,err_pw);
+%                 msg = sprintf('      (%d) WGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',gs,it,err_L2 / norm_L2,err_inf);
                 disp(msg);
             end
             % Exit if convergence is met
@@ -170,12 +173,15 @@ for m=1:ags_maxits
     end
     % Perform error tolerance checks
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,2);
-    [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,inf);
+%     [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,inf);
+    [err_pw, norm_pw] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,'pdt_pw');
     if err_L2 / norm_L2 < ags_rel_tol, ags_rel_converged = true; else ags_rel_converged = false; end
-    if err_inf < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
+    if err_pw < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
+%     if err_inf < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
     % Print AGS Iteration Information
     if data.IO.PrintIterationInfo
-        msg = sprintf('  AGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',m,err_L2 / norm_L2,err_inf);
+        msg = sprintf('  AGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',m,err_L2 / norm_L2,err_pw);
+%         msg = sprintf('  AGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',m,err_L2 / norm_L2,err_inf);
         disp(msg);
     end
     % Update Solution Vectors

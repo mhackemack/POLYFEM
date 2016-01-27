@@ -30,7 +30,11 @@ for m=1:nas
     % Collect Matrix and RHS and compute angular fluxes
     L = exec_func_LHS_dfem_transport_upwind_Rev1(data,xsid,qid,ang_sets{m},groups,mesh,DoF,FE);
     rhs = exec_func_RHS_dfem_transport_Rev1(data,qid,ang_sets{m},groups,mesh,DoF,FE);
-    y = L\rhs;
+    if ~any(rhs)
+        y = zeros(length(rhs),1);
+    else
+        y = L\rhs;
+    end
     % Postprocess angular flux solutions
     flux_out = add_to_flux(data.Quadrature(qid),ang_sets{m},groups,ndof,y,flux_out);
     data = add_reflecting_angular_fluxes(data,qid,xsid,mesh,DoF,ang_sets{m},groups,y);

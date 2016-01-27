@@ -240,7 +240,7 @@ classdef FEHandler < handle
                             obj.FaceFunctionMatrix{ff,1}       = MS{1}{f}*ones(nvf, 1);
                             obj.FaceConformingMassMatrix{ff,1} = MS{1}{f}(:,varargin{2}.ConformingFaceNodeNumbering{ff,1});
                             obj.FaceGradientMatrix{ff,1}       = MS{2}{f};
-                            if obj.MMSBool
+                            if obj.MMSBool || obj.Dimension == 1
                                 obj.FaceQuadNodes{ff,1}   = QS{1}{f};
                                 obj.FaceQuadWeights{ff,1} = QS{2}{f};
                                 obj.FaceBasisValues{ff,1} = QS{3}{f};
@@ -251,7 +251,7 @@ classdef FEHandler < handle
                             obj.FaceFunctionMatrix{ff,2}       = MS{1}{f}*ones(nvf, 1);
                             obj.FaceConformingMassMatrix{ff,2} = MS{1}{f}(:,varargin{2}.ConformingFaceNodeNumbering{ff,2});
                             obj.FaceGradientMatrix{ff,2}       = MS{2}{f};
-                            if obj.MMSBool
+                            if obj.MMSBool || obj.Dimension == 1
                                 obj.FaceQuadNodes{ff,2}   = QS{1}{f};
                                 obj.FaceQuadWeights{ff,2} = QS{2}{f};
                                 obj.FaceBasisValues{ff,2} = QS{3}{f};
@@ -260,7 +260,7 @@ classdef FEHandler < handle
                         end
                     end
                     % Assign Cell Quadrature
-                    if obj.MMSBool
+                    if obj.MMSBool || obj.Dimension == 1
                         obj.CellQuadNodes{c}   = QV{1};
                         obj.CellQuadWeights{c} = QV{2};
                         obj.CellBasisValues{c} = QV{3};

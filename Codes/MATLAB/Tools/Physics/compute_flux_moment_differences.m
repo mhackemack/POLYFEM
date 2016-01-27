@@ -47,6 +47,18 @@ elseif isa(n_type, 'double') && n_type > 0
     end
     err = sqrt(err);
     denom = sqrt(denom);
+elseif isa(n_type, 'char')
+    if strcmpi(n_type, 'pdt_pw')
+        for g=1:length(ngs)
+            gg = ngs(g);
+            sflux_max = max(abs([flux{gg,1}';flux0{gg,1}']))';
+            for m=1:length(mom)
+                terr = max(abs(flux{gg,m} - flux0{gg,m})./sflux_max);
+                if terr > err, err = terr; end
+%                 if tden > denom, denom = tden; end
+            end
+        end
+    end
 else
     error('Cannot determine norm type.');
 end

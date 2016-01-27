@@ -17,7 +17,7 @@ data.AMR.RefineMesh = 0;
 data.MMS.PerformMMS = 0;
 % Overall Problem Data
 % ------------------------------------------------------------------------------
-data.problem.NumberMaterials = 1;
+data.problem.NumberMaterials = 4;
 data.problem.ProblemType = 'SourceDriven';
 data.problem.PowerLevel = 1.0;
 data.problem.TransportMethod = 'Transport';
@@ -57,24 +57,31 @@ for g=1:data.Groups.NumberGroupSets, data.Groups.GroupSets{g} = g; end
 % Retrieve All Physical Properties
 % ------------------------------------------------------------------------------
 % Graphite
-% data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 2.4335449e-06);
+data = add_xs_component_contribution(data, 1, 3, 'graphite_99G', 8.5238E-2);
+data = add_xs_component_contribution(data, 1, 3, 'B10_99G', 2.4335449e-06);
 % Air
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
-% data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
-% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
-% data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+data = add_xs_component_contribution(data, 1, 4, 'FG_CNat_99G', 7.4906E-9);
+data = add_xs_component_contribution(data, 1, 4, 'N14_99G', 3.9123E-5);
+data = add_xs_component_contribution(data, 1, 4, 'O16_99G', 1.0511E-5);
+data = add_xs_component_contribution(data, 1, 4, 'Ar40_99G', 2.3297E-7);
 % HDPE
-data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
-data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
+data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
+data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
 % BHDPE
 % data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 5.0859E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 2.5429E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 6.6256E-3);
 % data = add_xs_component_contribution(data, 1, 1, 'B11_99G', 2.6669E-2);
-data.XS(1).ExtSource = rand(data.problem.NumberMaterials,data.Groups.NumberEnergyGroups);
-data.XS(1).BCFlags = [glob.Vacuum];
+% AmBe
+data = add_xs_component_contribution(data, 1, 1, 'Am241_99G', 1.1649E-3);
+data = add_xs_component_contribution(data, 1, 1, 'Be9_99G', 1.9077E-1);
+data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
+data.XS(1).BCFlags = [glob.Vacuum,glob.Reflecting];
 data.XS(1).BCVals{1} = 0;
+data.XS(1).BCVals{2} = 0;
+nm = data.problem.NumberMaterials;
+ng = data.Groups.NumberEnergyGroups;
+data.XS(1).ExtSource = [get_PDT_AmBe_source();zeros(nm-1,ng)];
 % Acceleration Properties
 % ------------------------------------------------------------------------------
 data.Acceleration.WGSAccelerationBool = false(data.Groups.NumberGroupSets,1);
@@ -101,14 +108,118 @@ data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;
-L = 1e3; ncells = 20;
-% L = 30*6.953164954422388e-02; ncells = 20;
-
+L = 1e2; ncells = 40;
 x=linspace(0,L,ncells+1);
-% y=linspace(0,L,ncells+1);
-% z=linspace(0,L,ncells+1);
 geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
-% geometry = CartesianGeometry(3,x,y,z);
+% Set material regions
+geometry.set_cell_matIDs_inside_domain(2,[5,15]);
+geometry.set_cell_matIDs_inside_domain(3,[15,80]);
+geometry.set_cell_matIDs_inside_domain(4,[80,100]);
+% Set boundary conditions
+geometry.set_face_flag_on_surface(2,0.0);
 
-% geometry.set_face_flag_on_surface(2,0.0);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Function Listing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_PDT_AmBe_source()
+out = [869835.638009
+869835.638
+93326.55976
+88165.67049
+128040.4112
+39513.79114
+10148.21286
+163035.1443
+16628.86276
+107093.4906
+43166.73633
+267267.8753
+353440.6146
+37396.0072
+31771.04436
+13638.08021
+565.4120754
+131414.1515
+1376.244385
+1195.777371
+125768.9349
+49795.44883
+12595.1248
+2529.485137
+127.48211
+71.68845762
+40.31326071
+22.66989262
+12.748211
+7.168845762
+4.031326071
+2.266989262
+1.2748211
+0.716884576
+0.403132607
+0.226698926
+0.12748211
+0.071688458
+0.040313261
+0.022669893
+0.012748211
+0.007168846
+0.004031326
+0.002266989
+0.001274821
+0.000716885
+0.000265914
+0.000149058
+0.000116298
+8.85E-05
+6.88E-05
+3.44E-05
+2.13E-05
+1.44E-05
+1.18E-05
+9.83E-06
+8.35E-06
+7.37E-06
+6.72E-06
+5.90E-06
+5.57E-06
+5.08E-06
+4.75E-06
+4.42E-06
+4.26E-06
+3.93E-06
+3.77E-06
+3.77E-06
+3.44E-06
+3.12E-06
+3.23E-07
+3.28E-06
+3.11E-06
+3.11E-06
+3.11E-06
+2.95E-06
+2.95E-06
+2.54E-06
+4.03E-07
+2.78E-06
+2.78E-06
+2.95E-06
+2.78E-06
+2.95E-06
+2.70E-07
+2.68E-06
+2.95E-06
+3.11E-06
+2.15E-07
+2.90E-06
+8.76E-08
+3.52E-06
+3.83E-06
+7.28E-07
+2.17E-06
+1.82E-06
+1.98E-06
+5.16E-06
+2.98E-06
+]';
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

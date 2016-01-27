@@ -30,7 +30,8 @@ for c=1:DoF.TotalCells
     cn = DoF.ConnectivityArray{c};
     nodes = DoF.NodeLocations(cn,:);
     % Interpolate to all quadrature points - this acts to build a larger
-    % interpolation space.
+    % interpolation space and make higher order 1D basis functions not appear
+    % linear when plotted.
     qx = FE.CellQuadNodes{c};
     bv = FE.CellBasisValues{c}; yy = x(cn);
     xlin = [nodes;qx];
