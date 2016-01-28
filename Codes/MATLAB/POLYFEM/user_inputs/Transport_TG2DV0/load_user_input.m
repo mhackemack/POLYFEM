@@ -17,7 +17,7 @@ data.AMR.RefineMesh = 0;
 data.MMS.PerformMMS = 0;
 % Overall Problem Data
 % ------------------------------------------------------------------------------
-data.problem.NumberMaterials = 1;
+data.problem.NumberMaterials = 3;
 data.problem.ProblemType = 'SourceDriven';
 data.problem.PowerLevel = 1.0;
 data.problem.TransportMethod = 'Transport';
@@ -57,30 +57,30 @@ for g=1:data.Groups.NumberGroupSets, data.Groups.GroupSets{g} = g; end
 % Retrieve All Physical Properties
 % ------------------------------------------------------------------------------
 % Air
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
-% data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
-% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
-% data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
+data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
+data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
+data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
 % Graphite
-data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
-data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 2.4335449e-06);
+data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
+data = add_xs_component_contribution(data, 1, 2, 'B10_99G', 2.4335449e-06);
 % HDPE
-% data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
+% data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
+% data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
 % BHDPE
 % data = add_xs_component_contribution(data, 1, 3, 'PolyH1_99G', 5.0859E-2);
 % data = add_xs_component_contribution(data, 1, 3, 'FG_CNat_99G', 2.5429E-2);
 % data = add_xs_component_contribution(data, 1, 3, 'B10_99G', 6.6256E-3);
 % data = add_xs_component_contribution(data, 1, 3, 'B11_99G', 2.6669E-2);
 % AmBe
-% data = add_xs_component_contribution(data, 1, 4, 'Am241_99G', 1.1649E-3);
-% data = add_xs_component_contribution(data, 1, 4, 'Be9_99G', 1.9077E-1);
-% data = add_xs_component_contribution(data, 1, 4, 'O16_99G', 1.0511E-5);
+data = add_xs_component_contribution(data, 1, 3, 'Am241_99G', 1.1649E-3);
+data = add_xs_component_contribution(data, 1, 3, 'Be9_99G', 1.9077E-1);
+data = add_xs_component_contribution(data, 1, 3, 'O16_99G', 1.0511E-5);
 data.XS(1).BCFlags = [glob.Vacuum, glob.Reflecting];
 data.XS(1).BCVals{1} = 0;
 data.XS(1).BCVals{2} = 0;
-% data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials-1,data.Groups.NumberEnergyGroups);rand(1,data.Groups.NumberEnergyGroups)];
-data.XS(1).ExtSource = get_PDT_AmBe_source();
+data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials-1,data.Groups.NumberEnergyGroups);get_PDT_AmBe_source()];
+% data.XS(1).ExtSource = get_PDT_AmBe_source();
 % Acceleration Properties
 % ------------------------------------------------------------------------------
 data.Acceleration.WGSAccelerationBool = false(data.Groups.NumberGroupSets,1);
@@ -114,9 +114,9 @@ x = [linspace(xd(1),xd(2),2),linspace(xd(2),xd(3),4),linspace(xd(3),xd(4),3)];
 y = [linspace(yd(1),yd(2),2),linspace(yd(2),yd(3),4),linspace(yd(3),yd(4),3)];
 geometry = CartesianGeometry(2,unique(x),unique(y));
 % Set material regions
-% geometry.set_cell_matIDs_inside_domain(2,[xd(1),yd(3);xd(4),yd(3);xd(4),yd(4);xd(1),yd(4)]);
-% geometry.set_cell_matIDs_inside_domain(3,[xd(2),yd(1);xd(3),yd(1);xd(3),yd(3);xd(2),yd(3)]);
-% geometry.set_cell_matIDs_inside_domain(4,[xd(1),yd(1);xd(2),yd(1);xd(2),yd(2);xd(1),yd(2)]);
+geometry.set_cell_matIDs_inside_domain(2,[xd(1),yd(3);xd(4),yd(3);xd(4),yd(4);xd(1),yd(4)]);
+geometry.set_cell_matIDs_inside_domain(2,[xd(2),yd(1);xd(3),yd(1);xd(3),yd(3);xd(2),yd(3)]);
+geometry.set_cell_matIDs_inside_domain(3,[xd(1),yd(1);xd(2),yd(1);xd(2),yd(2);xd(1),yd(2)]);
 % Set boundary conditions
 geometry.set_face_flag_on_surface(2,[0,0;0,Ly]);
 
