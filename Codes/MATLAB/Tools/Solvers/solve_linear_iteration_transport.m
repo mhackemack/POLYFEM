@@ -116,16 +116,19 @@ for m=1:ags_maxits
             end
             % Perform Acceleration if necessary
             if wgs_accel_bools(gs)
-                % Update acceleration info if necessary
-                if ActiveAccelID ~= wid
-                    DSA_Matrix = [];
-                    ActiveAccelID = wid;
-                    ActiveAccelInfo = data.Acceleration.Info(wid);
+                % Perform acceleration only at appropriate frequency
+                if mod(m,data.Acceleration.WGSAccelerationFrequency(gs)) == 0
+                    % Update acceleration info if necessary
+                    if ActiveAccelID ~= wid
+                        DSA_Matrix = [];
+                        ActiveAccelID = wid;
+                        ActiveAccelInfo = data.Acceleration.Info(wid);
+                    end
+                    % Perform Acceleration Here
+                    data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+                    [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
+                    data.Acceleration.Residual{ActiveAccelID} = [];
                 end
-                % Perform Acceleration Here
-                data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
-                [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
-                data.Acceleration.Residual{ActiveAccelID} = [];
             end
             % Retreive convergence criteria
             [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld,grps,1,2);
@@ -160,16 +163,23 @@ for m=1:ags_maxits
     end
     % Perform Acceleration if necessary
     if ags_accel_bool
-        % Update acceleration info if necessary
-        if ActiveAccelID ~= ags_accel_id
-            DSA_Matrix = [];
-            ActiveAccelID = ags_accel_id;
-            ActiveAccelInfo = data.Acceleration.Info(ags_accel_id);
+        % Perform acceleration only at appropriate frequency
+        if mod(m,data.Acceleration.AGSAccelerationFrequency) == 0
+            msg = sprintf('  Begin AGS Acceleration.');
+            disp(msg);
+            % Update acceleration info if necessary
+            if ActiveAccelID ~= ags_accel_id
+                DSA_Matrix = [];
+                ActiveAccelID = ags_accel_id;
+                ActiveAccelInfo = data.Acceleration.Info(ags_accel_id);
+            end
+            % Perform Acceleration Here
+            data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,AGS_OldPhi);
+            [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
+            data.Acceleration.Residual{ActiveAccelID} = [];
+            msg = sprintf('  End AGS Acceleration.');
+            disp(msg);
         end
-        % Perform Acceleration Here
-        data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,AGS_OldPhi);
-        [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
-        data.Acceleration.Residual{ActiveAccelID} = [];
     end
     % Perform error tolerance checks
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,2);

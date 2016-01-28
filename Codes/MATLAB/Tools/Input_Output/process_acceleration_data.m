@@ -23,10 +23,21 @@ if ~isfield(data,'Acceleration') || ~data.Transport.PerformAcceleration
     data.Acceleration.AGSAccelerationResidual = false;
     data.Acceleration.WGSAccelerationID = zeros(ngs,1);
     data.Acceleration.AGSAccelerationID = 0;
+    data.Acceleration.Info = [];
     % Set Eigenvalue acceleration values
     if strcmpi(data.problem.ProblemType, 'eigenvalue')
         data.Acceleration.PIAccelerationBool = false;
     end
     return
 end
+% Set appropriate frequencies if not present
+if ~isfield(data.Acceleration,'WGSAccelerationFrequency')
+    data.Acceleration.WGSAccelerationFrequency = ones(data.Groups.NumberGroupSets,1);
+end
+if ~isfield(data.Acceleration,'AGSAccelerationFrequency')
+    data.Acceleration.AGSAccelerationFrequency = 1;
+end
 % Perform some additional error checking
+for i=1:length(data.Acceleration.Info)
+    
+end
