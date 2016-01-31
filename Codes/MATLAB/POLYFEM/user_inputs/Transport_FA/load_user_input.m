@@ -46,7 +46,7 @@ data.Quadrature(1).SnLevels = 4;
 data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
-data.Fluxes.StartingSolution = 'zero';
+data.Fluxes.StartingSolution = 'one';
 % Retrieve All Physical Properties
 data = get_69G_Graphite_XS(data, data.Transport.PnOrder);
 data.XS(1).ExtSource = zeros(1,data.Groups.NumberEnergyGroups);

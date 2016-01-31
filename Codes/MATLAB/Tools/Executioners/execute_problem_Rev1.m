@@ -25,7 +25,7 @@ DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.pr
 % generates Quadrature Sets for the Polygonal/Polyhedral cells
 FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.problem.FEMLumping, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
 % Allocate Solution Space - gets reallocated after a mesh refinement
-data = prepare_problem_execution(data, geometry);
+data = prepare_problem_execution(data, geometry, DoF);
 % data = solution_allocation(data, geometry, DoF);
 % Solve the neutronics problem (either source-driven or k-eigenvalue)
 data = pcall(data, geometry, DoF, FE);
@@ -81,7 +81,7 @@ data = pcall(data, geometry, DoF, FE);
 %         refine_problem_mesh(data, geometry, DoF, FE, sol{r-1}.flux); % This works because of pass-by-reference
 %         DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.problem.DoFType);
 %         FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.Neutronics.FEMLumping, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
-%         data = prepare_problem_execution(data, geometry);
+%         data = prepare_problem_execution(data, geometry, DoF);
 %         [data, sol{r}] = solution_allocation(data, geometry, DoF);
 %         % Interpolate flux solutions to next refinement level
 %         if data.problem.projectSolution
@@ -185,7 +185,7 @@ pwTolphi = data.solver.PIFluxTolerance;
 pwTolkeff = data.solver.PIKeffTolerance;
 % Perform power iteration
 % ------------------------------------------------------------------------------
-glob_fiss_rate = calculate_global_QoI(data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,'Production');
+glob_fiss_rate = calculate_global_QoI(data,xsid,mesh,DoF,FE,data.Fluxes.Phi,'Production');
 for pi=1:data.solver.PIMaxIterations
     % Print PI Iteration Information
     if data.IO.PrintIterationInfo
@@ -198,7 +198,7 @@ for pi=1:data.solver.PIMaxIterations
     data = solve_linear_iteration_transport(data,xsid,qid,mesh,DoF,FE);
     % Update fission source and keff
     old_glob_fiss_rate = glob_fiss_rate;
-    glob_fiss_rate = calculate_global_QoI(data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,'Production');
+    glob_fiss_rate = calculate_global_QoI(data,xsid,mesh,DoF,FE,data.Fluxes.Phi,'Production');
     oldoldkeff = oldkeff; oldkeff = keff;
     keff = oldkeff*glob_fiss_rate/old_glob_fiss_rate;
     % Compute spectral radius to guard for false convergence
@@ -215,6 +215,8 @@ for pi=1:data.solver.PIMaxIterations
     % Print PI iteration information
     pwErrkeff = abs(1.0 - oldkeff / keff);
     if data.IO.PrintIterationInfo
+        msg = sprintf('  Power Iteration %d: keff - %0.5e',pi,keff);
+        disp(msg);
         msg = sprintf('  Power Iteration %d: (keff|Phi) Error - (%0.5e | %0.5e)',pi,pwErrkeff,pwErrphi);
         disp(msg);
     end

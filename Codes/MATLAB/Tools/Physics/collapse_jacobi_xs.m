@@ -18,7 +18,7 @@ global glob
 % Retrieve some problem information
 % ------------------------------------------------------------------------------
 nm = data.problem.NumberMaterials;
-grps = data.Groups.ThermalGroups; ngrps = length(grps);
+grps = data.Acceleration.Info(accid).Groups; ngrps = length(grps);
 txs = data.XS(xsin).TotalXS(:,grps);
 sxs = data.XS(xsin).ScatteringXS(:,grps,grps,1);
 % Generate Eigenshape for energy collapse
@@ -32,7 +32,7 @@ for m=1:nm
 end
 % Populate Acceleration XS
 % ------------------------------------------------------------------------------
-if data.Acceleration.Info(accid).AccelerationType == glob.Accel_AGS_TG
+if data.Acceleration.Info(accid).AccelerationType == glob.Accel_WGS_DSA
     data.XS(xsout).DiffXS = zeros(nm,1);
     data.XS(xsout).AbsorbXS = zeros(nm,1);
     data.XS(xsout).ScatteringXS = data.XS(xsin).ScatteringXS;
@@ -45,7 +45,7 @@ if data.Acceleration.Info(accid).AccelerationType == glob.Accel_AGS_TG
         data.XS(xsout).DiffXS(m) = DC*y{m};
         data.XS(xsout).AbsorbXS(m) = txs(m,:)*y{m} - sum(squeeze(sxs(m,:,:))*y{m});
     end
-elseif data.Acceleration.Info(accid).AccelerationType == glob.Accel_AGS_TTG
+elseif data.Acceleration.Info(accid).AccelerationType == glob.Accel_WGS_TSA
     
 else
     error('Incorrect acceleration type for this function call.');

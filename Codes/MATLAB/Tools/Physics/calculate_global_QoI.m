@@ -13,7 +13,7 @@
 %   Notes:   
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = calculate_global_QoI(XS, mesh, DoF, FE, flux, varargin)
+function out = calculate_global_QoI(data, xsid, mesh, DoF, FE, flux, varargin)
 % Process Input Information
 % ------------------------------------------------------------------------------
 nm = data.problem.NumberMaterials;
@@ -23,9 +23,9 @@ else
     ng = 1;
 end
 if nargin > 5
-    qt = get_qoi_type( XS, varargin{1}, nm, ng );
+    qt = get_qoi_type( data.XS(xsid), varargin{1}, nm, ng );
 else
-    qt = get_qoi_type( XS, 'Flux', nm, ng );
+    qt = get_qoi_type( data.XS(xsid), 'Flux', nm, ng );
 end
 % Loop through mesh cells
 out = 0;

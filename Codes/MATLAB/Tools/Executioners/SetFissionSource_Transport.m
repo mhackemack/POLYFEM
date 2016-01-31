@@ -34,7 +34,7 @@ for c=1:mesh.TotalCells
         chi = XS.FissSpec(cmat,groups(g));
         gvec = zeros(ncn,1);
         for gg=1:ngin
-            gvec = gvec + chi*fxs(cmat,ngin(gg))*flux{ngin(gg),1}(cn);
+            gvec = gvec + chi*fxs(cmat,gin(gg))*flux{gin(gg),1}(cn);
         end
         src{g}(cn) = src{g}(cn) + M*gvec;
     end

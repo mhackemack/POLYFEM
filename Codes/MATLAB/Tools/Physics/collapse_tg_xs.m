@@ -18,7 +18,7 @@ global glob
 % Retrieve some problem information
 % ------------------------------------------------------------------------------
 nm = data.problem.NumberMaterials;
-grps = data.Groups.ThermalGroups; ngrps = length(grps);
+grps = data.Acceleration.Info(accid).Groups; ngrps = length(grps);
 txs = data.XS(xsin).TotalXS(:,grps);
 sxs = data.XS(xsin).ScatteringXS(:,grps,grps,1);
 % Generate Eigenshape for energy collapse
