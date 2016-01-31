@@ -13,7 +13,7 @@ function [data, geometry, DoF, FE] = execute_problem_Rev1(data, geometry)
 global glob
 % Generate problem execution schedule
 % ------------------------------------------------------------------------------
-pcall = get_execution_funcation_handle(data);
+pcall = get_execution_function_handle(data);
 geometry = createAMRMesh(data, geometry);
 [mms, deg] = get_mms_information(data);
 % ------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ DoF = DoFHandler(geometry, data.problem.FEMDegree, data.problem.FEMType, data.pr
 % generates Quadrature Sets for the Polygonal/Polyhedral cells
 FE = FEHandler(geometry, DoF, data.problem.SpatialMethod, data.problem.FEMLumping, data.problem.FEMVolumeBools, data.problem.FEMSurfaceBools, mms, deg);
 % Allocate Solution Space - gets reallocated after a mesh refinement
-% data = prepare_problem_execution(data, geometry);
+data = prepare_problem_execution(data, geometry);
 % data = solution_allocation(data, geometry, DoF);
 % Solve the neutronics problem (either source-driven or k-eigenvalue)
 data = pcall(data, geometry, DoF, FE);
@@ -125,9 +125,6 @@ data = pcall(data, geometry, DoF, FE);
 %   Procedure for source-driven transport problem
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = perform_transport_source_driven_problem(data, mesh, DoF, FE)
-% Prepare for transport execution
-% ------------------------------------------------------------------------------
-data = prepare_transport_execution(data, mesh, DoF);
 % Get Necessary Function Handles
 % ------------------------------------------------------------------------------
 pcall = @solve_linear_iteration_transport;
@@ -171,13 +168,71 @@ data = pcall(data,trans_xsid,mesh,DoF,FE);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = perform_transport_eignevalue_problem(data, mesh, DoF, FE)
-% Get Linear Iteration Function Handle
+% Get some transport information
 % ------------------------------------------------------------------------------
-pcall = @solve_linear_iteration_transport;
-% Get some additional information
+xsid = data.Transport.XSID;
+qid  = data.Transport.QuadID;
+ng = data.Groups.NumberEnergyGroups;
+% Set initial source terms
 % ------------------------------------------------------------------------------
-trans_xsid = data.Transport.XSID;
-trans_qid  = data.Transport.QuadID;
+KeffOldPhi = data.Fluxes.Phi;
+data.Sources.ExtSource = SetExtSource_Transport(data,xsid,qid,1:ng,mesh,DoF,FE);
+% Allocate some terms for power iteration
+% ------------------------------------------------------------------------------
+keff = data.problem.KeffGuess;
+oldkeff = 0.0; rhodenomphi = 1.0;
+pwTolphi = data.solver.PIFluxTolerance;
+pwTolkeff = data.solver.PIKeffTolerance;
+% Perform power iteration
+% ------------------------------------------------------------------------------
+glob_fiss_rate = calculate_global_QoI(data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,'Production');
+for pi=1:data.solver.PIMaxIterations
+    % Print PI Iteration Information
+    if data.IO.PrintIterationInfo
+        msg = sprintf('Begin Power Iteration #: %d',pi);
+        disp(msg);
+    end
+    % Compute fission source
+    data.Sources.FissionSource = SetFissionSource_Transport(data.XS(xsid),1:ng,1:ng,data.Fluxes.Phi,mesh,DoF,FE,keff);
+    % Solve linear transport iteration
+    data = solve_linear_iteration_transport(data,xsid,qid,mesh,DoF,FE);
+    % Update fission source and keff
+    old_glob_fiss_rate = glob_fiss_rate;
+    glob_fiss_rate = calculate_global_QoI(data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,'Production');
+    oldoldkeff = oldkeff; oldkeff = keff;
+    keff = oldkeff*glob_fiss_rate/old_glob_fiss_rate;
+    % Compute spectral radius to guard for false convergence
+    [rhonumerphi,pwErrphi] = compute_global_PI_error(data.Fluxes.Phi,KeffOldPhi);
+    if data.solver.PISpectralRadiusCheck
+        rhokeff = abs(keff-oldkeff)/abs(oldkeff-oldoldkeff);
+        rhophi = rhonumerphi / rhodenomphi;
+        rhodenomphi = rhonumerphi;
+        if pi > 3
+            pwTolkeff = (1.0-rhokeff)*data.solver.PIKeffTolerance;
+            pwTolphi =  (1.0-rhophi) *data.solver.PIFluxTolerance;
+        end
+    end
+    % Print PI iteration information
+    pwErrkeff = abs(1.0 - oldkeff / keff);
+    if data.IO.PrintIterationInfo
+        msg = sprintf('  Power Iteration %d: (keff|Phi) Error - (%0.5e | %0.5e)',pi,pwErrkeff,pwErrphi);
+        disp(msg);
+    end
+    % Check for convergence
+    if pwErrkeff < pwTolkeff && pwErrphi < pwTolphi && pi > 4
+        if data.IO.PrintIterationInfo
+            msg = sprintf('End Power Iteration #: %d',pi);
+            disp(msg);
+        end
+        break; 
+    end
+    % Update solution information
+    KeffOldPhi = data.Fluxes.Phi;
+end
+% Process some iteration/output information
+% ------------------------------------------------------------------------------
+data.problem.KeffGuess = keff;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,19 +242,39 @@ trans_qid  = data.Transport.QuadID;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = perform_diffusion_eignevalue_problem(data, mesh, DoF, FE)
-% Get Linear Iteration Function Handle
-% ------------------------------------------------------------------------------
-pcall = @solve_linear_iteration_diffusion;
 % Get some additional information
 % ------------------------------------------------------------------------------
-trans_xsid = data.Transport.XSID;
-trans_qid  = data.Transport.QuadID;
+xsid = data.Transport.XSID;
+ng = data.Groups.NumberEnergyGroups;
+% Set initial source terms
+% ------------------------------------------------------------------------------
+KeffOldPhi = data.Fluxes.Phi;
 
+% Allocate some terms for power iteration
+% ------------------------------------------------------------------------------
+keff = data.problem.KeffGuess;
+oldkeff = 0.0; oldoldkeff = 0.0;
+pwErrphi = 0.0; pwErrkeff = 0.0;
+pwTolphi = data.solver.PIFluxTolerance;
+pwTolkeff = data.solver.PIKeffTolerance;
+% Perform power iteration
+% ------------------------------------------------------------------------------
+glob_fiss_rate = calculate_global_QoI(data.XS(xsid),mesh,DoF,FE,data.Fluxes.Phi,'Production');
+for pi=1:data.solver.PIMaxIterations
+    % Compute fission source
+    
+    % Solve linear diffusion problem
+    
+    % Update fission source and keff
+    
+    % Check for convergence
+    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Miscellaneous Function Calls
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = get_execution_funcation_handle(data)
+function out = get_execution_function_handle(data)
 if strcmpi(data.problem.TransportMethod,'transport')
     if strcmpi(data.problem.ProblemType,'sourcedriven')
         out = @perform_transport_source_driven_problem;
@@ -220,6 +295,13 @@ if data.AMR.RefineMesh && data.AMR.RefinementLevels > 0
     if isfield(data.problem,'AMRIrregularity')
         geometry.MaxIrregularity = data.AMR.AMRIrregularity;
     end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = prepare_problem_execution(data, mesh, DoF)
+if strcmpi(data.problem.TransportMethod,'transport')
+    data = prepare_transport_execution(data, mesh, DoF);
+elseif strcmpi(data.problem.TransportMethod,'diffusion')
+    data = prepare_diffusion_execution(data, mesh, DoF);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = prepare_transport_execution(data, mesh, DoF)
@@ -274,18 +356,17 @@ end
 % Set PhiOld
 data.Fluxes.PhiOld = data.Fluxes.Phi;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = compute_global_fission_rate(phi,XS,mesh,DoF,FE)
-out = 0; ng = size(phi,1);
-fxs = XS.FissionXS.*XS.NuBar;
-% Loop through cells
-for c=1:mesh.TotalCells
-    cmat = mesh.MatID(c);
-    cn = DoF.ConnectivityArray{c}; ocn = ones(1,length(cn));
-    M = FE.CellMassMatrix{c};
-    for g=1:ng
-        out = out + fxs(cmat,g)*ocn*M*phi{g}(cn);
-    end
+function [abs_err,rel_err] = compute_global_PI_error(phi,phi0)
+if size(phi,1) ~= size(phi0,1), error('Energy dimension of fluxes do not match.'); end
+delt = 1e-12; ng = size(phi,1);
+abs_err = 0; rel_err = 0; count = 0;
+for g=1:ng
+    rel_err = rel_err + sum(((phi{g,1} - phi0{g,1})./(phi{g,1}+delt)).^2);
+    abs_err = abs_err + sum((phi{g,1} - phi0{g,1}).^2);
+    count = count + length(phi{g,1});
 end
+abs_err = sqrt(abs_err/count);
+rel_err = sqrt(rel_err/count);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [mms, deg] = get_mms_information(data)
 if data.MMS.PerformMMS

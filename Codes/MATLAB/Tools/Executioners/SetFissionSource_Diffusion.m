@@ -12,16 +12,16 @@
 function src = SetFissionSource_Diffusion(XS,groups,gin,flux,mesh,DoF,FE,keff)
 % Get some preliminary information
 % ------------------------------------------------------------------------------
-if nargin < 9 || isempty(keff), keff = 1.0; end
+if nargin < 8 || isempty(keff), keff = 1.0; end
 ngroups = length(groups); ngin = length(gin);
-fxs = XS.NuBar*XS.FissionXS/keff;
+fxs = XS.NuBar.*XS.FissionXS/keff;
 % Allocate memory space
 % ------------------------------------------------------------------------------
 src = cell(ngroups,1);
 for g=1:ngroups
     src{g} = zeros(DoF.TotalDoFs,1);
 end
-% Exit with vectors of zeros if there is no inscattering
+% Exit with vectors of zeros if there is no fission
 if ngin == 0 || ~XS.HasFission, return; end
 % Loop through spatial cells and build source
 % ------------------------------------------------------------------------------

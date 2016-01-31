@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = calculate_average_material_QoI( data, mesh, DoF, FE, flux, varargin)
 % Process Input Information
-% -------------------------
+% ------------------------------------------------------------------------------
 nm = data.problem.NumberMaterials;
 if iscell(flux)
     [ng, nf] = size(flux);

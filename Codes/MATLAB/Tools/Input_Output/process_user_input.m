@@ -29,6 +29,18 @@ end
 % Process XS Data
 % ------------------------------------------------------------------------------
 data.XS = process_xs_data(data.XS);
+% Process General Neutronics Data
+% ------------------------------------------------------------------------------
+if strcmpi(data.problem.ProblemType, 'SourceDriven')
+    
+elseif strcmpi(data.problem.ProblemType, 'Eigenvalue')
+    if ~strcmpi(data.Fluxes.StartingSolution, 'one')
+        data.Fluxes.StartingSolution = 'one';
+    end
+    if ~isfield(data.problem,'KeffGuess')
+        data.problem.KeffGuess = 1.0;
+    end
+end
 % Process Transport Problem Data
 % ------------------------------------------------------------------------------
 if strcmpi(data.problem.TransportMethod, 'transport')

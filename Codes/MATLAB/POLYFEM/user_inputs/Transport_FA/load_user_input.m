@@ -18,7 +18,8 @@ data.MMS.PerformMMS = 0;
 % Overall Problem Data
 % ------------------------------------------------------------------------------
 data.problem.NumberMaterials = 1;
-data.problem.ProblemType = 'SourceDriven';
+data.problem.ProblemType = 'Eigenvalue';
+data.problem.KeffGuess = 1.0;
 data.problem.PowerLevel = 1.0;
 data.problem.TransportMethod = 'Transport';
 data.problem.FEMType = 'DFEM';
@@ -63,43 +64,31 @@ data = collapse_two_grid_xs(data);
 % Acceleration Properties
 % ------------------------------------------------------------------------------
 data.Acceleration.WGSAccelerationBool = [false(data.Groups.NumberGroupSets-2,1);true;true];
-data.Acceleration.AGSAccelerationBool = true;
+data.Acceleration.AGSAccelerationBool = false;
+data.Acceleration.PIAccelerationBool = false;
 data.Acceleration.WGSAccelerationResidual = false(data.Groups.NumberGroupSets,1);
 data.Acceleration.AGSAccelerationResidual = false;
 data.Acceleration.WGSAccelerationID = [zeros(data.Groups.NumberGroupSets-2,1);2;3];
-data.Acceleration.AGSAccelerationID = 1;
-data.Acceleration.Info(1).AccelerationType = glob.Accel_AGS_TG;
+data.Acceleration.AGSAccelerationID = 0;
+data.Acceleration.PIAccelerationID = 0;
+data.Acceleration.Info(1).AccelerationType = glob.Accel_AGS_FA;
 data.Acceleration.Info(1).DiscretizationType = glob.Accel_DSA_MIP;
 data.Acceleration.Info(1).IP_Constant = 4;
 data.Acceleration.Info(1).Groups = data.Groups.ThermalGroups;
 data.Acceleration.Info(1).Moments = 1;
 data.Acceleration.Info(1).XSID = 2;
-% Group 68 Acceleration
-data.Acceleration.Info(2).AccelerationType = glob.Accel_WGS_DSA;
-data.Acceleration.Info(2).DiscretizationType = glob.Accel_DSA_MIP;
-data.Acceleration.Info(2).IP_Constant = 4;
-data.Acceleration.Info(2).Groups = data.Groups.GroupSets{end-1};
-data.Acceleration.Info(2).Moments = 1;
-data.Acceleration.Info(2).XSID = 3;
-data.Acceleration.Info(2).ErrorShape = ones(data.problem.NumberMaterials,1);
-data = set_within_group_DSA_XS(data, data.Acceleration.Info(2).Groups);
-% Group 69 Acceleration
-data.Acceleration.Info(3).AccelerationType = glob.Accel_WGS_DSA;
-data.Acceleration.Info(3).DiscretizationType = glob.Accel_DSA_MIP;
-data.Acceleration.Info(3).IP_Constant = 4;
-data.Acceleration.Info(3).Groups = data.Groups.GroupSets{end};
-data.Acceleration.Info(3).Moments = 1;
-data.Acceleration.Info(3).XSID = 4;
-data.Acceleration.Info(3).ErrorShape = ones(data.problem.NumberMaterials,1);
-data = set_within_group_DSA_XS(data, data.Acceleration.Info(3).Groups);
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
 data.solver.AGSMaxIterations = 1;
 data.solver.WGSMaxIterations = 1e3*ones(data.Groups.NumberGroupSets,1);
+data.solver.PIMaxIterations = 1e3;
 data.solver.AGSRelativeTolerance = 1e-4;
 data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
 data.solver.AGSAbsoluteTolerance = 1e-4;
 data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
+data.solver.PIKeffTolerance = 1e-3;
+data.solver.PIFluxTolerance = 1e-3;
+data.solver.PISpectralRadiusCheck = false;
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 1;
@@ -159,25 +148,4 @@ end
 data.XS(2).ScatteringXS = data.XS(1).ScatteringXS;
 data.XS(2).BCFlags = data.XS(1).BCFlags; 
 data.XS(2).BCVals  = data.XS(1).BCVals;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function data = set_within_group_DSA_XS(data, grp)
-n = length(data.XS)+1;
-nm = data.problem.NumberMaterials;
-data.XS(n).TotalXS = data.XS(1).TotalXS(:,grp);
-data.XS(n).AbsorbXS = data.XS(1).AbsorbXS(:,grp);
-data.XS(n).ScatteringXS = data.XS(1).ScatteringXS(:,:,:,1);
-data.XS(n).DiffXS = zeros(nm,1);
-for m=1:nm
-    if data.Transport.PnOrder == 0
-        data.XS(n).DiffXS(m) = 1/3/data.XS(n).TotalXS(m);
-    elseif data.Transport.PnOrder > 1
-        tt = 0;
-        for g=1:data.Groups.NumberEnergyGroups
-            tt = tt + data.XS(n).ScatteringXS(m,g,grp);
-        end
-        data.XS(n).DiffXS(m) = 1/3/(data.XS(n).TotalXS(m)-tt);
-    end
-end
-data.XS(n).BCFlags = data.XS(1).BCFlags; 
-data.XS(n).BCVals  = data.XS(1).BCVals;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -165,7 +165,7 @@ for m=1:ags_maxits
     if ags_accel_bool
         % Perform acceleration only at appropriate frequency
         if mod(m,data.Acceleration.AGSAccelerationFrequency) == 0
-            msg = sprintf('  Begin AGS Acceleration.');
+            msg = sprintf('    Begin AGS Acceleration.');
             disp(msg);
             % Update acceleration info if necessary
             if ActiveAccelID ~= ags_accel_id
@@ -177,7 +177,7 @@ for m=1:ags_maxits
             data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,AGS_OldPhi);
             [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
             data.Acceleration.Residual{ActiveAccelID} = [];
-            msg = sprintf('  End AGS Acceleration.');
+            msg = sprintf('    End AGS Acceleration.');
             disp(msg);
         end
     end
@@ -190,7 +190,7 @@ for m=1:ags_maxits
 %     if err_inf < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
     % Print AGS Iteration Information
     if data.IO.PrintIterationInfo
-        msg = sprintf('  AGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',m,err_L2 / norm_L2,err_pw);
+        msg = sprintf('    AGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',m,err_L2 / norm_L2,err_pw);
 %         msg = sprintf('  AGS Iteration %d: (L2|Linf) Error - (%0.5e | %0.5e)',m,err_L2 / norm_L2,err_inf);
         disp(msg);
     end
@@ -199,7 +199,7 @@ for m=1:ags_maxits
     % Exit if convergence is met
     if ags_rel_converged && ags_abs_converged
         if data.IO.PrintIterationInfo
-            msg = sprintf('  End AGS Iteration #: %d',m);
+            msg = sprintf('  End AGS Iterations.');
             disp(msg);
         end
         break;

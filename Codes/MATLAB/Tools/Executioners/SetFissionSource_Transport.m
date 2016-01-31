@@ -12,7 +12,7 @@
 function src = SetFissionSource_Transport(XS,groups,gin,flux,mesh,DoF,FE,keff)
 % Get some preliminary information
 % ------------------------------------------------------------------------------
-if nargin < 10 || isempty(keff), keff = 1.0; end
+if nargin < 8 || isempty(keff), keff = 1.0; end
 ngroups = length(groups); ngin = length(gin);
 fxs = XS.NuBar.*XS.FissionXS/keff;
 % Allocate memory space
@@ -21,7 +21,7 @@ src = cell(ngroups,1);
 for g=1:ngroups
     src{g} = zeros(DoF.TotalDoFs,1);
 end
-% Exit with vectors of zeros if there is no inscattering
+% Exit with vectors of zeros if there is no fission
 if ngin == 0 || ~XS.HasFission, return; end
 % Loop through spatial cells and build source
 % ------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ for c=1:mesh.TotalCells
         for gg=1:ngin
             gvec = gvec + chi*fxs(cmat,ngin(gg))*flux{ngin(gg),1}(cn);
         end
-        src{g,1}(cn) = src{g,1}(cn) + M*gvec;
+        src{g}(cn) = src{g}(cn) + M*gvec;
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

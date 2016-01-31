@@ -41,6 +41,11 @@ elseif strcmpi(data.Transport.TransportType,'hybrid')
         data.Transport.CurrentStabilization = 1.0;
     end
 end
+if strcmpi(data.problem.ProblemType, 'eigenvalue')
+    if ~isfield(data.solver,'PISpectralRadiusCheck')
+        data.solver.PISpectralRadiusCheck = false;
+    end
+end
 % Determine reflecting boundaries
 % ------------------------------------------------------------------------------
 data = determine_reflecting_boundaries_Rev1( data, mesh );
@@ -49,7 +54,6 @@ data = determine_reflecting_boundaries_Rev1( data, mesh );
 if ~isfield(data,'Quadrature'), error('No angular quadrature field specified.'); end
 if ~isfield(data.Transport,'QuadID'), error('Need main quadrature ID.'); end
 data = process_angular_quadrature(data);
-% data = determine_angle_sets_Rev1(data, mesh);
 % Process Transport Acceleration Data
 % ------------------------------------------------------------------------------
 data = process_acceleration_data(data);
