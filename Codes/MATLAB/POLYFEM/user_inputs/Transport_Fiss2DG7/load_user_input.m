@@ -40,7 +40,7 @@ data.Transport.FluxStabilization = 2.0;
 data.Transport.CurrentStabilization = 1.0;
 % Quadrature Properties
 data.Quadrature(1).PnOrder = data.Transport.PnOrder;
-data.Quadrature(1).AngleAggregation = 'all';
+data.Quadrature(1).AngleAggregation = 'auto';
 data.Quadrature(1).QuadType = 'LS';
 data.Quadrature(1).SnLevels = 8;
 % Flux Properties
@@ -49,14 +49,14 @@ data.Fluxes.StartingSolution = 'one';
 data.Groups.NumberEnergyGroups = 7;
 data.Groups.FastGroups = 1:3;
 data.Groups.ThermalGroups = 4:7;
-data.Groups.NumberGroupSets = 1;
-data.Groups.GroupSets = cell(data.Groups.NumberGroupSets,1);
-data.Groups.GroupSetUpscattering = false;
-data.Groups.GroupSets{1} = 1:data.Groups.NumberEnergyGroups;
-% data.Groups.NumberGroupSets = data.Groups.NumberEnergyGroups;
+% data.Groups.NumberGroupSets = 1;
 % data.Groups.GroupSets = cell(data.Groups.NumberGroupSets,1);
-% data.Groups.GroupSetUpscattering = [false(length(data.Groups.FastGroups),1);true(length(data.Groups.ThermalGroups),1)];
-% for g=1:data.Groups.NumberGroupSets, data.Groups.GroupSets{g} = g; end
+% data.Groups.GroupSetUpscattering = false;
+% data.Groups.GroupSets{1} = 1:data.Groups.NumberEnergyGroups;
+data.Groups.NumberGroupSets = data.Groups.NumberEnergyGroups;
+data.Groups.GroupSets = cell(data.Groups.NumberGroupSets,1);
+data.Groups.GroupSetUpscattering = [false(length(data.Groups.FastGroups),1);true(length(data.Groups.ThermalGroups),1)];
+for g=1:data.Groups.NumberGroupSets, data.Groups.GroupSets{g} = g; end
 % Retrieve All Physical Properties
 % data.XS(1) = get_C5G7_XS(1);
 data.XS(1) = get_C5G7_XS([7,1]);
@@ -81,15 +81,15 @@ data.Acceleration.Info(1).XSID = 2;
 data = collapse_jacobi_xs(data,1,2,1);
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.AGSMaxIterations = 1;
+data.solver.AGSMaxIterations = 10;
 data.solver.WGSMaxIterations = 10*ones(data.Groups.NumberGroupSets,1);
 data.solver.PIMaxIterations = 10000;
 data.solver.AGSRelativeTolerance = 1e-1;
 data.solver.AGSAbsoluteTolerance = 1e-1;
-data.solver.WGSRelativeTolerance = 1e-3*ones(data.Groups.NumberGroupSets,1);
-data.solver.WGSAbsoluteTolerance = 1e-3*ones(data.Groups.NumberGroupSets,1);
-data.solver.PIKeffTolerance = 1e-5;
-data.solver.PIFluxTolerance = 1e-5;
+data.solver.WGSRelativeTolerance = 1e-4*ones(data.Groups.NumberGroupSets,1);
+data.solver.WGSAbsoluteTolerance = 1e-4*ones(data.Groups.NumberGroupSets,1);
+data.solver.PIKeffTolerance = 1e-6;
+data.solver.PIFluxTolerance = 1e-6;
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
