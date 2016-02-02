@@ -17,11 +17,21 @@ function [data, inputs] = process_fourier_inputs( data, varargin )
 % Build Input Space
 % ------------------------------------------------------------------------------
 x = varargin{1}; nx = length(x);
-if length(varargin) == 2
+% Set some defaults
+yz = 1.0; nyz = 1;
+ncellx = 1; ncelly = 1; ncellz = 1;
+mats = [];
+if length(varargin) > 1
     yz = varargin{2};
     nyz = length(yz);
-elseif length(varargin) ~= 2 || data.problem.Dimension == 1
-    yz = 1.0; nyz = 1;
+end
+if length(varargin) > 2
+    ncellx = varargin{3}(1);
+    ncelly = varargin{3}(2);
+    ncellz = varargin{3}(3);
+end
+if length(varargin) > 3
+    mats = varargin{4};
 end
 check_geometry_inputs(data,x,yz);
 ntot = nx*nyz;
@@ -37,7 +47,8 @@ inputs.fes = cell(ntot, 1);
 % ------------------------------------------------------------------------------
 if data.problem.Dimension == 1
     for i=1:nx
-        inputs.meshes{i} = CartesianGeometry(1, [0,x(i)]);
+        inputs.meshes{i} = CartesianGeometry(1, linspace(0,x(i),ncellx+1));
+%         inputs.meshes{i} = CartesianGeometry(1, [0,x(i)]);
         inputs.meshes{i}.set_periodic_flag(1, 'x');
     end
 elseif data.problem.Dimension == 2
@@ -46,9 +57,11 @@ elseif data.problem.Dimension == 2
         for i=1:nx
             c = c + 1;
             if strcmp(data.geometry_type,'cart')
-                inputs.meshes{c} = CartesianGeometry(2, [0,x(i)], [0,x(i)*yz(j)]);
+                inputs.meshes{c} = CartesianGeometry(2, linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
+%                 inputs.meshes{c} = CartesianGeometry(2, [0,x(i)], [0,x(i)*yz(j)]);
             elseif strcmp(data.geometry_type,'tri')
-                [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
+                [xx,yy] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
+%                 [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);
                 tri = delaunayTriangulation(xx,yy);
                 inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
@@ -63,22 +76,43 @@ elseif data.problem.Dimension == 3
         for i=1:nx
             c = c + 1;
             if strcmp(data.geometry_type,'cart')
-                inputs.meshes{c} = CartesianGeometry(3, [0,x(i)], [0,x(i)*yz(j)], [0,x(i)*yz(j)]);
+                inputs.meshes{c} = CartesianGeometry(3, linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1), linspace(0,x(i)*yz(j),ncellz+1));
+%                 inputs.meshes{c} = CartesianGeometry(3, [0,x(i)], [0,x(i)*yz(j)], [0,x(i)*yz(j)]);
             elseif strcmp(data.geometry_type,'tet')
-                [xx,yy,zz] = meshgrid([0,x(i)], [0,x(i)*yz(j)], [0,x(i)*yz(j)]);
+                [xx,yy,zz] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1), linspace(0,x(i)*yz(j),ncellz+1));
+%                 [xx,yy,zz] = meshgrid([0,x(i)], [0,x(i)*yz(j)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);zz=zz(:);
                 tri = delaunayTriangulation(xx,yy,zz);
                 inputs.meshes{c} = GeneralGeometry(3, 'Delaunay', tri);
             elseif strcmp(data.geometry_type,'tri')
-                [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
+                [xx,yy] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
+%                 [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);
                 tri = delaunayTriangulation(xx,yy);
                 inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
-                inputs.meshes{c}.extrude_mesh_2D_to_3D([0,x(i)*yz(j)]);
+                inputs.meshes{c}.extrude_mesh_2D_to_3D(linspace(0,x(i)*yz(j),ncellz+1));
+%                 inputs.meshes{c}.extrude_mesh_2D_to_3D([0,x(i)*yz(j)]);
             end
             inputs.meshes{c}.set_periodic_flag(1, 'x');
             inputs.meshes{c}.set_periodic_flag(1, 'y');
             inputs.meshes{c}.set_periodic_flag(1, 'z');
+        end
+    end
+end
+% 
+% ------------------------------------------------------------------------------
+if ~isempty(mats)
+    nmats = length(mats);
+    c = 0;
+    for j=1:nyz
+        for i=1:nx
+            c = c + 1;
+            for m=1:nmats
+                id  = mats(m).ID;
+                reg = mats(m).Region;
+                mx = [reg(:,1)*x(i),reg(:,2)*x(i)*yz(j)];
+                inputs.meshes{c}.set_cell_matIDs_inside_domain(id,mx);
+            end
         end
     end
 end

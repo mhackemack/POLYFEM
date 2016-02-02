@@ -35,6 +35,7 @@ out.output_path = '../Outputs/';
 out.geom_path = '/geometry_inputs/precompiled/';
 out.geom_raw_tri_tet_path = 'geometry_inputs/raw_tri_tet_files/';
 out.geom_raw_dg_path = 'geometry_inputs/raw_dg_files/';
+out.xs_dir = '../XSFiles/';
 out.directory = [];
 out.print_info = true;
 % Global Face Condition Types
