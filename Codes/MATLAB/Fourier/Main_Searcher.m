@@ -35,7 +35,7 @@ data.Output.plotting_bool = true;
 data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
-data.geometry_type = 'tri';
+data.geometry_type = 'cart';
 % x=[logspace(-3,0,55),logspace(0,2,141),logspace(2,3,45)];
 % x=unique(x);
 log_xmin = 0; log_xmax = 0; xnum = 1;
