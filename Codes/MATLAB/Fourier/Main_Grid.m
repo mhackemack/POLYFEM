@@ -32,7 +32,6 @@ glob.print_info = false;
 data.Type = 'Grid';
 % outputs
 data.Output.plotting_bool = false;
-data.Output.printing_bool = false;
 data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
@@ -41,7 +40,7 @@ data.geometry_type = 'cart';
 % x=unique(x);
 % log_xmin = 0; log_xmax = 0; xnum = 1;
 % x = logspace(log_xmin, log_xmax, xnum);
-x = 2e2;
+x = 1e0;
 dyz = [1];
 % dyz = [1/100,1/16,1/4,4,16,100];
 nx = 2;
@@ -61,6 +60,7 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 data.Neutronics.DSAType = 'MIP';
+data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
@@ -79,13 +79,13 @@ data.Neutronics.Diffusion.AbsorbXS = (1-c)*sigt;
 data.Neutronics.Transport.BCFlags = glob.Periodic;
 data.Neutronics.Transport.BCVals = 0.0;
 % phase
-data.NumberPhasePerDim = 51;
+data.NumberPhasePerDim = 81;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
 % -----------------------------------
 print_FA_heading(data, x, dyz);
-[data, inputs] = process_fourier_inputs( data, x, dyz, [nx, ny, nz], mats );
+[data, inputs] = process_fourier_inputs( data, x, dyz, [nx, ny, nz], [] );
 inputs = build_phase_transformation_matrix(data, inputs);
 % Retrieve all spectrum data and postprocess
 % ------------------------------------------

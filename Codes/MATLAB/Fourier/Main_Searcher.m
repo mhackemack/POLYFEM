@@ -31,7 +31,7 @@ glob.print_info = false;
 % ------------------------------------------------------------------------------
 data.Type = 'Search';
 % outputs
-data.Output.plotting_bool = true;
+data.Output.plotting_bool = false;
 data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
@@ -42,8 +42,8 @@ log_xmin = 0; log_xmax = 0; xnum = 1;
 x = logspace(log_xmin, log_xmax, xnum);
 dyz = [1];
 % dyz = [1/100,1/64,1/16,1/4,1,4,16,64,100];
-nx = 1;
-ny = 1;
+nx = 2;
+ny = 2;
 nz = 1;
 % mat regions
 mats(1).ID = 2;
@@ -59,6 +59,7 @@ data.Neutronics.FEMLumping = false;
 data.Neutronics.SpatialMethod = 'LAGRANGE';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.DSAType = 'MIP';
+data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % hybrid transport properties
 data.Neutronics.Transport.StabilizationMethod = 'EGDG';
