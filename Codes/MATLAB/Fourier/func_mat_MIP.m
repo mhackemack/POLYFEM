@@ -13,16 +13,16 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A,B] = func_mat_MIP(lam, input)
+function [A,R] = func_mat_MIP(lam, input)
 % Copy Input Space
-% ----------------
+% ------------------------------------------------------------------------------
 data = input.data;
 mesh = input.mesh;
 dof  = input.dof;
 fe   = input.fe;
 off  = input.offset;
 % Retrieve Preliminary Data
-% -------------------------
+% ------------------------------------------------------------------------------
 dim = mesh.Dimension;
 ndofs = dof.TotalDoFs;
 node_locs = dof.NodeLocations;
@@ -30,10 +30,10 @@ if dim == size(lam,2); lam=lam'; end
 PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
-% ----------------------
-A = zeros(ndofs); B = zeros(ndofs);
+% ------------------------------------------------------------------------------
+A = zeros(ndofs); R = zeros(ndofs);
 % Loop through Cells and Build Matrices
-% -------------------------------------
+% ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
     cn  = dof.ConnectivityArray{c};
     mat = mesh.MatID(c);
@@ -42,14 +42,14 @@ for c=1:mesh.TotalCells
     sxs = data.ScatteringXS(mat);
     axs = data.AbsorbXS(mat);
     D   = data.DiffusionXS(mat);
-    B(cn,cn) = B(cn,cn) + sxs*M;
+    R(cn,cn) = R(cn,cn) + sxs*M;
     A(cn,cn) = A(cn,cn) + axs*M + D*K;
 end
 % Apply Volumetric Phase Shift
-B = B * PM;
+R = R * PM;
 A = A * PM;
 % Loop through Faces and Build Matrices
-% -------------------------------------
+% ------------------------------------------------------------------------------
 for f=1:mesh.TotalFaces
     fid = mesh.FaceID(f);
     fcells = mesh.FaceCells(f,:);
@@ -79,7 +79,7 @@ for f=1:mesh.TotalFaces
         PMf1  = PM(fn1, fn1); PMf2 = PM(fn2, fn2);
         PMc1  = PM(cn1, cn1); PMc2 = PM(cn2, cn2);
         % Build all interior face-coupling matrix contributions
-        % -----------------------------------------------------
+        % ----------------------------------------------------------------------
 %         Gf1 = G1(:,fcnn1); Gf2 = G2(:,fcnn2);
         % ( [[b]] , [[u]] )
         A(fn1,fn1) = A(fn1,fn1) + k*M1*PMf1;   % (-,-)
@@ -128,7 +128,7 @@ for f=1:mesh.TotalFaces
         PMf1  = PM(fn1, fn1); PMf2 = PM(fn2, fn2)*exp(1i*t_off*lam);
         PMc1  = PM(cn1, cn1); PMc2 = PM(cn2, cn2)*exp(1i*t_off*lam);
         % Build all periodic matrix contributions
-        % ---------------------------------------
+        % ----------------------------------------------------------------------
 %         Gf1 = G1(:,fcnn1); Gf2 = G2(:,fcnn2);
 %         Gf1t = Gf1'; Gf2t = Gf2';
         % ( [[b]] , [[u]] )

@@ -5,15 +5,18 @@ data.Output.plotting_bool = false;
 data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
-data.geometry.type = 'tri';
+data.geometry.type = 'cart';
 log_xmin = 0; log_xmax = 0; xnum = 1;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
-data.geometry.ncellx = 1;
-data.geometry.ncelly = 1;
+data.geometry.ncellx = 2;
+data.geometry.ncelly = 2;
 data.geometry.ncellz = 1;
 % mat regions
-data.geometry.mats = [];
+mats(1).ID = 2;
+mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
+mats(2).ID = 2;
+mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;

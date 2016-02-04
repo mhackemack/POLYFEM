@@ -22,7 +22,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function T = func_mat_SI_upwind(lam, input)
 % Copy Input Space
-% ----------------
+% ------------------------------------------------------------------------------
 data = input.data;
 mesh = input.mesh;
 dof = input.dof;
@@ -32,7 +32,7 @@ m2d = m_quad.moment_to_discrete;
 d2m = m_quad.discrete_to_moment;
 lamt = lam';
 % Retrieve Preliminary Data
-% -------------------------
+% ------------------------------------------------------------------------------
 dim = mesh.Dimension;
 ndofs = dof.TotalDoFs;
 zn = zeros(ndofs);
@@ -42,14 +42,14 @@ num_dirs = m_quad.NumberAngularDirections;
 PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
-% ----------------------
+% ------------------------------------------------------------------------------
 L = cell(num_dirs, 1);
 S = zeros(ndofs); T = zeros(ndofs);
 for q=1:num_dirs
     L{q} = zeros(ndofs);
 end
 % Loop through Cells and Build Volumetric Portions of Matrices
-% ------------------------------------------------------------
+% ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
     cn  = dof.ConnectivityArray{c};
     mat = mesh.MatID(c);
@@ -65,13 +65,13 @@ for c=1:mesh.TotalCells
     end
 end
 % Apply Volumetric Phase Shift
-% ----------------------------
+% ------------------------------------------------------------------------------
 S = S * PM;
 for q=1:num_dirs
     L{q} = L{q} * PM;
 end
 % Build Face Contributions to Transport Matrix
-% --------------------------------------------
+% ------------------------------------------------------------------------------
 % Again loop through cells
 for c=1:mesh.TotalCells
     cfaces = mesh.CellFaces{c};
@@ -115,7 +115,7 @@ for c=1:mesh.TotalCells
     end
 end
 % Apply angle integration collapse
-% --------------------------------
+% ------------------------------------------------------------------------------
 for q=1:num_dirs
     T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
 end

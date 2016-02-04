@@ -13,26 +13,15 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data, inputs] = process_fourier_inputs( data, varargin )
+function [data, inputs] = process_fourier_inputs( data )
 % Build Input Space
 % ------------------------------------------------------------------------------
-x = varargin{1}; nx = length(x);
-% Set some defaults
-yz = 1.0; nyz = 1;
-ncellx = 1; ncelly = 1; ncellz = 1;
-mats = [];
-if length(varargin) > 1
-    yz = varargin{2};
-    nyz = length(yz);
-end
-if length(varargin) > 2
-    ncellx = varargin{3}(1);
-    ncelly = varargin{3}(2);
-    ncellz = varargin{3}(3);
-end
-if length(varargin) > 3
-    mats = varargin{4};
-end
+x      = data.geometry.x;      nx = length(x);
+yz     = data.geometry.dyz;    nyz = length(yz);
+ncellx = data.geometry.ncellx;
+ncelly = data.geometry.ncelly;
+ncellz = data.geometry.ncellz;
+mats   = data.geometry.mats;
 check_geometry_inputs(data,x,yz);
 ntot = nx*nyz;
 inputs.x = x';
@@ -56,10 +45,10 @@ elseif data.problem.Dimension == 2
     for j=1:nyz
         for i=1:nx
             c = c + 1;
-            if strcmp(data.geometry_type,'cart')
+            if strcmp(data.geometry.type,'cart')
                 inputs.meshes{c} = CartesianGeometry(2, linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
 %                 inputs.meshes{c} = CartesianGeometry(2, [0,x(i)], [0,x(i)*yz(j)]);
-            elseif strcmp(data.geometry_type,'tri')
+            elseif strcmp(data.geometry.type,'tri')
                 [xx,yy] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
 %                 [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);
@@ -75,16 +64,16 @@ elseif data.problem.Dimension == 3
     for j=1:nyz
         for i=1:nx
             c = c + 1;
-            if strcmp(data.geometry_type,'cart')
+            if strcmp(data.geometry.type,'cart')
                 inputs.meshes{c} = CartesianGeometry(3, linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1), linspace(0,x(i)*yz(j),ncellz+1));
 %                 inputs.meshes{c} = CartesianGeometry(3, [0,x(i)], [0,x(i)*yz(j)], [0,x(i)*yz(j)]);
-            elseif strcmp(data.geometry_type,'tet')
+            elseif strcmp(data.geometry.type,'tet')
                 [xx,yy,zz] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1), linspace(0,x(i)*yz(j),ncellz+1));
 %                 [xx,yy,zz] = meshgrid([0,x(i)], [0,x(i)*yz(j)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);zz=zz(:);
                 tri = delaunayTriangulation(xx,yy,zz);
                 inputs.meshes{c} = GeneralGeometry(3, 'Delaunay', tri);
-            elseif strcmp(data.geometry_type,'tri')
+            elseif strcmp(data.geometry.type,'tri')
                 [xx,yy] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
 %                 [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);
@@ -159,7 +148,7 @@ inputs.quadrature{m}.MomentOrders = m_data.Neutronics.Transport.MomentOrders;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function check_geometry_inputs(data, x, yz)
 dim = data.problem.Dimension;
-gt = data.geometry_type;
+gt = data.geometry.type;
 if dim == 1
     
 elseif dim == 2

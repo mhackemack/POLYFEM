@@ -14,9 +14,11 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function process_fourier_outputs(data, inputs, outputs)
+% Return if not doing anything
+if ~data.Output.plotting_bool && ~data.Output.file_bool, return; end
 % Collect some input information
 dim      = data.problem.Dimension;
-gt       = data.geometry_type;
+gt       = data.geometry.type;
 q_type   = data.Neutronics.Transport.QuadType;
 n_sn     = length(data.Neutronics.Transport.SnLevels);
 sdm      = data.Neutronics.SpatialMethod;

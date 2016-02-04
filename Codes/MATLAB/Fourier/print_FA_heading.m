@@ -13,7 +13,7 @@
 %   Notes:  
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function print_FA_heading( data, x, dyz )
+function print_FA_heading( data)
 
 time = datevec(now);
 time = get_time(time);
@@ -21,9 +21,9 @@ time = get_time(time);
 dim = data.problem.Dimension;
 n_sn = length(data.Neutronics.Transport.SnLevels);
 if dim == 1
-    n_m = length(x);
+    n_m = length(data.geometry.x);
 else
-    n_m = length(x)*length(dyz);
+    n_m = length(data.geometry.x)*length(data.geometry.dyz);
 end
 
 disp('***************************************************************************')

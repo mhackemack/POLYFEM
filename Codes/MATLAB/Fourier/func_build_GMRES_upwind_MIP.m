@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          GMRES + IP matrix functor
+%   Title:          GMRES-upwind + MIP matrix functor
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -13,4 +13,11 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function P = func_build_GMRES_IP(lam, input)
+function P = func_build_GMRES_upwind_MIP(lam, input)
+% Retrieve Matrices
+T = func_mat_SI_upwind(lam, input);
+[A, B] = func_mat_MIP(lam, input);
+% Get Additional Preliminaries
+I = eye(size(T,1));
+% Build Full Matrix
+P = I - (T + (A\B)*(T - I));

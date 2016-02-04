@@ -45,7 +45,7 @@ data.Quadrature(1).SnLevels = 4;
 data.Quadrature(1).PolarLevels = 4;
 data.Quadrature(1).AzimuthalLevels = 4;
 % Flux Properties
-data.Fluxes.StartingSolution = 'zero';
+data.Fluxes.StartingSolution = 'rand';
 % Construct Group Set Information
 data.Groups.NumberEnergyGroups = 99;
 data.Groups.FastGroups = 1:42;
@@ -83,7 +83,8 @@ data = add_xs_component_contribution(data, 1, 4, 'O16_99G', 1.0511E-5);
 data.XS(1).BCFlags = [glob.Vacuum, glob.Reflecting];
 data.XS(1).BCVals{1} = 0;
 data.XS(1).BCVals{2} = 0;
-data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials-1,data.Groups.NumberEnergyGroups);get_PDT_AmBe_source()];
+data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials,data.Groups.NumberEnergyGroups)];
+% data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials-1,data.Groups.NumberEnergyGroups);get_PDT_AmBe_source()];
 % data.XS(1).ExtSource = get_PDT_AmBe_source();
 % Acceleration Properties
 % ------------------------------------------------------------------------------
@@ -104,12 +105,12 @@ data.Acceleration.Info(1).XSID = 2;
 data = collapse_tg_xs(data,1,2,1);
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.AGSMaxIterations = 1e4;
-data.solver.WGSMaxIterations = 1e4*ones(data.Groups.NumberGroupSets,1);
-data.solver.AGSRelativeTolerance = 1e-4;
-data.solver.AGSAbsoluteTolerance = 1e-4;
-data.solver.WGSRelativeTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
-data.solver.WGSAbsoluteTolerance = 1e-6*ones(data.Groups.NumberGroupSets,1);
+data.solver.AGSMaxIterations = 1e2;
+data.solver.WGSMaxIterations = 1e2*ones(data.Groups.NumberGroupSets,1);
+data.solver.AGSRelativeTolerance = 1e-200;
+data.solver.AGSAbsoluteTolerance = 1e-200;
+data.solver.WGSRelativeTolerance = 1e-200*ones(data.Groups.NumberGroupSets,1);
+data.solver.WGSAbsoluteTolerance = 1e-200*ones(data.Groups.NumberGroupSets,1);
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;

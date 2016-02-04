@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          GMRES + MIP matrix functor
+%   Title:          GMRES-upwind + IP matrix functor
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -13,12 +13,11 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function P = func_build_GMRES_MIP(lam, input)
+function P = func_build_GMRES_upwind_IP(lam, input)
 % Retrieve Matrices
-T = func_mat_GMRES(lam, input);
-[A, B] = func_mat_MIP(lam, input);
+T = func_mat_SI_upwind(lam, input);
+[A, B] = func_mat_IP(lam, input);
 % Get Additional Preliminaries
-I = eye(input.dof.TotalDoFs);
+I = eye(size(T,1));
 % Build Full Matrix
-TT = I-T;
-P = TT + (A\B)*(TT - I);
+P = I - (T + (A\B)*(T - I));
