@@ -45,9 +45,15 @@ inputs = build_phase_transformation_matrix(data, inputs);
 % ------------------------------------------
 outputs = calculate_eigenspectrums(data, inputs);
 % Loop through quadrature sets
-for q=1:length(data.Neutronics.Transport.SnLevels)
-    % Loop through meshes
-    for i=1:inputs.TotalMeshes
-        
+if data.Output.plotting_bool
+    for q=1:length(data.Neutronics.Transport.SnLevels)
+        % Loop through meshes
+        c = 0;
+        for j=1:inputs.nyz
+            for i=1:inputs.nx
+                c = c + 1;
+                
+            end
+        end
     end
 end

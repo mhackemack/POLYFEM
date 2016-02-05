@@ -23,6 +23,13 @@ out.data.DiffusionXS  = data.Neutronics.Diffusion.DiffusionXS;
 out.data.BCFlags      = data.Neutronics.Transport.BCFlags;
 out.data.BCVals       = data.Neutronics.Transport.BCVals;
 out.data.IP_Constant  = data.Neutronics.IP_Constant;
+out.data.AccelType    = data.Neutronics.AccelType;
+% Average Cross Sections
+out.data.numberEnergyGroups = data.Neutronics.numberEnergyGroups;
+out.data.AveTotalXS         = data.Neutronics.Transport.AveTotalXS;
+out.data.AveAbsorbXS        = data.Neutronics.Diffusion.AveAbsorbXS;
+out.data.AveScatteringXS    = data.Neutronics.Transport.AveScatteringXS;
+out.data.AveDiffusionXS     = data.Neutronics.Diffusion.DiffusionXS;
 % Hybrid Transport Inputs
 % ------------------------------------------------------------------------------
 if strcmp(data.Neutronics.Transport.transportType, 'hybrid')
@@ -44,6 +51,9 @@ end
 out.mesh = inputs.meshes{m};
 out.dof = inputs.dofs{m};
 out.fe = inputs.fes{m};
+% Scattering Matrix
+% ------------------------------------------------------------------------------
+out.ScatteringMatrix = build_0th_scattering_matrices(data,out.mesh,out.dof,out.fe);
 % Quadrature Inputs
 % ------------------------------------------------------------------------------
 out.Quadrature = inputs.quadrature{q};

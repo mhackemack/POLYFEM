@@ -117,8 +117,8 @@ data.problem.Dimension = 2;
 Lx = 35; Ly = 45;
 xd = [0,1,20,35];
 yd = [0,3,35,45];
-x = [linspace(xd(1),xd(2),2),linspace(xd(2),xd(3),4),linspace(xd(3),xd(4),3)];
-y = [linspace(yd(1),yd(2),2),linspace(yd(2),yd(3),4),linspace(yd(3),yd(4),3)];
+x = [linspace(xd(1),xd(2),2),linspace(xd(2),xd(3),2),linspace(xd(3),xd(4),2)];
+y = [linspace(yd(1),yd(2),2),linspace(yd(2),yd(3),2),linspace(yd(3),yd(4),2)];
 geometry = CartesianGeometry(2,unique(x),unique(y));
 % Set material regions
 geometry.set_cell_matIDs_inside_domain(2,[xd(1),yd(3);xd(4),yd(3);xd(4),yd(4);xd(1),yd(4)]);

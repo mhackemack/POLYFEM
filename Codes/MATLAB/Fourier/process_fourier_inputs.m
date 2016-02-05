@@ -32,6 +32,7 @@ inputs.TotalMeshes = ntot;
 inputs.meshes = cell(ntot, 1);
 inputs.dofs = cell(ntot, 1);
 inputs.fes = cell(ntot, 1);
+inputs.ScatteringMatrix = cell(ntot, 1);
 % Build Meshes
 % ------------------------------------------------------------------------------
 if data.problem.Dimension == 1
@@ -119,6 +120,7 @@ end
 for i=1:ntot
     inputs.dofs{i} = DoFHandler(inputs.meshes{i}, deg, fem, dtype);
     inputs.fes{i} = FEHandler(inputs.meshes{i}, inputs.dofs{i}, sdm, lump, [1,1,1], [1,1,0,0]);
+%     inputs.ScatteringMatrix{i} = build_0th_scattering_matrices(data,inputs.meshes{i},inputs.dofs{i},inputs.fes{i});
 end
 % Get Angular Quadrature
 % ------------------------------------------------------------------------------

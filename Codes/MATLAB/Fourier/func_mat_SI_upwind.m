@@ -20,33 +20,34 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function T = func_mat_SI_upwind(lam, input)
+function L = func_mat_SI_upwind(lam, input)
 % Copy Input Space
 % ------------------------------------------------------------------------------
 data = input.data;
 mesh = input.mesh;
 dof = input.dof;
 fe = input.fe;
-m_quad = input.Quadrature;
-m2d = m_quad.moment_to_discrete;
-d2m = m_quad.discrete_to_moment;
-lamt = lam';
+% m_quad = input.Quadrature;
+% m2d = input.Quadrature.moment_to_discrete;
+% d2m = input.Quadrature.discrete_to_moment;
 % Retrieve Preliminary Data
 % ------------------------------------------------------------------------------
 dim = mesh.Dimension;
-ndofs = dof.TotalDoFs;
-zn = zeros(ndofs);
+ng = input.data.numberEnergyGroups; ndofs = dof.TotalDoFs;
+ntot = ng*ndofs;
+g_offset = (1:ng)*ndofs - ndofs;
+% zn = zeros(ndofs);
 node_locs = dof.NodeLocations;
 if dim == size(lam,2); lam=lam'; end
-num_dirs = m_quad.NumberAngularDirections;
+num_dirs = input.Quadrature.NumberAngularDirections;
 PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
 % ------------------------------------------------------------------------------
 L = cell(num_dirs, 1);
-S = zeros(ndofs); T = zeros(ndofs);
+% S = zeros(ntot); T = zeros(ntot);
 for q=1:num_dirs
-    L{q} = zeros(ndofs);
+    L{q} = zeros(ntot);
 end
 % Loop through Cells and Build Volumetric Portions of Matrices
 % ------------------------------------------------------------------------------
@@ -56,19 +57,25 @@ for c=1:mesh.TotalCells
     M   = fe.CellMassMatrix{c};
     G   = fe.CellGradientMatrix{c};
     txs = data.TotalXS(mat);
-    sxs = data.ScatteringXS(mat);
-    S(cn,cn) = S(cn,cn) + sxs*M;
+%     sxs = data.ScatteringXS(mat);
+%     S(cn,cn) = S(cn,cn) + sxs*M;
     % Loop through quadrature
     for q=1:num_dirs
-        GG = cell_dot(dim, m_quad.AngularDirections(q,:), G)';
-        L{q}(cn,cn) = L{q}(cn,cn) + txs*M - GG;
+        GG = cell_dot(dim, input.Quadrature.AngularDirections(q,:), G)';
+        for g=1:ng
+            gcn = cn + g_offset(g);
+            L{q}(gcn,gcn) = L{q}(gcn,gcn) + txs*M - GG;
+        end
     end
 end
 % Apply Volumetric Phase Shift
 % ------------------------------------------------------------------------------
-S = S * PM;
+% S = S * PM;
 for q=1:num_dirs
-    L{q} = L{q} * PM;
+    for g=1:ng
+        gdofs = (1:ndof) + g_offset(g);
+        L{q}(gdofs,gdofs) = L{q}(gdofs,gdofs) * PM;
+    end
 end
 % Build Face Contributions to Transport Matrix
 % ------------------------------------------------------------------------------
@@ -102,7 +109,7 @@ for c=1:mesh.TotalCells
         end
         % Apply Upwinding Terms by Angle
         for q=1:num_dirs
-            fdot = m_quad.AngularDirections(q,:)*fnorm;
+            fdot = input.Quadrature.AngularDirections(q,:)*fnorm;
             lq1 = fn1;
             % apply mass matrix term based on face normal
             if fdot > 0
@@ -110,15 +117,19 @@ for c=1:mesh.TotalCells
             else
                 lq2 = fn2;
             end
-            L{q}(lq1,lq2) = L{q}(lq1,lq2) + fdot*M*PM(lq1,lq1);
+            for g=1:ng
+                glq1 = lq1 + g_offset(g);
+                glq2 = lq2 + g_offset(g);
+                L{q}(glq1,glq2) = L{q}(glq1,glq2) + fdot*M*PM(lq1,lq1);
+            end
         end
     end
 end
 % Apply angle integration collapse
 % ------------------------------------------------------------------------------
-for q=1:num_dirs
-    T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
-end
+% for q=1:num_dirs
+%     T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxiallary Functions

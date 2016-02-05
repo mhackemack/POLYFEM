@@ -13,7 +13,7 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A,R] = func_mat_MIP(lam, input)
+function A = func_mat_MIP(lam, input)
 % Copy Input Space
 % ------------------------------------------------------------------------------
 data = input.data;
@@ -31,7 +31,7 @@ PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
 % ------------------------------------------------------------------------------
-A = zeros(ndofs); R = zeros(ndofs);
+A = zeros(ndofs);% R = zeros(ndofs);
 % Loop through Cells and Build Matrices
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
@@ -39,14 +39,14 @@ for c=1:mesh.TotalCells
     mat = mesh.MatID(c);
     M   = fe.CellMassMatrix{c};
     K   = fe.CellStiffnessMatrix{c};
-    sxs = data.ScatteringXS(mat);
-    axs = data.AbsorbXS(mat);
-    D   = data.DiffusionXS(mat);
-    R(cn,cn) = R(cn,cn) + sxs*M;
+%     sxs = data.ScatteringXS(mat);
+    axs = data.AveAbsorbXS(mat);
+    D   = data.AveDiffusionXS(mat);
+%     R(cn,cn) = R(cn,cn) + sxs*M;
     A(cn,cn) = A(cn,cn) + axs*M + D*K;
 end
 % Apply Volumetric Phase Shift
-R = R * PM;
+% R = R * PM;
 A = A * PM;
 % Loop through Faces and Build Matrices
 % ------------------------------------------------------------------------------

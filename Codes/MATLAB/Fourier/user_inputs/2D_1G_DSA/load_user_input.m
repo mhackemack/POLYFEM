@@ -41,3 +41,8 @@ data.Neutronics.Diffusion.AbsorbXS = (1-c)*sigt;
 % bcs
 data.Neutronics.Transport.BCFlags = glob.Periodic;
 data.Neutronics.Transport.BCVals = 0.0;
+% average cross sections
+data.Neutronics.Transport.AveTotalXS = data.Neutronics.Transport.TotalXS;
+data.Neutronics.Diffusion.AveDiffusionXS = data.Neutronics.Diffusion.DiffusionXS;
+data.Neutronics.Transport.AveScatteringXS = data.Neutronics.Transport.ScatteringXS;
+data.Neutronics.Diffusion.AveAbsorbXS = data.Neutronics.Diffusion.AbsorbXS;

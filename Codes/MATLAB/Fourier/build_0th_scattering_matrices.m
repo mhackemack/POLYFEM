@@ -13,19 +13,21 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function S0 = build_0th_scattering_matrices(lam, input)
-% Copy Input Space
-% ------------------------------------------------------------------------------
-data = input.data;
-mesh = input.mesh;
-dof = input.dof;
-fe = input.fe;
+function S0 = build_0th_scattering_matrices(data,mesh,dof,fe)
 % Retrieve Preliminary Data
 % ------------------------------------------------------------------------------
-ndofs = dof.TotalDoFs;
-
+ng = data.Neutronics.numberEnergyGroups; ndofs = dof.TotalDoFs;
+sxs = data.Neutronics.Transport.ScatteringXS;
+S0 = zeros(ndofs,ndofs,ng,ng);
 % Loop through Cells and Build Matrices
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
-    
+    cn  = dof.ConnectivityArray{c};
+    mat = mesh.MatID(c);
+    M   = fe.CellMassMatrix{c};
+    for g=1:ng
+        for gg=1:ng
+            S0(cn,cn,g,gg) = sxs(mat,g,gg)*M;
+        end
+    end
 end
