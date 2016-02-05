@@ -83,7 +83,7 @@ data = add_xs_component_contribution(data, 1, 4, 'O16_99G', 1.0511E-5);
 data.XS(1).BCFlags = [glob.Vacuum, glob.Reflecting];
 data.XS(1).BCVals{1} = 0;
 data.XS(1).BCVals{2} = 0;
-data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials,data.Groups.NumberEnergyGroups)];
+data.XS(1).ExtSource = zeros(data.problem.NumberMaterials,data.Groups.NumberEnergyGroups);
 % data.XS(1).ExtSource = [zeros(data.problem.NumberMaterials-1,data.Groups.NumberEnergyGroups);get_PDT_AmBe_source()];
 % data.XS(1).ExtSource = get_PDT_AmBe_source();
 % Acceleration Properties
