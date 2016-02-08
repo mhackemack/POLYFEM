@@ -27,6 +27,7 @@ data = input.data;
 mesh = input.mesh;
 dof = input.dof;
 fe = input.fe;
+adirs = input.Quadrature.AngularDirections;
 % m_quad = input.Quadrature;
 % m2d = input.Quadrature.moment_to_discrete;
 % d2m = input.Quadrature.discrete_to_moment;
@@ -56,15 +57,16 @@ for c=1:mesh.TotalCells
     mat = mesh.MatID(c);
     M   = fe.CellMassMatrix{c};
     G   = fe.CellGradientMatrix{c};
-    txs = data.TotalXS(mat);
+%     txs = data.TotalXS(mat);
 %     sxs = data.ScatteringXS(mat);
 %     S(cn,cn) = S(cn,cn) + sxs*M;
     % Loop through quadrature
     for q=1:num_dirs
         GG = cell_dot(dim, input.Quadrature.AngularDirections(q,:), G)';
+        % Loop through energy groups
         for g=1:ng
             gcn = cn + g_offset(g);
-            L{q}(gcn,gcn) = L{q}(gcn,gcn) + txs*M - GG;
+            L{q}(gcn,gcn) = L{q}(gcn,gcn) + data.TotalXS(mat,g)*M - GG;
         end
     end
 end
@@ -73,7 +75,7 @@ end
 % S = S * PM;
 for q=1:num_dirs
     for g=1:ng
-        gdofs = (1:ndof) + g_offset(g);
+        gdofs = (1:ndofs) + g_offset(g);
         L{q}(gdofs,gdofs) = L{q}(gdofs,gdofs) * PM;
     end
 end
@@ -109,7 +111,7 @@ for c=1:mesh.TotalCells
         end
         % Apply Upwinding Terms by Angle
         for q=1:num_dirs
-            fdot = input.Quadrature.AngularDirections(q,:)*fnorm;
+            fdot = adirs(q,:)*fnorm;
             lq1 = fn1;
             % apply mass matrix term based on face normal
             if fdot > 0

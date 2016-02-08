@@ -29,15 +29,16 @@ for q=1:nlevels
     % Loop through meshes
     for m=1:inputs.TotalMeshes
         % Print mesh/quad combo to screen to keep from going insane...
-        msg = sprintf('      -> Computing spectrum for Mesh %d of %d and Quadrature %d of %d',m,inputs.TotalMeshes,q,nlevels);
-        fprintf([rev_str,msg]);
-        rev_str = repmat(sprintf('\b'), 1, length(msg));
+        msg = sprintf('   -> Computing spectrum for Mesh %d of %d and Quadrature %d of %d',m,inputs.TotalMeshes,q,nlevels);
+        disp(msg)
+%         fprintf([rev_str,msg]);
+%         rev_str = repmat(sprintf('\b'), 1, length(msg));
         % Collect input
         [m_in, phase] = combine_input_set(data, inputs, m, q);
         outputs{q,m} = p_func(b_func, m_in, phase);
     end
 end
-fprintf(rev_str);
+% fprintf(rev_str);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -70,7 +71,11 @@ out.Eigen.Max = 0;
 out.Search.LamList = zeros(pnum,dim);
 out.Search.Evals = zeros(pnum,1);
 % Loop through all phases
+rev_str = [];
 for p=1:pnum
+    msg = sprintf('      -> Computing spectrum for Phase %d of %d',p,pnum);
+    fprintf([rev_str,msg]);
+    rev_str = repmat(sprintf('\b'), 1, length(msg));
     lam = p_in.WNList(p,:);
     [x,fv,~,output] = fminsearchbnd(@(x) func_search(x,b_func,m_in), lam,pmin,pmax);
     % Assign Output Values
@@ -78,6 +83,7 @@ for p=1:pnum
     out.Search.LamList(p,:) = x;
     out.Search.Evals(p) = output.funcCount;
 end
+fprintf(rev_str);
 % Finalize Computations
 if dim ~= 1, out.Eigen.Grid = reshape(out.Eigen.List, pdim*ones(1,dim)); end
 out.Eigen.Max = max(out.Eigen.List);
@@ -91,11 +97,16 @@ out.Eigen.List = zeros(pnum,1);
 out.Eigen.Grid = zeros(pdim*ones(1,dim));
 out.Eigen.Max = 0;
 % Loop through all phases
+rev_str = [];
 for p=1:pnum
+    msg = sprintf('      -> Computing spectrum for Phase %d of %d',p,pnum);
+    fprintf([rev_str,msg]);
+    rev_str = repmat(sprintf('\b'), 1, length(msg));
     lam = p_in.WNList(p,:);
     e_spect = b_func(lam, m_in);
     out.Eigen.List(p) = max(abs(eig( e_spect )));
 end
+fprintf(rev_str);
 % Finalize Computations
 if dim ~= 1, out.Eigen.Grid = reshape(out.Eigen.List, pdim*ones(1,dim)); end
 out.Eigen.Max = max(out.Eigen.List);

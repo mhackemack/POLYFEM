@@ -14,7 +14,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Clear Project Space
-% -------------------
+% ------------------------------------------------------------------------------
 if exist('pbool', 'var')
     clearvars -except pbool
 else
@@ -29,11 +29,11 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Define all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
+inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 81;
+data.NumberPhasePerDim = 9;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures

@@ -14,16 +14,19 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function A = func_mat_MIP(lam, input)
+% global glob
 % Copy Input Space
-% ------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
 data = input.data;
 mesh = input.mesh;
 dof  = input.dof;
 fe   = input.fe;
 off  = input.offset;
+% E    = data.EnergyShape;
 % Retrieve Preliminary Data
 % ------------------------------------------------------------------------------
 dim = mesh.Dimension;
+% ng = data.numberEnergyGroups;
 ndofs = dof.TotalDoFs;
 node_locs = dof.NodeLocations;
 if dim == size(lam,2); lam=lam'; end
@@ -31,19 +34,40 @@ PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
 % ------------------------------------------------------------------------------
-A = zeros(ndofs);% R = zeros(ndofs);
+A = zeros(ndofs); %R = zeros(ndofs);
 % Loop through Cells and Build Matrices
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
-    cn  = dof.ConnectivityArray{c};
-    mat = mesh.MatID(c);
-    M   = fe.CellMassMatrix{c};
-    K   = fe.CellStiffnessMatrix{c};
+%     tp = 0;
+    cn    = dof.ConnectivityArray{c};
+    matid = mesh.MatID(c);
+    M     = fe.CellMassMatrix{c};
+    K     = fe.CellStiffnessMatrix{c};
 %     sxs = data.ScatteringXS(mat);
-    axs = data.AveAbsorbXS(mat);
-    D   = data.AveDiffusionXS(mat);
+    axs = data.AveAbsorbXS(matid);
+    D   = data.AveDiffusionXS(matid);
 %     R(cn,cn) = R(cn,cn) + sxs*M;
     A(cn,cn) = A(cn,cn) + axs*M + D*K;
+%     if data.AccelType == glob.Accel_WGS_DSA
+%         for g=1:ng
+%             for gg=1:ng
+%                 tp = tp + data.ScatteringXS(matid,g,gg);
+%             end
+%         end
+%     elseif data.AccelType == glob.Accel_AGS_TG
+%         for g=1:ng
+%             for gg=g+1:ng
+%                 tp = tp + data.ScatteringXS(matid,g,gg);
+%             end
+%         end
+%     elseif data.AccelType == glob.Accel_AGS_MTG
+%         for g=1:ng
+%             for gg=g:ng
+%                 tp = tp + data.ScatteringXS(matid,g,gg);
+%             end
+%         end
+%     end
+%     R(cn,cn) = R(cn,cn) + tp * M;
 end
 % Apply Volumetric Phase Shift
 % R = R * PM;

@@ -35,7 +35,7 @@ if strcmp(dsa_type,'MIP') ||strcmp(dsa_type,'IP')
     dsa_type = [dsa_type,'_C=',num2str(data.Neutronics.IP_Constant)];
 end
 f_name = [t_type,'_',dsa_type,'_'];
-sigt = data.Neutronics.Transport.TotalXS;
+sigt = data.Neutronics.TotalXS;
 mfp = inputs.x * sigt;
 % Preliminary plotting setup
 if data.Output.plotting_bool
