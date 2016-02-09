@@ -33,7 +33,7 @@ inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 9;
+data.NumberPhasePerDim = 11;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -47,12 +47,17 @@ outputs = calculate_eigenspectrums(data, inputs);
 % Loop through quadrature sets
 if data.Output.plotting_bool
     for q=1:length(data.Neutronics.Transport.SnLevels)
-        % Loop through meshes
-        c = 0;
-        for j=1:inputs.nyz
-            for i=1:inputs.nx
-                c = c + 1;
-                
+        % Loop through meshes in 1D
+        if data.problem.Dimension == 1
+            
+        else
+            % Loop through meshes in 2D/3D
+            c = 0;
+            for j=1:inputs.nyz
+                for i=1:inputs.nx
+                    c = c + 1;
+                    
+                end
             end
         end
     end

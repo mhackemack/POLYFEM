@@ -31,8 +31,8 @@ d2m = input.Quadrature.discrete_to_moment;
 L = func_mat_SI_upwind(lam, input);
 A = func_mat_MIP(lam, input);
 S0 = input.ScatteringMatrix;
-P = input.ProjectionMatrix;
-I = eye(ndofs*ng); T = zeros(ndofs*ng);
+P = input.ProjectionMatrix; PP = zeros(ng*ndofs,ndofs);
+I = eye(ndofs*ng); Id = eye(ndofs);
 % Build full matrix based on acceleration type
 % P = T + (A\B)*(T - I);
 if input.data.AccelType == glob.Accel_WGS_DSA
@@ -46,9 +46,11 @@ if input.data.AccelType == glob.Accel_WGS_DSA
         end
     end
     % Build transport operators
+    T = zeros(ndofs*ng);
     for q=1:input.Quadrature.NumberAngularDirections
         T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
     end
+%     E = T;
     TT = T - I;
     % Build final matrix based on energy group numbers
     if ng == 1
@@ -59,7 +61,6 @@ if input.data.AccelType == glob.Accel_WGS_DSA
             gdofs = zdofs + g_offset(g);
             for gg=1:ng
                 ggdofs = zdofs + g_offset(gg);
-%                 B = B + S0(:,:,g,gg)*TT(gdofs,ggdofs);
                 B = B + S(gdofs,ggdofs)*TT(gdofs,ggdofs);
             end
         end
@@ -71,7 +72,49 @@ if input.data.AccelType == glob.Accel_WGS_DSA
         E = T;
     end
 elseif input.data.AccelType == glob.Accel_AGS_TG
-    
+    % Build scattering matricies
+    Sd = zeros(ng*ndofs);
+    Su = zeros(ng*ndofs);
+    S  = zeros(ng*ndofs);
+    MDSA = zeros(ndofs,ng*ndofs);
+    for g=1:ng
+        gdofs = zdofs + g_offset(g);
+        for gg=1:ng
+            ggdofs = zdofs + g_offset(gg);
+            tS0 = S0(:,:,g,gg)*PM;
+            if gg <= g
+                Sd(gdofs,ggdofs) = tS0;
+            elseif gg > g
+                Su(gdofs,ggdofs) = tS0;
+            end
+            S(gdofs,ggdofs) = tS0;
+        end
+    end
+    % Build tranpsort matrices
+    B = zeros(ng*ndofs); C = zeros(ng*ndofs);
+    for q=1:input.Quadrature.NumberAngularDirections
+        B = B + d2m(1,q)*( L{q}\( m2d(1,q)*Sd ));
+        C = C + d2m(1,q)*( L{q}\( m2d(1,q)*Su ));
+    end
+    T = I - B; TC = T\C; TCI = TC - I;
+    % Build final acceleration matrix
+    TCI = Su*TCI;
+    for g=1:ng
+        gdofs = zdofs + g_offset(g);
+        for gg=g+1:ng
+            ggdofs = zdofs + g_offset(gg);
+            MDSA(:,ggdofs) = MDSA(:,ggdofs) + TCI(gdofs,ggdofs);
+%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(gdofs,ggdofs);
+        end
+    end
+%     MDSA = A\MDSA;
+    for g=1:ng
+        gdofs = zdofs + g_offset(g);
+%         TC(gdofs,gdofs) = TC(gdofs,gdofs) + P(:,:,g)*MDSA;
+        PP(gdofs,:) = P(:,:,g);
+    end
+    E = TC + PP*(A\MDSA);
+%     E = TC;
 elseif input.data.AccelType == glob.Accel_AGS_MTG
     
 end

@@ -23,7 +23,7 @@ outputs = cell(data.Neutronics.Transport.NumSnLevels, inputs.TotalMeshes);
 % Loop through Input Space and Calculate EigenSpectrums
 % -----------------------------------------------------
 nlevels = data.Neutronics.Transport.NumSnLevels;
-disp('-> Computing EigenSpectrums.'); rev_str = [];
+disp('-> Computing EigenSpectrums.'); %rev_str = [];
 % Loop through quadratures
 for q=1:nlevels
     % Loop through meshes

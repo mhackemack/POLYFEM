@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          GMRES-upwind + MIP matrix functor
+%   Title:          SI-upwind matrix functor
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -13,7 +13,10 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function P = func_build_GMRES_upwind_MIP(lam, input)
-% Retrieve Matrices
-T = func_build_SI_upwind_MIP(lam, input);
-P = eye(size(T,1)) - T;
+function E = func_build_SI_upwind(lam, input)
+global glob
+% Build Phase Matrix
+if input.mesh.Dimension == size(lam,2); lam=lam'; end
+node_locs = input.dof.NodeLocations;
+PV = exp(1i*node_locs*lam);
+PM = diag(PV);

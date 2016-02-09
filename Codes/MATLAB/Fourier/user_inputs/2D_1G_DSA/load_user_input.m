@@ -4,8 +4,9 @@ global glob
 data.Output.plotting_bool = true;
 data.Output.file_bool = false;
 % geometry
-data.problem.Dimension = 2;
+data.problem.Dimension = 1;
 data.geometry.type = 'cart';
+% log_xmin = 0; log_xmax = 0; xnum = 1;
 log_xmin = -1; log_xmax = 3; xnum = 41;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];

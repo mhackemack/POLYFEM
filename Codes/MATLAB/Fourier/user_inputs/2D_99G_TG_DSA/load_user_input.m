@@ -29,7 +29,7 @@ data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
 data.Neutronics.DSAType = 'MIP';
-data.Neutronics.AccelType = glob.Accel_WGS_DSA;
+data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';

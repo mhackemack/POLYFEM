@@ -78,9 +78,9 @@ end
 % axis([0,max(x),0,1])
 % clear S0;
 % % Try lambda = 0 hack here (success)
-% Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
-% F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
-% L0_hack = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
+Sd = tril(S(:,:,1),0); Su = triu(S(:,:,1),1);
+F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
+L0_hack = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
 % P1 Fourier Analysis
 % ------------------------------------------------------------------------------
 % if Pn == 1

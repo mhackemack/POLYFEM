@@ -6,7 +6,7 @@ data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 1;
 data.geometry.type = 'cart';
-log_xmin = -2; log_xmax = 3; xnum = 151;
+log_xmin = -2; log_xmax = 3; xnum = 51;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
 data.geometry.ncellx = 1;
