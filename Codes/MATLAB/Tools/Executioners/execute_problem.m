@@ -156,6 +156,7 @@ for l=1:solvdat.maxIterations
     [ndat, sol.flux, mat, extra_its, extra_time] = fcall(ndat, solvdat, geometry, DoF, FE, sol.flux, mat);
     [err_L2, norm_L2] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,2);
     [err_inf, norm_inf] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,inf);
+%     [err_pw, norm_pw] = compute_flux_moment_differences(DoF, FE,sol.flux,sol.flux0,1:sol.numberEnergyGroups,1,'pdt_pw');
     % Output iteration data
     if glob.print_info
         disp(['   -> Flux L2 Error: ',num2str(err_L2/norm_L2, '%0.9e')])
@@ -363,6 +364,18 @@ elseif isa(n_type, 'double') && n_type > 0
     end
     err = sqrt(err);
     denom = sqrt(denom);
+elseif isa(n_type, 'char')
+    if strcmpi(n_type, 'pdt_pw')
+        for g=1:length(ngs)
+            gg = ngs(g);
+            sflux_max = max(abs([flux{gg,1}';flux0{gg,1}']))';
+            for m=1:length(mom)
+                terr = max(abs(flux{gg,m} - flux0{gg,m})./sflux_max);
+                if terr > err, err = terr; end
+%                 if tden > denom, denom = tden; end
+            end
+        end
+    end
 else
     error('Cannot determine norm type.');
 end

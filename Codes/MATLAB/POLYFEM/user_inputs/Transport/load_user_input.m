@@ -20,12 +20,12 @@ data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = 
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
-data.Neutronics.StartingSolution = 'zero';
+data.Neutronics.StartingSolution = 'random';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LAGRANGE';
-data.Neutronics.FEMLumping = true;
+data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
@@ -33,7 +33,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'all';
+data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -62,7 +62,7 @@ data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
-data.Neutronics.Transport.ExtSource = [1.0];
+data.Neutronics.Transport.ExtSource = [0.0];
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 data.Neutronics.Transport.BCVals  = [0.0];
@@ -81,16 +81,16 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-6;
-data.solver.relativeTolerance = 1e-6;
-data.solver.maxIterations = 10000;
+data.solver.absoluteTolerance = 1e-8;
+data.solver.relativeTolerance = 1e-8;
+data.solver.maxIterations = 40;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 1;
+L = 1; ncells = 8;
 % gname = 'PolyMesh_SqDomain_L1_n1024';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
