@@ -33,12 +33,12 @@ dat_in.AzimuthalLevels = 24;
 dat_in.PolarLevels = 1;
 % ---
 dat_in.refinementLevels = 27;
-dat_in.AMRIrregularity = 2;
+dat_in.AMRIrregularity = 3;
 dat_in.refinementTolerance = 1/10;
 dat_in.projectSolution = 0;
 % ---
 dat_in.DSASolveMethod = 'PCG';
-dat_in.DSAPreconditioner = 'jacobi';
+dat_in.DSAPreconditioner = 'eisenstat';
 dat_in.DSATolerance = 1e-3;
 % Load data and perform error checking
 % ------------------------------------------------------------------------------
