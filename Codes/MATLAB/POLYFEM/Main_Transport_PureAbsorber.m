@@ -24,6 +24,10 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % ------------------------------------------------------------------------------
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'cart';
+geom_in.PolyNum = 4;
+geom_in.Lx = 1; geom_in.ncellx = 4;
+geom_in.Ly = 1; geom_in.ncelly = 4;
+geom_in.Lz = 1; geom_in.ncellz = 4;
 geom_in.xmin_bound_type = glob.IncidentIsotropic;
 geom_in.xmax_bound_type = glob.Vacuum;
 geom_in.ymin_bound_type = glob.Reflecting;
@@ -43,8 +47,8 @@ dat_in.QuadAngles  = [1,1]/norm([1,1]);  % Angles for manual set
 dat_in.QuadWeights = 1;                  % Weights for manual set
 % ---
 dat_in.refineMesh = 0;
-dat_in.refinementLevels = 0;
-dat_in.AMRIrregularity = 0;
+dat_in.refinementLevels = 4;
+dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 0.0;
 dat_in.projectSolution = 0;
 % ---
