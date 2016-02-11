@@ -178,13 +178,13 @@ for f=1:mesh.TotalFaces
                 case(glob.Dirichlet)
                     L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
                     L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - D*(G + G');
-                    rhs(gfnodes) = rhs(gfnodes) +  ndat.Diffusion.BCVals(fflag,g)*(kp*M)*ones(length(gfnodes),1);
-                    rhs(gcnodes) = rhs(gcnodes) -  ndat.Diffusion.BCVals(fflag,g)*(D*G)*ones(length(gcnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) +  ndat.Diffusion.BCVals{fflag,g}*(kp*M)*ones(length(gfnodes),1);
+                    rhs(gcnodes) = rhs(gcnodes) -  ndat.Diffusion.BCVals{fflag,g}*(D*G)*ones(length(gcnodes),1);
                 case(glob.Neumann)
-                    rhs(gfnodes) = rhs(gfnodes) - ndat.Diffusion.BCVals(fflag,g)*F;
+                    rhs(gfnodes) = rhs(gfnodes) - ndat.Diffusion.BCVals{fflag,g}*F;
                 case(glob.Robin)
                     L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + 0.5*M;
-                    rhs(gfnodes) = rhs(gfnodes) + 2*ndat.Diffusion.BCVals(fflag,g)*F;
+                    rhs(gfnodes) = rhs(gfnodes) + 2*ndat.Diffusion.BCVals{fflag,g}*F;
                 case(glob.Function)
                     % matrix contribution
                     L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
@@ -355,14 +355,14 @@ for f=1:mesh.TotalFaces
                     tcmat = -D*(G + G'); tfmat = kp*M;
                     I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
                     I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tfmat(:)];
-                    rhs(gfnodes) = rhs(gfnodes) +  ndat.Diffusion.BCVals(fflag,g)*(kp*M)*ones(length(gfnodes),1);
-                    rhs(gcnodes) = rhs(gcnodes) -  ndat.Diffusion.BCVals(fflag,g)*(D*G)*ones(length(gcnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) +  ndat.Diffusion.BCVals{fflag,g}*(kp*M)*ones(length(gfnodes),1);
+                    rhs(gcnodes) = rhs(gcnodes) -  ndat.Diffusion.BCVals{fflag,g}*(D*G)*ones(length(gcnodes),1);
                 case(glob.Neumann)
-                    rhs(gfnodes) = rhs(gfnodes) - ndat.Diffusion.BCVals(fflag,g)*M*ones(length(gfnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) - ndat.Diffusion.BCVals{fflag,g}*M*ones(length(gfnodes),1);
                 case(glob.Robin)
                     tmat = 0.5*M;
                     I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tmat(:)];
-                    rhs(gfnodes) = rhs(gfnodes) + 2*ndat.Diffusion.BCVals(fflag,g)*M*ones(length(gfnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) + 2*ndat.Diffusion.BCVals{fflag,g}*M*ones(length(gfnodes),1);
                 case(glob.Function)
                     tcmat = -D*(G + G'); tfmat = kp*M;
                     I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
@@ -457,12 +457,12 @@ for f=1:mesh.TotalFaces
             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
             switch(ndat.Diffusion.BCFlags(fflag))
                 case(glob.Dirichlet)
-                    rhs(gfnodes) = rhs(gfnodes) +  ndat.Diffusion.BCVals(fflag,g)*(kp*M)*ones(length(gfnodes),1);
-                    rhs(gcnodes) = rhs(gcnodes) -  ndat.Diffusion.BCVals(fflag,g)*(D*G)*ones(length(gcnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) +  ndat.Diffusion.BCVals{fflag,g}*(kp*M)*ones(length(gfnodes),1);
+                    rhs(gcnodes) = rhs(gcnodes) -  ndat.Diffusion.BCVals{fflag,g}*(D*G)*ones(length(gcnodes),1);
                 case(glob.Neumann)
-                    rhs(gfnodes) = rhs(gfnodes) - ndat.Diffusion.BCVals(fflag,g)*M*ones(length(gfnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) - ndat.Diffusion.BCVals{fflag,g}*M*ones(length(gfnodes),1);
                 case(glob.Robin)
-                    rhs(gfnodes) = rhs(gfnodes) + 2*ndat.Diffusion.BCVals(fflag,g)*M*ones(length(gfnodes),1);
+                    rhs(gfnodes) = rhs(gfnodes) + 2*ndat.Diffusion.BCVals{fflag,g}*M*ones(length(gfnodes),1);
                 case(glob.Function)
                     qx = FE.FaceQuadNodes{f,1};
                     qw = FE.FaceQuadWeights{f,1};

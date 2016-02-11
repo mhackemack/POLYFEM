@@ -61,7 +61,7 @@ data.Neutronics.Transport.ExtSource = ep;
 % data.Neutronics.Transport.ExtSource = [1.0];
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
-data.Neutronics.Transport.BCVals  = [0.0];
+data.Neutronics.Transport.BCVals  = {0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------

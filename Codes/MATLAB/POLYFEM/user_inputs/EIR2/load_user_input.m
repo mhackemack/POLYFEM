@@ -93,5 +93,5 @@ geometry.set_cell_matIDs_inside_domain(4, [48,43;78,43;78,68;48,68]);
 geometry.set_cell_matIDs_inside_domain(5, [18,43;48,43;48,68;18,68]);
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = glob.Vacuum;
-data.Neutronics.Transport.BCVals  = 0.0;
+data.Neutronics.Transport.BCVals  = {0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

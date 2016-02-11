@@ -29,8 +29,8 @@ data.Neutronics.numberEnergyGroups = 1;
 % MMS Properties
 data.Neutronics.Transport.MMS = true;
 data.Neutronics.Transport.QuadOrder = 6;
-data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1);
-data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
+% data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1);
+% data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'all';
@@ -55,21 +55,21 @@ data.Neutronics.Transport.ScatteringXS = 0;
 data.Neutronics.Transport.FissionXS = 0.0;
 data.Neutronics.Transport.NuBar = 0.0;
 data.Neutronics.Transport.FissSpec = 0.0;
-data.Neutronics.Transport.ExtSource{1,1} = dat_in.RHSFunc;
-data.Neutronics.Transport.ExactSolution{1,1} = dat_in.SolFunc;
+data.Neutronics.Transport.ExtSource = dat_in.RHSFunc;
+data.Neutronics.Transport.ExactSolution = dat_in.SolFunc;
 % DSA Properties
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 0;
 data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = dat_in.DSASolveMethod;
+data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'none';
 data.Neutronics.Transport.DSATolerance = 1e-4;
 data.Neutronics.Transport.DSAMaxIterations = 1e7;
 data.Neutronics.IP_Constant = 4;
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-8;
-data.solver.relativeTolerance = 1e-8;
+data.solver.absoluteTolerance = 1e-10;
+data.solver.relativeTolerance = 1e-10;
 data.solver.maxIterations = 10000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];

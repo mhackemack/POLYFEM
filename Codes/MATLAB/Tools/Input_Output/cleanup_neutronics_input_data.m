@@ -215,23 +215,27 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
                     data.Neutronics.Diffusion.AbsorbXS(m,g) = data.Neutronics.Transport.TotalXS(m,g) - sum(data.Neutronics.Diffusion.ScatteringXS(m,g,:));
                 end
             end
-            % Set Bondary Conditions
+            % Set Boundary Conditions
             data.Neutronics.Diffusion.BCFlags = zeros(ntf);
-            data.Neutronics.Diffusion.BCVals = zeros(ntf,ng);
+            data.Neutronics.Diffusion.BCVals = cell(ntf,ng);
             for f=1:ntf
                 for g=1:ng
                     if (data.Neutronics.Transport.BCFlags(f) == glob.Vacuum || ...
-                        data.Neutronics.Transport.BCFlags(f)  == glob.IncidentIsotropic || ...
-                        data.Neutronics.Transport.BCFlags(f)  == glob.IncidentCurrent)
+                        data.Neutronics.Transport.BCFlags(f) == glob.IncidentIsotropic || ...
+                        data.Neutronics.Transport.BCFlags(f) == glob.IncidentCurrent || ...
+                        data.Neutronics.Transport.BCFlags(f) == glob.Function)
 
                         data.Neutronics.Diffusion.BCFlags(f) = glob.Dirichlet;
-                        data.Neutronics.Diffusion.BCVals(f,g) = 0.0;
+                        data.Neutronics.Diffusion.BCVals{f,g} = 0.0;
                     elseif data.Neutronics.Transport.BCFlags(f) == glob.Reflecting
                         data.Neutronics.Diffusion.BCFlags(f) = glob.Neumann;
-                        data.Neutronics.Diffusion.BCVals(f,g) = 0.0;
+                        data.Neutronics.Diffusion.BCVals{f,g} = 0.0;
                     elseif data.Neutronics.Transport.BCFlags(f) == glob.Periodic
                         data.Neutronics.Diffusion.BCFlags(f) = glob.Periodic;
-                        data.Neutronics.Diffusion.BCVals(f,g) = 0.0;
+                        data.Neutronics.Diffusion.BCVals{f,g} = 0.0;
+                    else
+                        data.Neutronics.Diffusion.BCFlags(f) = glob.Dirichlet;
+                        data.Neutronics.Diffusion.BCVals{f,g} = 0.0;
                     end
                 end
             end

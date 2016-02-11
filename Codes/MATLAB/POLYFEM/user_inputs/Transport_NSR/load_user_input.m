@@ -25,7 +25,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % Transport Properties
 
 % Boundary Conditions
-data.Neutronics.Transport.BCVals  = [0.0];
+data.Neutronics.Transport.BCVals  = {0.0};
 if strcmp(bc_type, 'Vacuum')
     data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 elseif strcmp(bc_type, 'Reflecting')

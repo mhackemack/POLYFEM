@@ -179,7 +179,7 @@ for f=1:mesh.TotalFaces
                         per_af = ndat.Transport.PeriodicFluxesOld{f}{angNum}(:,g);
                         rhs(fcnodes) = rhs(fcnodes) - fdot * M * per_af;
                     case(glob.IncidentIsotropic)
-                        rhs(fcnodes) = rhs(fcnodes) - (fdot*ndat.Transport.BCVals(fflag,g)/angNorm)*F;
+                        rhs(fcnodes) = rhs(fcnodes) - (fdot*ndat.Transport.BCVals{fflag,g}/angNorm)*F;
                     case(glob.IncidentCurrent)
                         
                     case(glob.IncidentBeam)
@@ -310,7 +310,7 @@ for ff=1:mesh.TotalBoundaryFaces
                     per_af = ndat.Transport.PeriodicFluxesOld{f}{angNum}(:,g);
                     rhs(fcnodes) = rhs(fcnodes) - fdot * M * per_af;
                 case(glob.IncidentIsotropic)
-                    rhs(fcnodes) = rhs(fcnodes) - (fdot*ndat.Transport.BCVals(fflag,g)/angNorm)*F;
+                    rhs(fcnodes) = rhs(fcnodes) - (fdot*ndat.Transport.BCVals{fflag,g}/angNorm)*F;
                 case(glob.IncidentCurrent)
                     
                 case(glob.IncidentBeam)

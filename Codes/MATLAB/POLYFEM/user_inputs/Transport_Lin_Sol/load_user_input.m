@@ -66,7 +66,7 @@ data.Neutronics.Transport.ExactSolution{1,1} = @sol_func;
 data.Neutronics.Transport.BCFlags = [glob.Function];
 data.Neutronics.Transport.BCVals{1,1} = @ang_sol_func;
 % data.Neutronics.Transport.BCFlags = [glob.Vacuum; glob.IncidentIsotropic; glob.Reflecting];
-% data.Neutronics.Transport.BCVals = [0.0; 10.0; 0.0];
+% data.Neutronics.Transport.BCVals = {0.0; 10.0; 0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------

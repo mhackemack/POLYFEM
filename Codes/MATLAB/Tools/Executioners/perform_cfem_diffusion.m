@@ -127,12 +127,12 @@ for f=1:mesh.TotalBoundaryFaces
                 for i=1:length(fgnodes)
                     L(fgnodes(i),fgnodes(i)) = 1;
                 end
-                rhs(fgnodes) = ndat.Diffusion.BCVals(flag,g);
+                rhs(fgnodes) = ndat.Diffusion.BCVals{flag,g};
             case(glob.Neumann)
-                rhs(fgnodes) = rhs(fgnodes) - ndat.Diffusion.BCVals(flag,g)*F;
+                rhs(fgnodes) = rhs(fgnodes) - ndat.Diffusion.BCVals{flag,g}*F;
             case(glob.Robin)
                 L(fgnodes,fgnodes) = L(fgnodes,fgnodes) + 0.5*M;
-                rhs(fgnodes) = rhs(fgnodes) + 2*ndat.Diffusion.BCVals(flag,g)*F;
+                rhs(fgnodes) = rhs(fgnodes) + 2*ndat.Diffusion.BCVals{flag,g}*F;
             case(glob.Function)
                 L(fgnodes,:) = 0;
                 for i=1:length(fgnodes)
@@ -220,12 +220,12 @@ for f=1:mesh.TotalBoundaryFaces
         switch(gflag)
             case(glob.Dirichlet)
                 dirch_nums = [dirch_nums,fgnodes];
-                rhs(fgnodes) = ndat.Diffusion.BCVals(flag,g)*ones(length(fgnodes),1);
+                rhs(fgnodes) = ndat.Diffusion.BCVals{flag,g}*ones(length(fgnodes),1);
             case(glob.Neumann)
-                rhs(fgnodes) = rhs(fgnodes) - ndat.Diffusion.BCVals(flag,g)*F;
+                rhs(fgnodes) = rhs(fgnodes) - ndat.Diffusion.BCVals{flag,g}*F;
             case(glob.Robin)
                 L(fgnodes,fgnodes) = L(fgnodes,fgnodes) + 0.5*M;
-                rhs(fgnodes) = rhs(fgnodes) + 2*ndat.Diffusion.BCVals(flag,g)*F;
+                rhs(fgnodes) = rhs(fgnodes) + 2*ndat.Diffusion.BCVals{flag,g}*F;
             case(glob.Function)
                 dirch_nums = [dirch_nums,fgnodes];
                 fxn = DoF.NodeLocations(fnodes,:);
@@ -301,11 +301,11 @@ for f=1:mesh.TotalBoundaryFaces
         fgnodes = fnodes + (g-1)*ndg;
         switch(gflag)
             case(glob.Dirichlet)
-                rhs(fgnodes) = ndat.Diffusion.BCVals(flag,g)*ones(length(fgnodes),1);
+                rhs(fgnodes) = ndat.Diffusion.BCVals{flag,g}*ones(length(fgnodes),1);
             case(glob.Neumann)
-                rhs(fgnodes) = rhs(fgnodes) - ndat.Diffusion.BCVals(flag,g)*F;
+                rhs(fgnodes) = rhs(fgnodes) - ndat.Diffusion.BCVals{flag,g}*F;
             case(glob.Robin)
-                rhs(fgnodes) = rhs(fgnodes) + 2*ndat.Diffusion.BCVals(flag,g)*F;
+                rhs(fgnodes) = rhs(fgnodes) + 2*ndat.Diffusion.BCVals{flag,g}*F;
             case(glob.Function)
                 fxn = DoF.NodeLocations(fnodes,:);
                 rhs(fgnodes) = ndat.Diffusion.BCVals{flag,g}(fxn);

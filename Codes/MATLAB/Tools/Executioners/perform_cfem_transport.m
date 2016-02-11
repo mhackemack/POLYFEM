@@ -158,7 +158,7 @@ for f=1:mesh.TotalBoundaryFaces
                 case(glob.Periodic)
                     
                 case(glob.IncidentIsotropic)
-                    rhs(fcnodes) = ndat.Transport.BCVals(flag,g);
+                    rhs(fcnodes) = ndat.Transport.BCVals{flag,g};
                 case(glob.IncidentCurrent)
                     
                 case(glob.IncidentBeam)
@@ -261,7 +261,7 @@ for f=1:mesh.TotalBoundaryFaces
                 case(glob.Periodic)
                     
                 case(glob.IncidentIsotropic)
-                    rhs(fcnodes) = ndat.Transport.BCVals(flag,g);
+                    rhs(fcnodes) = ndat.Transport.BCVals{flag,g};
                 case(glob.IncidentCurrent)
                     
                 case(glob.IncidentBeam)

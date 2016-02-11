@@ -66,7 +66,7 @@ data.Neutronics.Transport.ExactSolution{1,1} = @sol_func_sinusoid;
 % data.Neutronics.Transport.BCFlags = [glob.Function];
 % data.Neutronics.Transport.BCVals{1,1} = @ang_sol_func_sinusoid;
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
-data.Neutronics.Transport.BCVals = [0.0];
+data.Neutronics.Transport.BCVals = {0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------

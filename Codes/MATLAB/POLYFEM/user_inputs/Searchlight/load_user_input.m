@@ -59,7 +59,7 @@ data.Neutronics.Transport.FissSpec = [0.0];
 data.Neutronics.Transport.ExtSource = [0.0];
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum; glob.IncidentBeam];
-data.Neutronics.Transport.BCVals = [0.0; 0.515];
+data.Neutronics.Transport.BCVals = {0.0; 0.515};
 
 % DSA Properties
 % ------------------------------------------------------------------------------

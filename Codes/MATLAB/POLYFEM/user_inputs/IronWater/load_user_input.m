@@ -86,5 +86,5 @@ geometry.set_cell_matIDs_inside_domain(1, [0,8;2,8;2,10;0,10]);
 geometry.set_face_flag_on_surface(2,[0,0;0,L]);
 geometry.set_face_flag_on_surface(2,[0,L;L,L]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.Reflecting];
-data.Neutronics.Transport.BCVals  = [0.0,         0.0];
+data.Neutronics.Transport.BCVals  = {0.0,         0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

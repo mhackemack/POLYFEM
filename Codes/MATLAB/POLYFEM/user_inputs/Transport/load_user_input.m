@@ -20,7 +20,7 @@ data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = 
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
-data.Neutronics.StartingSolution = 'random';
+data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
@@ -62,12 +62,12 @@ data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
-data.Neutronics.Transport.ExtSource = [0.0];
+data.Neutronics.Transport.ExtSource = [1.0];
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
-data.Neutronics.Transport.BCVals  = [0.0];
+data.Neutronics.Transport.BCVals  = {0.0};
 % data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentBeam];
-% data.Neutronics.Transport.BCVals = [0.0, 1.0];
+% data.Neutronics.Transport.BCVals = {0.0, 1.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ geometry.set_cell_matIDs_inside_domain(4, [48,43;78,43;78,68;48,68]);
 geometry.set_cell_matIDs_inside_domain(5, [18,43;48,43;48,68;18,68]);
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = glob.Vacuum;
-data.Neutronics.Transport.BCVals  = 0.0;
+data.Neutronics.Transport.BCVals  = {0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Iron-Water Benchmark Overwrite
 function [data, geometry] = get_IronWater( data, n, s )
@@ -210,7 +210,7 @@ geometry.set_cell_matIDs_inside_domain(1, [0,0;12,0;12,12;0,12]);
 geometry.set_face_flag_on_surface(2,[0,0;0,30]);
 geometry.set_face_flag_on_surface(2,[0,0;30,0]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.Reflecting];
-data.Neutronics.Transport.BCVals  = [0.0,         0.0];
+data.Neutronics.Transport.BCVals  = {0.0,         0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Iron-Water Benchmark Overwrite
 function [data, geometry] = get_IronWaterII( data, n, s )
@@ -236,7 +236,7 @@ geometry.set_cell_matIDs_inside_domain(1, [0,8;2,8;2,10;0,10]);
 geometry.set_face_flag_on_surface(2,[0,0;0,L]);
 geometry.set_face_flag_on_surface(2,[0,L;L,L]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.Reflecting];
-data.Neutronics.Transport.BCVals  = [0.0,         0.0];
+data.Neutronics.Transport.BCVals  = {0.0,         0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BWR Assembly Benchmark Overwrite
 function [data, geometry] = get_BWRAssembly( data, n, s )
@@ -284,7 +284,7 @@ geometry.set_cell_matIDs_inside_domain(5, [xm(6),ym(8);xm(7),ym(8);xm(7),ym(9);x
 geometry.set_face_flag_on_surface(2,[0,0;0,y(end)]);
 geometry.set_face_flag_on_surface(2,[0,0;x(end),0]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.Reflecting];
-data.Neutronics.Transport.BCVals  = [0.0,         0.0];
+data.Neutronics.Transport.BCVals  = {0.0,         0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [data, geometry] = get_Yaqi_2D( data, n, s )
 global glob
@@ -310,7 +310,7 @@ geometry.set_cell_matIDs_inside_domain(3, [3*dx,0;Lx,0;Lx,2*dy;3*dx,2*dy]);
 geometry.set_cell_matIDs_inside_domain(3, [dx,2*dy;2*dx,2*dy;2*dx,Ly;dx,Ly]);
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = glob.Vacuum;
-data.Neutronics.Transport.BCVals  = 0.0;
+data.Neutronics.Transport.BCVals  = {0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [data, geometry] = get_2D_SS_tophat( data, c, n, s )
 global glob
@@ -337,7 +337,7 @@ geometry.set_cell_matIDs_inside_domain(1, [3.0,1.0;4.0,1.0;4.0,3.0;3.0,3.0]);
 % Boundary Conditions
 geometry.set_face_flag_on_surface(2,[0,1.5;0,2.5]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentIsotropic];
-data.Neutronics.Transport.BCVals  = [0.0, 1];
+data.Neutronics.Transport.BCVals  = {0.0, 1};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [data, geometry] = get_3D_SS_tophat( data, c, n, s )
 global glob
@@ -364,7 +364,7 @@ geometry.set_cell_matIDs_inside_domain(1, [3.0,1.0;4.0,1.0;4.0,3.0;3.0,3.0]);
 % Boundary Conditions
 geometry.set_face_flag_on_surface(2,[0,1.5;0,2.5]);
 data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentIsotropic];
-data.Neutronics.Transport.BCVals  = [0.0, 1e5];
+data.Neutronics.Transport.BCVals  = {0.0, 1e5};
 % Extrude Mesh
 geometry.extrude_mesh_2D_to_3D(z);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -385,7 +385,7 @@ geometry.set_cell_matIDs_inside_domain(4, [5,6]);
 geometry.set_cell_matIDs_inside_domain(5, [6,8]);
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
-data.Neutronics.Transport.BCVals  = [0.0];
+data.Neutronics.Transport.BCVals  = {0.0};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = asymptotic_limit_func(x)
 dim = size(x,2);

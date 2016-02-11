@@ -40,7 +40,7 @@ data.Neutronics.numberEnergyGroups = 57;
 data.Neutronics.ThermalGroups = 43:99;
 % bcs
 data.Neutronics.BCFlags = glob.Periodic;
-data.Neutronics.BCVals = 0.0;
+data.Neutronics.BCVals = {0.0};
 % Build graphite xs
 % ------------------------------------------------------------------------------
 xs_dir = [glob.xs_dir,'graphite_99G/'];

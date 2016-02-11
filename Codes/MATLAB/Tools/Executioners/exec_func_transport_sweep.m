@@ -147,7 +147,7 @@ for cc=1:ncells
                             opp_dir = ndat.Transport.ReflectingBoundaryAngles{f}(tq);
                             psi = ndat.Transport.ReflectingFluxes{f}{opp_dir}(:,g);
                         case(glob.IncidentIsotropic)
-                            val = ndat.Transport.BCVals(fid,grp)/angNorm;
+                            val = ndat.Transport.BCVals{fid,grp}/angNorm;
                             psi = val*ofn;
                         case(glob.IncidentBeam)
                             beam_val = ndat.Transport.BeamFluxes{f}(tq, g);

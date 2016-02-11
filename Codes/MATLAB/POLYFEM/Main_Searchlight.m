@@ -40,7 +40,7 @@ nr = data.problem.refinementLevels + 1;
 dofnum = zeros(nr,1);
 lfluxsum = zeros(nr,1); rfluxsum = zeros(nr,1);
 lfluxbndsum = zeros(nr,1); rfluxbndsum = zeros(nr,1);
-influx = data.Neutronics.Transport.BCVals(2)*dot([1,0], data.Neutronics.Transport.QuadAngles)*0.2;
+influx = data.Neutronics.Transport.BCVals{2}*dot([1,0], data.Neutronics.Transport.QuadAngles)*0.2;
 lfc = cell(nr,1); rfc = cell(nr,1);
 lpos = cell(nr,1); rpos = cell(nr,1);
 lflux = cell(nr,1); rflux = cell(nr,1);

@@ -479,7 +479,9 @@ for f=1:mesh.TotalBoundaryFaces
                 min_dot = fdot; min_ind = m;
             end
         end
-        ndat.Transport.BeamFluxes{ff}(min_ind,:) = ndat.Transport.BCVals(fid,:);
+        for g=1:ng
+            ndat.Transport.BeamFluxes{ff}(min_ind,g) = ndat.Transport.BCVals{fid,g};
+        end
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

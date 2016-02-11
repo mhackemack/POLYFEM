@@ -48,7 +48,7 @@ out.NuBar = zeros(nm,ng);
 out.FissSpec = zeros(nm,ng);
 out.ExtSource = [];
 out.BCFlags = [];
-out.BCVals = [];
+out.BCVals = {[]};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function XS = add_comp_contribution(XS, xs_dir, matid, density)
 % Total XS contribution - MT1

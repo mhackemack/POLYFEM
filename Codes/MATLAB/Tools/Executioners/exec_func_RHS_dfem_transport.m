@@ -99,7 +99,7 @@ for ff=1:mesh.TotalBoundaryFaces
                     per_af = ndat.PeriodicFluxesOld{f}{tq}(:,grp);
                     rhs(cnqg) = rhs(cnqg) - fdot * M * per_af;
                 case(glob.IncidentIsotropic)
-                    rhs(cnqg) = rhs(cnqg) - (fdot*ndat.BCVals(fflag,grp)/angNorm)*F;
+                    rhs(cnqg) = rhs(cnqg) - (fdot*ndat.BCVals{fflag,grp}/angNorm)*F;
                 case(glob.IncidentCurrent)
 
                 case(glob.IncidentBeam)
@@ -113,5 +113,4 @@ for ff=1:mesh.TotalBoundaryFaces
         end
     end
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

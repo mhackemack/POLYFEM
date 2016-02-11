@@ -37,9 +37,9 @@ data.Neutronics.Diffusion.FissSpec = [0.0];
 data.Neutronics.Diffusion.ExtSource = [0.0];
 % Boundary Conditions
 data.Neutronics.Diffusion.BCFlags = [glob.Dirichlet];
-data.Neutronics.Diffusion.BCVals = [0.0];
+data.Neutronics.Diffusion.BCVals = {0.0};
 % data.Neutronics.Diffusion.BCFlags = [glob.Neumann; glob.Robin; glob.Robin];
-% data.Neutronics.Diffusion.BCVals = [0.0;0.0;9.0];
+% data.Neutronics.Diffusion.BCVals = {0.0;0.0;9.0};
 
 % Solver Input Parameters
 % -----------------------

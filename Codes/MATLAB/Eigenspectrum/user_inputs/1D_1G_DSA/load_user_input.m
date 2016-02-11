@@ -40,4 +40,4 @@ data.Neutronics.Transport.ScatteringXS = c*sigt;
 data.Neutronics.Diffusion.AbsorbXS = (1-c)*sigt;
 % bcs
 data.Neutronics.Transport.BCFlags = glob.Periodic;
-data.Neutronics.Transport.BCVals = 0.0;
+data.Neutronics.Transport.BCVals = {0.0};

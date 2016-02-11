@@ -42,7 +42,7 @@ data.Neutronics.AbsorbXS = (1-c)*sigt;
 data.Neutronics.EnergyShape = ones(data.problem.NumberMaterials,data.Neutronics.numberEnergyGroups);
 % bcs
 data.Neutronics.BCFlags = glob.Periodic;
-data.Neutronics.BCVals = 0.0;
+data.Neutronics.BCVals = {0.0};
 % average cross sections
 data.Neutronics.AveTotalXS      = data.Neutronics.TotalXS;
 data.Neutronics.AveDiffusionXS  = data.Neutronics.DiffusionXS;
