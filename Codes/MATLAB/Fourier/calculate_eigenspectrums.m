@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          
+%   Title:          Calculate Eigenspectrums
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -23,7 +23,7 @@ outputs = cell(data.Neutronics.Transport.NumSnLevels, inputs.TotalMeshes);
 % Loop through Input Space and Calculate EigenSpectrums
 % -----------------------------------------------------
 nlevels = data.Neutronics.Transport.NumSnLevels;
-disp('-> Computing EigenSpectrums.'); %rev_str = [];
+disp('-> Computing EigenSpectrums.');
 % Loop through quadratures
 for q=1:nlevels
     % Loop through meshes
@@ -31,14 +31,11 @@ for q=1:nlevels
         % Print mesh/quad combo to screen to keep from going insane...
         msg = sprintf('   -> Computing spectrum for Mesh %d of %d and Quadrature %d of %d',m,inputs.TotalMeshes,q,nlevels);
         disp(msg)
-%         fprintf([rev_str,msg]);
-%         rev_str = repmat(sprintf('\b'), 1, length(msg));
         % Collect input
         [m_in, phase] = combine_input_set(data, inputs, m, q);
         outputs{q,m} = p_func(b_func, m_in, phase);
     end
 end
-% fprintf(rev_str);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -53,10 +50,7 @@ else
     p_func = @grid_func;
 end
 % Matrix Build Function Call
-TM = data.Neutronics.TransportMethod;
-TT = data.Neutronics.Transport.transportType;
-DM = data.Neutronics.DSAType;
-b_func = str2func(['func_build_',TM,'_',TT,'_',DM]);
+b_func = get_build_function(data);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = searcher_func(b_func, m_in, p_in)
 pnum = p_in.TotalPhases;
@@ -86,7 +80,8 @@ end
 fprintf(rev_str);
 % Finalize Computations
 if dim ~= 1, out.Eigen.Grid = reshape(out.Eigen.List, pdim*ones(1,dim)); end
-out.Eigen.Max = max(out.Eigen.List);
+[out.Eigen.Max,ind] = max(out.Eigen.List);
+out.Eigen.MaxLambda = out.Search.LamList(ind,:);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = grid_func(b_func, m_in, p_in)
 pnum = p_in.TotalPhases;
@@ -110,6 +105,8 @@ fprintf(rev_str);
 % Finalize Computations
 if dim ~= 1, out.Eigen.Grid = reshape(out.Eigen.List, pdim*ones(1,dim)); end
 out.Eigen.Max = max(out.Eigen.List);
+[out.Eigen.Max,ind] = max(out.Eigen.List);
+out.Eigen.MaxLambda = p_in.WNList(ind,:);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_problem_dimensions( g )
 if g.Dimension == 1

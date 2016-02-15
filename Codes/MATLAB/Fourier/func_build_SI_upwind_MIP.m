@@ -56,27 +56,21 @@ if input.data.AccelType == glob.Accel_WGS_DSA
     if ng == 1
         E = T + (A\S)*TT;
     else
-        B = zeros(ndofs);
+        MDSA = zeros(ndofs,ng*ndofs);
         for g=1:ng
             gdofs = zdofs + g_offset(g);
-            for gg=1:ng
+            for gg=(g+1):ng
                 ggdofs = zdofs + g_offset(gg);
-                B = B + S(gdofs,ggdofs)*TT(gdofs,ggdofs);
+                MDSA(:,ggdofs) = MDSA(:,ggdofs) + S(gdofs,ggdofs)*TT(gdofs,ggdofs);
             end
         end
-        B = A\B;
-        for g=1:ng
-            gdofs = zdofs + g_offset(g);
-            T(gdofs,gdofs) = T(gdofs,gdofs) + P(:,:,g)*B;
-        end
-        E = T;
+        E = T + P*(A\MDSA);
     end
 elseif input.data.AccelType == glob.Accel_AGS_TG
-    % Build scattering matricies
+    % Build scattering matrices
     Sd = zeros(ng*ndofs);
     Su = zeros(ng*ndofs);
     S  = zeros(ng*ndofs);
-    MDSA = zeros(ndofs,ng*ndofs);
     for g=1:ng
         gdofs = zdofs + g_offset(g);
         for gg=1:ng
@@ -97,24 +91,17 @@ elseif input.data.AccelType == glob.Accel_AGS_TG
         C = C + d2m(1,q)*( L{q}\( m2d(1,q)*Su ));
     end
     T = I - B; TC = T\C; TCI = TC - I;
-    % Build final acceleration matrix
-    TCI = Su*TCI;
+%     E = TC;
+    % Build restriction/projection operators
+    MDSA = zeros(ndofs,ng*ndofs);
     for g=1:ng
         gdofs = zdofs + g_offset(g);
-        for gg=g+1:ng
+        for gg=(g+1):ng
             ggdofs = zdofs + g_offset(gg);
-            MDSA(:,ggdofs) = MDSA(:,ggdofs) + TCI(gdofs,ggdofs);
-%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(gdofs,ggdofs);
+            MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(gdofs,ggdofs);
         end
     end
-%     MDSA = A\MDSA;
-    for g=1:ng
-        gdofs = zdofs + g_offset(g);
-%         TC(gdofs,gdofs) = TC(gdofs,gdofs) + P(:,:,g)*MDSA;
-        PP(gdofs,:) = P(:,:,g);
-    end
-    E = TC + PP*(A\MDSA);
-%     E = TC;
+    E = TC + P*(A\MDSA);
 elseif input.data.AccelType == glob.Accel_AGS_MTG
     
 end

@@ -63,7 +63,7 @@ data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
 data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
 % Graphite
 data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
-data = add_xs_component_contribution(data, 1, 2, 'B10_99G', 2.4335449e-06);
+% data = add_xs_component_contribution(data, 1, 2, 'B10_99G', 2.4335449e-06);
 % HDPE
 data = add_xs_component_contribution(data, 1, 3, 'PolyH1_99G', 8.1570E-2);
 data = add_xs_component_contribution(data, 1, 3, 'FG_CNat_99G', 4.0787E-2);

@@ -29,11 +29,11 @@ glob = get_globals('Office');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
+inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
-data.Type = 'Search';
-data.NumberPhasePerDim = 5;
+data.Type = 'Grid';
+data.NumberPhasePerDim = 11;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -42,7 +42,22 @@ print_FA_heading(data);
 [data, inputs] = process_fourier_inputs( data );
 inputs = build_phase_transformation_matrix(data, inputs);
 % Retrieve all spectrum data and postprocess
-% ------------------------------------------
+% ------------------------------------------------------------------------------
+b_func = get_build_function(data);
 outputs = calculate_eigenspectrums(data, inputs);
-process_fourier_outputs(data, inputs, outputs);
-
+for q=1:length(data.Neutronics.Transport.SnLevels)
+    for m=1:inputs.TotalMeshes
+        [inp, phase] = combine_input_set(data, inputs, m, q);
+        P = b_func(outputs{q,m}.Eigen.MaxLambda,inp);
+        D = eig(P);
+        % Plot data if specified in input
+        if data.Output.plotting_bool
+            
+        end
+        % Output data to file if specified in input
+        if data.Output.file_bool
+            
+        end
+    end
+end
+% ------------------------------------------------------------------------------
