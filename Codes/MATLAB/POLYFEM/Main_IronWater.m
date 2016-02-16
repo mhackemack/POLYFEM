@@ -38,7 +38,7 @@ dat_in.refinementTolerance = 1/4;
 dat_in.projectSolution = 1;
 % ---
 dat_in.DSASolveMethod = 'PCG';
-dat_in.DSAPreconditioner = 'ilu';
+dat_in.DSAPreconditioner = 'jacobi';
 dat_in.DSATolerance = 1e-3;
 % Load data and perform error checking
 % ------------------------------------------------------------------------------
