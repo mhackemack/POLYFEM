@@ -4,7 +4,7 @@ global glob
 data.Output.plotting_bool = false;
 data.Output.file_bool = false;
 % geometry
-data.problem.Dimension = 1;
+data.problem.Dimension = 2;
 data.geometry.type = 'cart';
 log_xmin = 0; log_xmax = 0; xnum = 1;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
@@ -33,7 +33,7 @@ data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [4];
+data.Neutronics.Transport.SnLevels = [16];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 57;

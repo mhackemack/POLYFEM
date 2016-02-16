@@ -86,20 +86,25 @@ elseif input.data.AccelType == glob.Accel_AGS_TG
     end
     % Build tranpsort matrices
     B = zeros(ng*ndofs); C = zeros(ng*ndofs);
+%     SSd = sparse(Sd); SSu = sparse(Su);
     for q=1:input.Quadrature.NumberAngularDirections
         B = B + d2m(1,q)*( L{q}\( m2d(1,q)*Sd ));
         C = C + d2m(1,q)*( L{q}\( m2d(1,q)*Su ));
     end
-    T = I - B; TC = T\C; TCI = TC - I;
+    TC = (I-B)\C;
+    TCI = TC - I;
 %     E = TC;
     % Build restriction/projection operators
-    MDSA = zeros(ndofs,ng*ndofs);
+    MDSA = zeros(ndofs,ng*ndofs); SS = Su*TCI;
     for g=1:ng
         gdofs = zdofs + g_offset(g);
         for gg=(g+1):ng
-            ggdofs = zdofs + g_offset(gg);
-            MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(gdofs,ggdofs);
+%             ggdofs = zdofs + g_offset(gg);
+%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(ggdofs,gdofs);
+%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(gdofs,ggdofs);
+%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + SS(gdofs,ggdofs);
         end
+        MDSA = MDSA + SS(gdofs,:);
     end
     E = TC + P*(A\MDSA);
 elseif input.data.AccelType == glob.Accel_AGS_MTG

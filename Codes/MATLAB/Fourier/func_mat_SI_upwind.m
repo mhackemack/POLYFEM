@@ -127,10 +127,10 @@ for c=1:mesh.TotalCells
         end
     end
 end
-% Apply angle integration collapse
+% Convert to sparse matrices
 % ------------------------------------------------------------------------------
 % for q=1:num_dirs
-%     T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
+%     L{q} = sparse(L{q});
 % end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -4,7 +4,7 @@
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2015
+%   Year:           2016
 %   
 %   Description:    
 %   
@@ -20,7 +20,7 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format long e
+clc; %close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % ------------------------------------------------------------------------------
@@ -29,11 +29,11 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
+inp = '1D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
-data.Type = 'Grid';
-data.NumberPhasePerDim = 201;
+data.Type = 'Search';
+data.NumberPhasePerDim = 3;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -49,7 +49,7 @@ for q=1:length(data.Neutronics.Transport.SnLevels)
     for m=1:inputs.TotalMeshes
         [inp, phase] = combine_input_set(data, inputs, m, q);
         P = b_func(outputs{q,m}.Eigen.MaxLambda,inp);
-        D = eig(P);
+        [V,D] = eig(P); D=diag(D);
         % Plot data if specified in input
         if data.Output.plotting_bool
             

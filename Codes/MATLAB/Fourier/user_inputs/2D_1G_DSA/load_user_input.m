@@ -6,7 +6,7 @@ data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
 data.geometry.type = 'cart';
-log_xmin = 0; log_xmax = 0; xnum = 3;
+log_xmin = 0; log_xmax = 0; xnum = 1;
 % log_xmin = -1; log_xmax = 3; xnum = 41;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
@@ -30,7 +30,7 @@ data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4];
+data.Neutronics.Transport.SnLevels = [4];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;

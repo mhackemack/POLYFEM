@@ -4,9 +4,9 @@ global glob
 data.Output.plotting_bool = false;
 data.Output.file_bool = false;
 % geometry
-data.problem.Dimension = 2;
+data.problem.Dimension = 1;
 data.geometry.type = 'cart';
-log_xmin = 0; log_xmax = 0; xnum = 1;
+log_xmin = -4; log_xmax = -4; xnum = 1;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
 data.geometry.ncellx = 1;
@@ -29,11 +29,11 @@ data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
 data.Neutronics.DSAType = 'MIP';
-data.Neutronics.AccelType = glob.Accel_WGS_DSA;
+data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [4];
+data.Neutronics.Transport.SnLevels = [18];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 57;
@@ -61,7 +61,7 @@ data.Neutronics.AbsorbXS = [];
 % Collapse two-grid spectrum
 T = diag(data.Neutronics.TotalXS);
 S = squeeze(data.Neutronics.ScatteringXS(1,:,:));
-A = T\S;
+A = (T - tril(S))\triu(S,1);
 [y,~,~] = power_method(A,ones(ng,1),2000,1e-15);
 data.Neutronics.EnergyShape = (y / sum(y))';
 % Average cross sections
@@ -72,9 +72,10 @@ data.Neutronics.AveScatteringXS = [];
 % Inf medium analytical value
 T = diag(data.Neutronics.TotalXS);
 S = squeeze(data.Neutronics.ScatteringXS(1,:,:));
-F = T\S; FF = S*(F-eye(ng));
+Sd = tril(S,0); Su = triu(S,1);
+F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
 V = y/sum(y);
-L = F + V*(sum((T-S)*V))^(-1)*sum(FF,1);
+L = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
 [V,D] = eig(L); D=(diag(D));
 [data.AnalyticalEigenvalue,ind] = max(abs(D));
 data.AnalyticalEigenvector = V(:,ind);
