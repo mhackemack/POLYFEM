@@ -26,7 +26,7 @@ grad_bool = false;
 if nargout > 1, grad_bool = true; end
 % Get Basis Function Values and Gradients from Appropriate Functor Calls
 % ------------------------------------------------------------------------------
-if order == 1 
+if order == 1
     if ~grad_bool
         bout = max_entropy_O1_basis_functions(verts, qx, faces, order, nverts);
     else

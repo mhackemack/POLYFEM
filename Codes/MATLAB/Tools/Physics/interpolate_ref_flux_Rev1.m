@@ -55,7 +55,7 @@ for c=1:mesh.TotalCells
     elseif dim == 2
         f = get_2D_face_vertex_ordering(ncvd1);
     end
-    nodes1 = dof1.NodeLocations(cdofs1,:);
+    nodes1 = dof1.NodeLocations(cvd1,:);
     nodes2 = dof2.NodeLocations(cdofs2,:);
     % Get basis function values and interpolate
     b = bf_func(nodes1, nodes2, f, fe_deg, ncvd1);
