@@ -20,18 +20,17 @@ global glob
 dim = data.problem.Dimension;
 dim_phase = data.NumberPhasePerDim;
 tot_phase = dim_phase^dim;
-% Quick Error Checking
-% --------------------
-% quick_error_checking(dim, dim_phase, inputs.dofs);
 % Build Phase Space
 wn_norm = 2*pi;
+% pmin = 0; pmax = 1e-3;
+pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
 if dim == 1
-    p = linspace(0,wn_norm,dim_phase)';
+    p = linspace(pmin,pmax,dim_phase)';
 elseif dim == 2
-    [px,py] = meshgrid(linspace(0,wn_norm,dim_phase),linspace(0,wn_norm,dim_phase));
+    [px,py] = meshgrid(linspace(pmin,pmax,dim_phase));
     p = [px(:),py(:)];
 else
-    [px,py,pz] = meshgrid(linspace(0,wn_norm,dim_phase),linspace(0,wn_norm,dim_phase),linspace(0,wn_norm,dim_phase));
+    [px,py,pz] = meshgrid(linspace(pmin,pmax,dim_phase));
     p = [px(:),py(:),pz(:)];
 end
 % Build all matrices

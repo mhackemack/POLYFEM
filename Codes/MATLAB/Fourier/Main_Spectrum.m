@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Office');
+glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 11;
+data.NumberPhasePerDim = 201;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures

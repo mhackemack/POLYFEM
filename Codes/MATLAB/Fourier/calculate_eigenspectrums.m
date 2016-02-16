@@ -57,7 +57,8 @@ pnum = p_in.TotalPhases;
 pdim = p_in.NumberPhasePerDim;
 dim = m_in.mesh.Dimension;
 geom_dims = get_problem_dimensions(m_in.mesh);
-pmin = zeros(1,dim); pmax = 2*pi*ones(1,dim)./(geom_dims(:,2)');
+pmin = sqrt(eps)*ones(1,dim); pmax = (2*pi-sqrt(eps))*ones(1,dim)./(geom_dims(:,2)');
+% pmin = zeros(1,dim); pmax = 2*pi*ones(1,dim)./(geom_dims(:,2)');
 % Allocate memory
 out.Eigen.List = zeros(pnum,1);
 out.Eigen.Grid = zeros(pdim*ones(1,dim));
