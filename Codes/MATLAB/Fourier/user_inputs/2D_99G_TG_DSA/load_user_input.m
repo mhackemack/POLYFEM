@@ -28,12 +28,13 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
+data.Neutronics.PerformAcceleration = 1;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [16];
+data.Neutronics.Transport.SnLevels = [4];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 57;
@@ -76,5 +77,6 @@ Sd = tril(S,0); Su = triu(S,1);
 F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
 V = y/sum(y);
 L = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
-D = abs(eig(L));
-data.AnalyticalAnswer = max(D);
+[V,D] = eig(L); D=(diag(D));
+[data.AnalyticalEigenvalue,ind] = max(abs(D));
+data.AnalyticalEigenvector = V(:,ind);

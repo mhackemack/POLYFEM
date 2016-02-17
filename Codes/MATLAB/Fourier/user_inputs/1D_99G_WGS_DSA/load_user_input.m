@@ -4,13 +4,13 @@ global glob
 data.Output.plotting_bool = false;
 data.Output.file_bool = false;
 % geometry
-data.problem.Dimension = 2;
+data.problem.Dimension = 1;
 data.geometry.type = 'cart';
 log_xmin = 0; log_xmax = 0; xnum = 1;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
-data.geometry.ncellx = 2;
-data.geometry.ncelly = 2;
+data.geometry.ncellx = 1;
+data.geometry.ncelly = 1;
 data.geometry.ncellz = 1;
 % mat regions
 data.problem.NumberMaterials = 1;
@@ -28,7 +28,7 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'GMRES';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
-data.Neutronics.PerformAcceleration = 1;
+data.Neutronics.PerformAcceleration = 0;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;

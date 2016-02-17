@@ -33,7 +33,7 @@ inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 11;
+data.NumberPhasePerDim = 21;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures

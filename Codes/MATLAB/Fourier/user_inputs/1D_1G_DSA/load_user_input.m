@@ -24,6 +24,7 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
+data.Neutronics.PerformAcceleration = 1;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_DSA_MIP;
 data.Neutronics.IP_Constant = 4;

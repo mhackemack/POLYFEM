@@ -31,8 +31,8 @@ d2m = input.Quadrature.discrete_to_moment;
 L = func_mat_SI_upwind(lam, input);
 A = func_mat_MIP(lam, input);
 S0 = input.ScatteringMatrix;
-P = input.ProjectionMatrix; PP = zeros(ng*ndofs,ndofs);
-I = eye(ndofs*ng); Id = eye(ndofs);
+P = input.ProjectionMatrix;
+I = eye(ndofs*ng);
 % Build full matrix based on acceleration type
 % P = T + (A\B)*(T - I);
 if input.data.AccelType == glob.Accel_WGS_DSA
@@ -56,13 +56,12 @@ if input.data.AccelType == glob.Accel_WGS_DSA
     if ng == 1
         E = T + (A\S)*TT;
     else
-        MDSA = zeros(ndofs,ng*ndofs);
+        MDSA = zeros(ndofs,ng*ndofs); SS = S*TT;
         for g=1:ng
             gdofs = zdofs + g_offset(g);
             for gg=(g+1):ng
-                ggdofs = zdofs + g_offset(gg);
-                MDSA(:,ggdofs) = MDSA(:,ggdofs) + S(gdofs,ggdofs)*TT(gdofs,ggdofs);
             end
+            MDSA = MDSA + SS(gdofs,:);
         end
         E = T + P*(A\MDSA);
     end
