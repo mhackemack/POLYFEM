@@ -33,9 +33,9 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 4;
+data.Neutronics.Transport.SnLevels = 6;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -50,7 +50,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e2; c = 0.9999;
+txs = 1e0; c = 1.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -62,16 +62,16 @@ data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
-data.Neutronics.Transport.ExtSource = [1.0];
+data.Neutronics.Transport.ExtSource = [0.0];
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 data.Neutronics.Transport.BCVals  = {0.0};
-% data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentBeam];
-% data.Neutronics.Transport.BCVals = {0.0, 1.0};
+% data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentIsotropic, glob.Reflecting];
+% data.Neutronics.Transport.BCVals = {0.0; 1.0; 0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 1;
+data.Neutronics.Transport.performDSA = 0;
 data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'gs';
@@ -83,14 +83,14 @@ data.Neutronics.IP_Constant = 4;
 % ------------------------------------------------------------------------------
 data.solver.absoluteTolerance = 1e-8;
 data.solver.relativeTolerance = 1e-8;
-data.solver.maxIterations = 40;
+data.solver.maxIterations = 1000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 8;
+L = 1; ncells = 6;
 % gname = 'PolyMesh_SqDomain_L1_n1024';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
@@ -129,9 +129,10 @@ geometry = CartesianGeometry(2,x,y);
 
 % geometry.set_face_flag_on_surface(2,0.0);
 % geometry.set_face_flag_on_surface(2,[0,.2*L;0,.4*L]);
-% geometry.set_face_flag_on_surface(2,[0,L;L,L]);
-% geometry.set_face_flag_on_surface(2,[L,0;L,L]);
-% geometry.set_face_flag_on_surface(2,[0,0;L,0]);
+% geometry.set_face_flag_on_surface(2,[0,0;0,L]);
+% geometry.set_face_flag_on_surface(3,[0,L;L,L]);
+% geometry.set_face_flag_on_surface(1,[L,0;L,L]);
+% geometry.set_face_flag_on_surface(3,[0,0;L,0]);
 
 % [data, geometry] = get_EIR( data, 1, 'cart' );
 % [data, geometry] = get_IronWater( data, 4, 'cart' );

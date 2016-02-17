@@ -32,7 +32,7 @@ L = func_mat_SI_upwind(lam, input);
 A = func_mat_MIP(lam, input);
 S0 = input.ScatteringMatrix;
 P = input.ProjectionMatrix;
-I = eye(ndofs*ng);
+I = speye(ndofs*ng);
 % Build full matrix based on acceleration type
 % P = T + (A\B)*(T - I);
 if input.data.AccelType == glob.Accel_WGS_DSA
@@ -50,7 +50,6 @@ if input.data.AccelType == glob.Accel_WGS_DSA
     for q=1:input.Quadrature.NumberAngularDirections
         T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
     end
-%     E = T;
     TT = T - I;
     % Build final matrix based on energy group numbers
     if ng == 1
@@ -69,7 +68,6 @@ elseif input.data.AccelType == glob.Accel_AGS_TG
     % Build scattering matrices
     Sd = zeros(ng*ndofs);
     Su = zeros(ng*ndofs);
-    S  = zeros(ng*ndofs);
     for g=1:ng
         gdofs = zdofs + g_offset(g);
         for gg=1:ng
@@ -80,29 +78,21 @@ elseif input.data.AccelType == glob.Accel_AGS_TG
             elseif gg > g
                 Su(gdofs,ggdofs) = tS0;
             end
-            S(gdofs,ggdofs) = tS0;
         end
     end
+    Sd = sparse(Sd); Su = sparse(Su);
     % Build tranpsort matrices
     B = zeros(ng*ndofs); C = zeros(ng*ndofs);
-%     SSd = sparse(Sd); SSu = sparse(Su);
     for q=1:input.Quadrature.NumberAngularDirections
-        B = B + d2m(1,q)*( L{q}\( m2d(1,q)*Sd ));
-        C = C + d2m(1,q)*( L{q}\( m2d(1,q)*Su ));
+        tL = sparse(L{q}\I);
+        B = B + d2m(1,q)*( tL*( m2d(1,q)*Sd ));
+        C = C + d2m(1,q)*( tL*( m2d(1,q)*Su ));
     end
-    TC = (I-B)\C;
-    TCI = TC - I;
-%     E = TC;
+    TC = (I-B)\C; TCI = TC - I;
     % Build restriction/projection operators
     MDSA = zeros(ndofs,ng*ndofs); SS = Su*TCI;
     for g=1:ng
         gdofs = zdofs + g_offset(g);
-        for gg=(g+1):ng
-%             ggdofs = zdofs + g_offset(gg);
-%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(ggdofs,gdofs);
-%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + Su(gdofs,ggdofs)*TCI(gdofs,ggdofs);
-%             MDSA(:,ggdofs) = MDSA(:,ggdofs) + SS(gdofs,ggdofs);
-        end
         MDSA = MDSA + SS(gdofs,:);
     end
     E = TC + P*(A\MDSA);

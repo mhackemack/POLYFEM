@@ -6,19 +6,20 @@ data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 1;
 data.geometry.type = 'cart';
-log_xmin = -4; log_xmax = -4; xnum = 1;
-data.geometry.x = logspace(log_xmin, log_xmax, xnum);
+data.geometry.x = [1e0,1e-1,1e-2,1e-3,1e-4];
+% log_xmin = -4; log_xmax = 0; xnum = 5;
+% data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
-data.geometry.ncellx = 1;
+data.geometry.ncellx = 10;
 data.geometry.ncelly = 1;
 data.geometry.ncellz = 1;
 % mat regions
-data.problem.NumberMaterials = 1;
-data.geometry.mats = [];
-% data.geometry.mats(1).ID = 2;
-% data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
+data.problem.NumberMaterials = 2;
+data.geometry.mats(1).ID = 1;
+data.geometry.mats(1).Region = [0.5;1];
 % data.geometry.mats(2).ID = 2;
 % data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
+% data.geometry.mats = [];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
@@ -34,8 +35,9 @@ data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [18];
+data.Neutronics.Transport.SnLevels = [16];
 data.Neutronics.Transport.PnOrder = 0;
+data.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 57;
 data.Neutronics.ThermalGroups = 43:99;
@@ -44,6 +46,20 @@ data.Neutronics.BCFlags = glob.Periodic;
 data.Neutronics.BCVals = {0.0};
 % Build graphite xs
 % ------------------------------------------------------------------------------
+% Rev1 changes
+data.Groups.NumberEnergyGroups = 99;
+data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
+data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
+% graphite
+data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
+% HDPE
+% data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
+% data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
+
+
+
+
+
 xs_dir = [glob.xs_dir,'graphite_99G/'];
 % Allocate Memory
 density = 8.5238E-2;

@@ -25,10 +25,10 @@ data.Neutronics.FEMDegree = 1;
 data.Neutronics.FEMLumping = false;
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.TransportMethod = 'GMRES';
+data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
-data.Neutronics.PerformAcceleration = 0;
+data.Neutronics.PerformAcceleration = 1;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;

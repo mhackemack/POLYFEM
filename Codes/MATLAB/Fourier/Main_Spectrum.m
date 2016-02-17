@@ -20,7 +20,7 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format long e
+clc; %close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % ------------------------------------------------------------------------------
@@ -29,11 +29,11 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
+inp = '1D_99G_WGS_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 3;
+data.NumberPhasePerDim = 2;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -46,10 +46,12 @@ inputs = build_phase_transformation_matrix(data, inputs);
 b_func = get_build_function(data);
 outputs = calculate_eigenspectrums(data, inputs);
 for q=1:length(data.Neutronics.Transport.SnLevels)
+    Dmeshes = [];
     for m=1:inputs.TotalMeshes
         [inp, phase] = combine_input_set(data, inputs, m, q);
         P = b_func(outputs{q,m}.Eigen.MaxLambda,inp);
         [V,D] = eig(P); D=diag(D);
+        Dmeshes = [Dmeshes,real(D),imag(D)];
         [Dmax,ind] = max(abs(D));
         Vmax = V(:,ind);
         % Plot data if specified in input
