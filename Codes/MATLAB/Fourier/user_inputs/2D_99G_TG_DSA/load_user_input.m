@@ -13,12 +13,12 @@ data.geometry.ncellx = 2;
 data.geometry.ncelly = 2;
 data.geometry.ncellz = 1;
 % mat regions
-data.problem.NumberMaterials = 1;
+data.problem.NumberMaterials = 2;
 data.geometry.mats = [];
-% data.geometry.mats(1).ID = 2;
-% data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
-% data.geometry.mats(2).ID = 2;
-% data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
+data.geometry.mats(1).ID = 2;
+data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
+data.geometry.mats(2).ID = 2;
+data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
@@ -36,6 +36,7 @@ data.Neutronics.IP_Constant = 4;
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = [4];
 data.Neutronics.Transport.PnOrder = 0;
+data.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 57;
 data.Neutronics.ThermalGroups = 43:99;
@@ -44,45 +45,68 @@ data.Neutronics.BCFlags = glob.Periodic;
 data.Neutronics.BCVals = {0.0};
 % Build graphite xs
 % ------------------------------------------------------------------------------
-xs_dir = [glob.xs_dir,'graphite_99G/'];
-% Allocate Memory
-density = 8.5238E-2;
-ng = length(data.Neutronics.ThermalGroups);
-data.Neutronics.TotalXS = zeros(1,ng);
-data.Neutronics.ScatteringXS = zeros(1,ng,ng);
-% Total XS
-M = open([xs_dir,'MT_1.mat']);
-data.Neutronics.TotalXS = density*M.mat(data.Neutronics.ThermalGroups)';
-data.Neutronics.DiffusionXS = (1/3)./data.Neutronics.TotalXS;
-% Scattering XS
-M = open([xs_dir,'MT_2500.mat']);
-data.Neutronics.ScatteringXS(1,:,:) = density*M.mat(data.Neutronics.ThermalGroups,data.Neutronics.ThermalGroups,1);
-% Remaining XS
-data.Neutronics.AbsorbXS = [];
-% Collapse two-grid spectrum
-T = diag(data.Neutronics.TotalXS);
-S = squeeze(data.Neutronics.ScatteringXS(1,:,:));
-A = (T - tril(S))\triu(S,1);
-[y,~,~] = power_method(A,ones(ng,1),2000,1e-15);
-data.Neutronics.EnergyShape = (y / sum(y))';
+% Rev1 changes
+data.Groups.NumberEnergyGroups = 99;
+data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
+data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
+% graphite
+data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
+% HDPE
+% data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
+% data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
+% BHPDE
+% data = add_xs_component_contribution(data, 1, 3, 'PolyH1_99G', 5.0859E-2);
+% data = add_xs_component_contribution(data, 1, 3, 'FG_CNat_99G', 2.5429E-2);
+% data = add_xs_component_contribution(data, 1, 3, 'B10_99G', 6.6256E-3);
+% data = add_xs_component_contribution(data, 1, 3, 'B11_99G', 2.6669E-2);
+% Air
+data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
+data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
+data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
+data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+% Wood
+% data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0376E-2);
+% Restrict Energy Groups
+data.XS.TotalXS = data.XS.TotalXS(:,data.Neutronics.ThermalGroups);
+data.XS.AbsorbXS = data.XS.AbsorbXS(:,data.Neutronics.ThermalGroups);
+data.XS.ScatteringXS = data.XS.ScatteringXS(:,data.Neutronics.ThermalGroups,data.Neutronics.ThermalGroups,:);
+data.Neutronics.DiffusionXS = [];
+data.Neutronics.TotalXS = data.XS.TotalXS;
+data.Neutronics.AbsorbXS = data.XS.AbsorbXS;
+data.Neutronics.ScatteringXS = data.XS.ScatteringXS;
+% Collapse energy groups
+data = collapse_tg_xs(data,1,2,1);
 % Average cross sections
-data.Neutronics.AveTotalXS = data.Neutronics.EnergyShape*data.Neutronics.TotalXS';
-data.Neutronics.AveDiffusionXS = data.Neutronics.EnergyShape*data.Neutronics.DiffusionXS';
-data.Neutronics.AveAbsorbXS = data.Neutronics.EnergyShape*data.Neutronics.TotalXS' - sum(S*data.Neutronics.EnergyShape');
+data.Neutronics.AveTotalXS = [];
 data.Neutronics.AveScatteringXS = [];
-% Inf medium analytical value
-T = diag(data.Neutronics.TotalXS);
-S = squeeze(data.Neutronics.ScatteringXS(1,:,:));
-Sd = tril(S,0); Su = triu(S,1);
-F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
-V = y/sum(y);
-L = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
-[V,D] = eig(L); D=(diag(D));
-[data.AnalyticalEigenvalue,ind] = max(abs(D));
-data.AnalyticalEigenvector = V(:,ind);
+data.Neutronics.AveDiffusionXS = data.XS(2).DiffXS;
+data.Neutronics.AveAbsorbXS = data.XS(2).AbsorbXS;
+data.Neutronics.ErrorShape = data.Acceleration.Info.ErrorShape;
+data = rmfield(data,'XS');
+data = get_analytical_solutions(data);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Function Listing
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+function data = get_analytical_solutions(data)
+nm = data.problem.NumberMaterials;
+ng = data.Neutronics.numberEnergyGroups;
+for m=1:nm
+    T = diag(data.Neutronics.TotalXS(m,:));
+    S = squeeze(data.Neutronics.ScatteringXS(m,:,:));
+    Sd = tril(S,0); Su = triu(S,1);
+    F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
+    [V,D] = eig(F); D=(diag(D));
+    data.AnalyticalUnacceleratedEigenvalue(m,:) = D;
+    data.AnalyticalUnacceleratedEigenvector{m} = V;
+    [data.AnalyticalMaxUnacceleratedEigenvalue(m),ind] = max(abs(D));
+    data.AnalyticalMaxUnacceleratedEigenvector(m,:) = V(:,ind);
+    V = data.Neutronics.ErrorShape(m,:)';
+    L = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
+    [V,D] = eig(L); D=(diag(D));
+    data.AnalyticalAcceleratedEigenvalue(m,:) = D;
+    data.AnalyticalAcceleratedEigenvector{m} = V;
+    [data.AnalyticalMaxAcceleratedEigenvalue(m),ind] = max(abs(D));
+    data.AnalyticalMaxAcceleratedEigenvector(m,:) = V(:,ind);
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -24,13 +24,13 @@ out.data.BCFlags      = data.Neutronics.BCFlags;
 out.data.BCVals       = data.Neutronics.BCVals;
 out.data.IP_Constant  = data.Neutronics.IP_Constant;
 out.data.AccelType    = data.Neutronics.AccelType;
-out.data.EnergyShape  = data.Neutronics.EnergyShape;
+out.data.ErrorShape   = data.Neutronics.ErrorShape;
 % Average Cross Sections
 out.data.numberEnergyGroups = data.Neutronics.numberEnergyGroups;
 out.data.AveTotalXS         = data.Neutronics.AveTotalXS;
 out.data.AveAbsorbXS        = data.Neutronics.AveAbsorbXS;
 out.data.AveScatteringXS    = data.Neutronics.AveScatteringXS;
-out.data.AveDiffusionXS     = data.Neutronics.DiffusionXS;
+out.data.AveDiffusionXS     = data.Neutronics.AveDiffusionXS;
 % Hybrid Transport Inputs
 % ------------------------------------------------------------------------------
 if strcmp(data.Neutronics.Transport.transportType, 'hybrid')

@@ -18,7 +18,7 @@ function P = build_projection_operator(input)
 % ------------------------------------------------------------------------------
 ng = input.data.numberEnergyGroups; ndofs = input.dof.TotalDoFs;
 ntot = ndofs*ng;
-eshape = input.data.EnergyShape;
+eshape = input.data.ErrorShape;
 % Allocate memory space
 % ------------------------------------------------------------------------------
 g_offset = (1:ng)*ndofs - ndofs;

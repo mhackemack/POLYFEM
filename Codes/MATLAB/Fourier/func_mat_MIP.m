@@ -22,7 +22,7 @@ mesh = input.mesh;
 dof  = input.dof;
 fe   = input.fe;
 off  = input.offset;
-% E    = data.EnergyShape;
+% E    = data.ErrorShape;
 % Retrieve Preliminary Data
 % ------------------------------------------------------------------------------
 dim = mesh.Dimension;
@@ -82,7 +82,7 @@ for f=1:mesh.TotalFaces
     if fid == 0
         % Get preliminaries
         mID   = mesh.MatID(fcells);
-        D     = data.DiffusionXS(mID);
+        D     = data.AveDiffusionXS(mID);
         h     = mesh.OrthogonalProjection(f,:);
         k     = get_penalty_coefficient(data.IP_Constant,fe.Degree,0,D,h);
         fn1   = dof.FaceCellNodes{f,1};
@@ -136,7 +136,7 @@ for f=1:mesh.TotalFaces
         op_f  = mesh.PeriodicOppositeFaces(f);
         op_c  = mesh.FaceCells(op_f,1);
         mID   = mesh.MatID([fcells(1), op_c]);
-        D     = data.DiffusionXS(mID);
+        D     = data.AveDiffusionXS(mID);
         h     = mesh.OrthogonalProjection([f,op_f],1);
         k     = get_penalty_coefficient(data.IP_Constant,fe.Degree,0,D,h);
         fn1   = dof.FaceCellNodes{f,1};

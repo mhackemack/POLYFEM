@@ -62,11 +62,11 @@ T = diag(data.Neutronics.TotalXS);
 S = squeeze(data.Neutronics.ScatteringXS(1,:,:));
 A = T\S;
 [y,~,~] = power_method(A,ones(ng,1),2000,1e-15);
-data.Neutronics.EnergyShape = (y / sum(y))';
+data.Neutronics.ErrorShape = (y / sum(y))';
 % Average cross sections
-data.Neutronics.AveTotalXS = data.Neutronics.EnergyShape*data.Neutronics.TotalXS';
-data.Neutronics.AveDiffusionXS = data.Neutronics.EnergyShape*data.Neutronics.DiffusionXS';
-data.Neutronics.AveAbsorbXS = data.Neutronics.EnergyShape*data.Neutronics.TotalXS' - sum(S*data.Neutronics.EnergyShape');
+data.Neutronics.AveTotalXS = data.Neutronics.ErrorShape*data.Neutronics.TotalXS';
+data.Neutronics.AveDiffusionXS = data.Neutronics.ErrorShape*data.Neutronics.DiffusionXS';
+data.Neutronics.AveAbsorbXS = data.Neutronics.ErrorShape*data.Neutronics.TotalXS' - sum(S*data.Neutronics.ErrorShape');
 data.Neutronics.AveScatteringXS = [];
 % Inf medium analytical value
 T = diag(data.Neutronics.TotalXS);

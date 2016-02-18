@@ -40,7 +40,7 @@ data.Neutronics.TotalXS = sigt;
 data.Neutronics.DiffusionXS = (1/3)./sigt;
 data.Neutronics.ScatteringXS = c*sigt;
 data.Neutronics.AbsorbXS = (1-c)*sigt;
-data.Neutronics.EnergyShape = ones(data.problem.NumberMaterials,data.Neutronics.numberEnergyGroups);
+data.Neutronics.ErrorShape = ones(data.problem.NumberMaterials,data.Neutronics.numberEnergyGroups);
 % bcs
 data.Neutronics.BCFlags = glob.Periodic;
 data.Neutronics.BCVals = {0.0};
