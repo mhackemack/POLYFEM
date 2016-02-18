@@ -100,7 +100,11 @@ if ~isempty(mats)
             for m=1:nmats
                 id  = mats(m).ID;
                 reg = mats(m).Region;
-                mx = [reg(:,1)*x(i),reg(:,2)*x(i)*yz(j)];
+                if data.problem.Dimension == 1
+                    mx = reg*x(i);
+                elseif data.problem.Dimension == 2
+                    mx = [reg(:,1)*x(i),reg(:,2)*x(i)*yz(j)];
+                end
                 inputs.meshes{c}.set_cell_matIDs_inside_domain(id,mx);
             end
         end

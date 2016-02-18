@@ -9,16 +9,14 @@ data.geometry.type = 'cart';
 log_xmin = 0; log_xmax = 0; xnum = 1;
 data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
-data.geometry.ncellx = 1;
+data.geometry.ncellx = 2;
 data.geometry.ncelly = 1;
 data.geometry.ncellz = 1;
 % mat regions
 data.problem.NumberMaterials = 1;
-data.geometry.mats = [];
-% data.geometry.mats(1).ID = 2;
-% data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
-% data.geometry.mats(2).ID = 2;
-% data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
+data.geometry.mats(1).ID = 1;
+data.geometry.mats(1).Region = [0.5;1];
+% data.geometry.mats = [];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;

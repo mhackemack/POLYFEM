@@ -39,7 +39,7 @@ dat_in.projectSolution = 1;
 % ---
 dat_in.DSASolveMethod = 'PCG';
 dat_in.DSAPreconditioner = 'eisenstat';
-dat_in.DSATolerance = 1e-3;
+dat_in.DSATolerance = 1e-2;
 % Load data and perform error checking
 % ------------------------------------------------------------------------------
 print_heading(now, date);
