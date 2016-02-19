@@ -50,10 +50,10 @@ data.Groups.NumberEnergyGroups = 99;
 data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
 data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
 % graphite
-data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
+% data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
 % HDPE
-% data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
-% data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
+data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
+data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
 % BHPDE
 % data = add_xs_component_contribution(data, 1, 3, 'PolyH1_99G', 5.0859E-2);
 % data = add_xs_component_contribution(data, 1, 3, 'FG_CNat_99G', 2.5429E-2);
