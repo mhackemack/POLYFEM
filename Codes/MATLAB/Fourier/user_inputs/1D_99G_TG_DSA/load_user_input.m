@@ -6,7 +6,7 @@ data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 1;
 data.geometry.type = 'cart';
-data.geometry.x = [1e0];
+data.geometry.x = [1e-3];
 % data.geometry.x = [1e0,1e-1,1e-2,1e-3,1e-4];
 % log_xmin = -4; log_xmax = 0; xnum = 5;
 % data.geometry.x = logspace(log_xmin, log_xmax, xnum);
@@ -15,12 +15,12 @@ data.geometry.ncellx = 2;
 data.geometry.ncelly = 1;
 data.geometry.ncellz = 1;
 % mat regions
-data.problem.NumberMaterials = 1;
-% data.geometry.mats(1).ID = 2;
-% data.geometry.mats(1).Region = [0.5;1];
+data.problem.NumberMaterials = 2;
+data.geometry.mats(1).ID = 2;
+data.geometry.mats(1).Region = [0.5;1];
 % data.geometry.mats(2).ID = 2;
 % data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
-data.geometry.mats = [];
+% data.geometry.mats = [];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
@@ -30,13 +30,13 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
-data.Neutronics.PerformAcceleration = 1;
+data.Neutronics.PerformAcceleration = 0;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_AGS_TG;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [12];
+data.Neutronics.Transport.SnLevels = [8];
 data.Neutronics.Transport.PnOrder = 0;
 data.Transport.PnOrder = 0;
 % groups
@@ -45,14 +45,14 @@ data.Neutronics.ThermalGroups = 43:99;
 % bcs
 data.Neutronics.BCFlags = glob.Periodic;
 data.Neutronics.BCVals = {0.0};
-% Build graphite xs
+% Build cross sections
 % ------------------------------------------------------------------------------
 % Rev1 changes
 data.Groups.NumberEnergyGroups = 99;
 data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
 data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
 % graphite
-% data = add_xs_component_contribution(data, 1, 2, 'graphite_99G', 8.5238E-2);
+data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 % HDPE
 data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
 data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
@@ -62,10 +62,10 @@ data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
 % data = add_xs_component_contribution(data, 1, 3, 'B10_99G', 6.6256E-3);
 % data = add_xs_component_contribution(data, 1, 3, 'B11_99G', 2.6669E-2);
 % Air
-data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
-data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
-data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
-data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
+% data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
+% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
+% data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
 % Wood
 % data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);

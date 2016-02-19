@@ -29,11 +29,11 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
+inp = '1D_99G_WGS_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 21;
+data.NumberPhasePerDim = 401;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures

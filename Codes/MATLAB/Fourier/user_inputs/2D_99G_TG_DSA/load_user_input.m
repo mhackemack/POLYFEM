@@ -43,7 +43,7 @@ data.Neutronics.ThermalGroups = 43:99;
 % bcs
 data.Neutronics.BCFlags = glob.Periodic;
 data.Neutronics.BCVals = {0.0};
-% Build graphite xs
+% Build cross sections
 % ------------------------------------------------------------------------------
 % Rev1 changes
 data.Groups.NumberEnergyGroups = 99;
