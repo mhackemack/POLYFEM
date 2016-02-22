@@ -40,8 +40,10 @@ if data.Acceleration.Info(accid).AccelerationType == glob.Accel_WGS_DSA
         if data.Transport.PnOrder == 0
             DC = 1./(3*txs(m,:));
         elseif data.Transport.PnOrder > 0
-            
+            tsxs = sum(squeeze(sxs(m,:,:,2)),2)';
+            DC = 1./(3*(txs(m,:) - tsxs));
         end
+        data.XS(xsout).TotalXS(m)  = txs(m,:)*y{m};
         data.XS(xsout).DiffXS(m) = DC*y{m};
         data.XS(xsout).AbsorbXS(m) = txs(m,:)*y{m} - sum(squeeze(sxs(m,:,:))*y{m});
     end

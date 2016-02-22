@@ -29,11 +29,11 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
+inp = '2D_99G-EC_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
-data.Type = 'Grid';
-data.NumberPhasePerDim = 81;
+data.Type = 'Search';
+data.NumberPhasePerDim = 5;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -45,15 +45,20 @@ inputs = build_phase_transformation_matrix(data, inputs);
 % ------------------------------------------------------------------------------
 b_func = get_build_function(data);
 outputs = calculate_eigenspectrums(data, inputs);
+Dout = cell(length(data.Neutronics.Transport.SnLevels),inputs.TotalMeshes);
+Vout = cell(length(data.Neutronics.Transport.SnLevels),inputs.TotalMeshes);
+Dmax = zeros(length(data.Neutronics.Transport.SnLevels),inputs.TotalMeshes);
 for q=1:length(data.Neutronics.Transport.SnLevels)
     Dmeshes = [];
     for m=1:inputs.TotalMeshes
         [inp, phase] = combine_input_set(data, inputs, m, q);
         P = b_func(outputs{q,m}.Eigen.MaxLambda,inp);
         [V,D] = eig(P); D=diag(D);
-        Dmeshes = [Dmeshes,real(D),imag(D)];
-        [Dmax,ind] = max(abs(D));
-        Vmax = V(:,ind);
+        Dout{q,m} = D;
+        Vout{q,m} = V;
+        [Dmax(q,m),ind] = max(abs(D));
+        Vmax(:,q,m) = V(:,ind);
+%         Dmeshes = [Dmeshes,real(D),imag(D)];
         % Plot data if specified in input
         if data.Output.plotting_bool
             

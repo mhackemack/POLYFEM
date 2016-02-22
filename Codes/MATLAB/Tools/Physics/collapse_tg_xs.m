@@ -33,6 +33,7 @@ end
 % Populate Acceleration XS
 % ------------------------------------------------------------------------------
 if data.Acceleration.Info(accid).AccelerationType == glob.Accel_AGS_TG
+    data.XS(xsout).TotalXS = zeros(nm,1);
     data.XS(xsout).DiffXS = zeros(nm,1);
     data.XS(xsout).AbsorbXS = zeros(nm,1);
     data.XS(xsout).ScatteringXS = data.XS(xsin).ScatteringXS;
@@ -43,7 +44,8 @@ if data.Acceleration.Info(accid).AccelerationType == glob.Accel_AGS_TG
             tsxs = sum(squeeze(sxs(m,:,:,2)),2)';
             DC = 1./(3*(txs(m,:) - tsxs));
         end
-        data.XS(xsout).DiffXS(m) = DC*y{m};
+        data.XS(xsout).TotalXS(m)  = txs(m,:)*y{m};
+        data.XS(xsout).DiffXS(m)   = DC*y{m};
         data.XS(xsout).AbsorbXS(m) = txs(m,:)*y{m} - sum(squeeze(sxs(m,:,:))*y{m});
     end
 elseif data.Acceleration.Info(accid).AccelerationType == glob.Accel_AGS_TTG
