@@ -34,6 +34,8 @@ data = load_user_input();
 % additional inputs
 data.Type = 'Search';
 data.NumberPhasePerDim = 5;
+% data.PhaseXSpacing = linspace(0,.25,61);
+% data.PhaseYSpacing = linspace(0,.25,61);
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -49,9 +51,8 @@ Dout = cell(length(data.Neutronics.Transport.SnLevels),inputs.TotalMeshes);
 Vout = cell(length(data.Neutronics.Transport.SnLevels),inputs.TotalMeshes);
 Dmax = zeros(length(data.Neutronics.Transport.SnLevels),inputs.TotalMeshes);
 for q=1:length(data.Neutronics.Transport.SnLevels)
-    Dmeshes = [];
     for m=1:inputs.TotalMeshes
-        [inp, phase] = combine_input_set(data, inputs, m, q);
+        [inp, ~] = combine_input_set(data, inputs, m, q);
         P = b_func(outputs{q,m}.Eigen.MaxLambda,inp);
         [V,D] = eig(P); D=diag(D);
         Dout{q,m} = D;

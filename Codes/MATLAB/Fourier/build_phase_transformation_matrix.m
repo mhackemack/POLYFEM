@@ -14,27 +14,35 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function inputs = build_phase_transformation_matrix( data, inputs )
-% Preliminary Information
-% -----------------------
 global glob
+% Build dimensional phase spacing if not specified
+% ------------------------------------------------------------------------------
 dim = data.problem.Dimension;
 dim_phase = data.NumberPhasePerDim;
 tot_phase = dim_phase^dim;
-% Build Phase Space
 wn_norm = 2*pi;
-% pmin = 0; pmax = 1e-3;
-pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
+pmin = 0; pmax = wn_norm;
+% pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
+if ~isfield(data,'PhaseXSpacing'), data.PhaseXSpacing = linspace(pmin,pmax,dim_phase)'; end
+if dim > 1
+    if ~isfield(data,'PhaseYSpacing'), data.PhaseYSpacing = linspace(pmin,pmax,dim_phase)'; end
+end
+if dim > 2
+    if ~isfield(data,'PhaseZSpacing'), data.PhaseZSpacing = linspace(pmin,pmax,dim_phase)'; end
+end
+% Build Phase Space
+% ------------------------------------------------------------------------------
 if dim == 1
-    p = linspace(pmin,pmax,dim_phase)';
+    p = data.PhaseXSpacing;
 elseif dim == 2
-    [px,py] = meshgrid(linspace(pmin,pmax,dim_phase));
+    [px,py] = meshgrid(data.PhaseXSpacing,data.PhaseYSpacing);
     p = [px(:),py(:)];
 else
-    [px,py,pz] = meshgrid(linspace(pmin,pmax,dim_phase));
+    [px,py,pz] = meshgrid(data.PhaseXSpacing,data.PhaseYSpacing,data.PhaseZSpacing);
     p = [px(:),py(:),pz(:)];
 end
 % Build all matrices
-% ------------------
+% ------------------------------------------------------------------------------
 inputs.phase = cell(inputs.TotalMeshes, 1);
 disp('-> Building Phase Matrices.'); rev_str = [];
 for m=1:inputs.TotalMeshes
