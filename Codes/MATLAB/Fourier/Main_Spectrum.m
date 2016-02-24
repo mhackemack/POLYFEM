@@ -29,13 +29,13 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_99G-EC_TG_DSA'; addpath([glob.input_path,inp]);
+inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
-data.Type = 'Search';
-data.NumberPhasePerDim = 5;
-% data.PhaseXSpacing = linspace(0,.25,61);
-% data.PhaseYSpacing = linspace(0,.25,61);
+data.Type = 'Grid';
+data.NumberPhasePerDim = 21;
+% data.PhaseXSpacing = linspace(0,.5,121);
+% data.PhaseYSpacing = linspace(0,.5,121);
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
