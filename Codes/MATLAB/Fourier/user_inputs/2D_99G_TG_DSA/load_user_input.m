@@ -16,9 +16,9 @@ data.geometry.ncellz = 1;
 data.problem.NumberMaterials = 2;
 data.geometry.mats = [];
 data.geometry.mats(1).ID = 2;
-data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
-data.geometry.mats(2).ID = 2;
-data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
+data.geometry.mats(1).Region = [0,0;1,0;1,.5;0,.5];
+% data.geometry.mats(2).ID = 2;
+% data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
