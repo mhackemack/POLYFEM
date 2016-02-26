@@ -15,12 +15,12 @@ data.geometry.ncelly = 2;
 data.geometry.ncellz = 1;
 % mat regions
 data.problem.NumberMaterials = 2;
-% data.geometry.mats(1).ID = 2;
-% data.geometry.mats(1).Region = [0,0;1,0;1,.5;0,.5];
 data.geometry.mats(1).ID = 2;
-data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
-data.geometry.mats(2).ID = 2;
-data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
+data.geometry.mats(1).Region = [0,0;1,0;1,.5;0,.5];
+% data.geometry.mats(1).ID = 2;
+% data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
+% data.geometry.mats(2).ID = 2;
+% data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
@@ -41,7 +41,7 @@ data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;
 % xs
-c = 0.9999; sigt = [1e-4;10];
+c = 0.9999; sigt = [1e-1;1e1];
 data.Neutronics.TotalXS = sigt;
 data.Neutronics.DiffusionXS = (1/3)./sigt;
 data.Neutronics.ScatteringXS = c*sigt;

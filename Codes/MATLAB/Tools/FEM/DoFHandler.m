@@ -19,7 +19,7 @@ classdef DoFHandler < handle
         Degree
         FEMType         % 1 = CFEM, 2 = DGFEM, 3 = WGFEM
         FEMName
-        DoFType         % 1 = Lagrange, 2 = Serendipity
+        DoFType         % 0 = LD, 1 = Lagrange, 2 = Serendipity
         MaxCellNodes
     end
     properties (Access = public)
