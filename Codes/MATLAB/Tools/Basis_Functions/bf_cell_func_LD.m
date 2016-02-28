@@ -29,38 +29,32 @@ nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
 faces = varargin{3}; nf = length(faces);
-order = varargin{4};
-v_flags = varargin{5};
-s_flags = varargin{6};
-q_bool = varargin{7};
+ord = varargin{4};
+lump_bool = varargin{5};
+v_flags = varargin{6};
+s_flags = varargin{7};
+q_bool = varargin{8};
 q_ord = ord+2;
-if nargin > 7
-    if ~isempty(varargin{9}),q_ord = varargin{8};end
+if nargin > 8
+    if ~isempty(varargin{9}),q_ord = varargin{9};end
 end
 % Prepare Vertices and Dimensional Space
-% --------------------------------------
+% ------------------------------------------------------------------------------
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
 % Quick Error Checking
-% --------------------
-if order ~= 1, error('LD requires 1st order FE space.'); end
-% Compute PWLD Matrices
 % ------------------------------------------------------------------------------
-if dim == 1
-    [bf_V,bf_S,QV,QS] = bf_cell_func_LD_1D(varargin{:});
-else
-    [bf_V,bf_S,QV,QS] = bf_cell_func_PWLD(varargin{:});
-end
-% Process Output Structures
+if order ~= 1, error('LD requires 1st order FE space.'); end
+% Compute Matrices and Quadrature Points
+% ------------------------------------------------------------------------------
+
+% Set Output Structures
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = bf_V;
+varargout{1} = {M, K, G};
 % Surface Matrices
-varargout{2} = bf_S;
+varargout{2} = {MM, G2};
 % Quadrature Structures
-varargout{3} = QV;
-varargout{4} = QS;
-
-
-
+varargout{3} = {qx_v, qw_v, bvals_v, bgrads_v};
+varargout{4} = {qx_s, qw_s, bvals_s, bgrads_s};

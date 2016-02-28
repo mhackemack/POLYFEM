@@ -132,12 +132,16 @@ classdef DoFHandler < handle
                 end
                 ttime = tic;
                 if glob.print_info, disp('-> Begin Degree of Freedom Construction.'); end
-                if obj.Dimension == 1
-                    obj = generate1DDoFs(obj, d);
-                elseif obj.Dimension == 2
-                    obj = generate2DDoFs(obj, d);
-                elseif obj.Dimension == 3
-                    obj = generate3DDoFs(obj, d);
+                if obj.DoFType == 0
+                    obj = generateLDDoFs(obj, d);
+                else
+                    if obj.Dimension == 1
+                        obj = generate1DDoFs(obj, d);
+                    elseif obj.Dimension == 2
+                        obj = generate2DDoFs(obj, d);
+                    elseif obj.Dimension == 3
+                        obj = generate3DDoFs(obj, d);
+                    end
                 end
                 if d.HasPeriodicFaces
                     obj = set_periodic_face_dofs( obj, d ); 
@@ -146,9 +150,6 @@ classdef DoFHandler < handle
                 obj.determine_face_node_partners();
                 obj.determine_face_cell_nodes();
                 obj.determine_max_cell_nodes();
-%                 if obj.Degree == 1
-%                     obj = generateLDDoFs(obj, d);
-%                 end
                 if glob.print_info
                     disp(['-> Total Degree of Freedom Generation Time:  ',num2str(toc(ttime))])
                     disp(' ')
@@ -998,54 +999,11 @@ for f=1:mesh.TotalBoundaryFaces
 end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = generateLDDoFs(obj, mesh)
-obj.LDNumCellDoF = obj.Dimension + 1;
-obj.LDTotalDoFs = obj.LDNumCellDoF*obj.TotalCells;
-% Allocate Memory
-obj.LDCellDoFs = zeros(obj.TotalCells, obj.LDNumCellDoF);
-obj.LDAveragePosition = zeros(obj.TotalCells, obj.Dimension);
-obj.LDCellProjection = cell(obj.TotalCells, 1);
-obj.LDCellInterpolation = cell(obj.TotalCells, 1);
-obj.LDFaceProjection = cell(obj.TotalCells, 2);
-obj.LDFaceInterpolation = cell(obj.TotalCells, 2);
-% Loop through cells and build LD matrices
-for c=1:obj.TotalCells
-    cdofs = (c-1)*obj.LDNumCellDoF+1:c*obj.LDNumCellDoF;
-    obj.LDCellDoFs(c,:) = cdofs;
-    dofs = obj.ConnectivityArray{c}; ndofs = length(dofs);
-    cfaces = mesh.CellFaces{c}; nfaces = length(cfaces);
-    verts = obj.NodeLocations(dofs,:);
-    cell_center = mean(verts);
-    obj.LDAveragePosition(c,:) = cell_center;
-    dx = verts - ones(ndofs,1)*cell_center;
-    obj.LDCellProjection{c}    = zeros(obj.LDNumCellDoF, ndofs);
-    obj.LDCellInterpolation{c} = zeros(ndofs, obj.LDNumCellDoF);
-    % Cell Projection Matrix
-    obj.LDCellProjection{c}(1,:) = 1;
-    obj.LDCellProjection{c}(2:end,:) = dx';
-    % Cell Interpolation Matrix
-    obj.LDCellInterpolation{c}(:,1) = 1;
-    obj.LDCellInterpolation{c}(:,2:end) = dx;
-    % Loop through Cell Faces
-    for f=1:nfaces
-        ff = cfaces(f);
-        if mesh.FaceCells(ff,1) == c
-            tfc = 1;
-        else
-            tfc = 2;
-        end
-        cfn = obj.FaceCellNodes{ff,tfc}; ncfn = length(cfn);
-        fverts = obj.NodeLocations(cfn,:);
-        fdx = fverts - ones(ncfn,1)*cell_center;
-        % Face Projection Matrix
-        obj.LDFaceProjection{ff,tfc} = zeros(obj.LDNumCellDoF, ncfn);
-        obj.LDFaceProjection{ff,tfc}(1,:) = 1;
-        obj.LDFaceProjection{ff,tfc}(2:end,:) = fdx';
-        % Face Interpolation Matrix
-        obj.LDFaceInterpolation{ff,tfc} = zeros(ncfn, obj.LDNumCellDoF);
-        obj.LDFaceInterpolation{ff,tfc}(:,1) = 1;
-        obj.LDFaceInterpolation{ff,tfc}(:,2:end) = fdx;
-    end
+function obj = generate0DegDoFs(obj, mesh)
+
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function obj = generateLDDoFs(obj, mesh)
+
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
