@@ -252,9 +252,7 @@ for f=1:nf
             qx_v(iiv,:) = ones_rv*v0 + (J*rqx_v')';
             bvals_v(iiv,eee) = b_ref(:,1:2);
             for q=1:nrqx_v
-%                 qx_v(iiv(q),:) = v0 + (J*rqx_v(q,:)')';
                 % Values
-%                 bvals_v(iiv(q),eee) = b_ref(q,1:2);
                 bvals_v(iiv(q),:) = bvals_v(iiv(q),:) + a*b_ref(q,end);
                 if dim == 3
                     bvals_v(iiv(q),fv) = bvals_v(iiv(q),fv) + b*b_ref(q,end-1);

@@ -104,7 +104,9 @@ classdef DoFHandler < handle
                     error('Unsure of FEM Type.')
                 end
                 obj.DoFType = varargin{4};
-                
+                if obj.DoFType==0 && obj.FEMType~=2
+                    error('LD Basis Functions only supported for DGFEM.');
+                end
                 clear varargin
                                 
                 % Get Geometry Information and Build DoF Arrays
@@ -132,7 +134,9 @@ classdef DoFHandler < handle
                 end
                 ttime = tic;
                 if glob.print_info, disp('-> Begin Degree of Freedom Construction.'); end
-                if obj.DoFType == 0
+                if obj.Degree == 0
+                    obj = generate0DegDoFs(obj, d);
+                elseif obj.DoFType == 0
                     obj = generateLDDoFs(obj, d);
                 else
                     if obj.Dimension == 1
@@ -1000,10 +1004,28 @@ end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function obj = generate0DegDoFs(obj, mesh)
-
+global glob
+% Retrieve some mesh information
+ncells = mesh.TotalCells;
+obj.TotalDoFs = ncells;
+obj.NodeLocations = mesh.CellCenters;
+% Loop through cells and build DoF structures
+for c=1:ncells
+    obj.ConnectivityArray{c} = c;
+    
+end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function obj = generateLDDoFs(obj, mesh)
-
+global glob
+ncells = mesh.TotalCells;
+obj.TotalDoFs = ncells*(obj.Dimension+1);
+% Loop through cells and build DoF structures
+counter = 1;
+for c=1:ncells
+    obj.ConnectivityArray{c} = counter:(counter+obj.Dimension+1);
+    
+    counter = counter + (obj.Dimension+1);
+end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

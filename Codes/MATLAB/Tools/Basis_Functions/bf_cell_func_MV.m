@@ -73,7 +73,7 @@ end
 % Collect all Matrices and Quadratures
 % ------------------------------------------------------------------------------
 % Cell-Wise Values
-[qx_v, qw_v] = get_general_volume_quadrature(verts, faces, 2*order+1, true); nqx = length(qw_v);
+[qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
 [bmv, gmv] = mean_value_basis_functions(verts, qx_v, faces, order, nverts);
 % mass matrix
 for q=1:nqx

@@ -463,6 +463,7 @@ classdef FEHandler < handle
             if obj.Dimension == 1
                 obj.BasisType = 1;
                 obj.bf_cell_func = @bf_cell_func_1D;
+                obj.basis_eval_func = @LD_basis_functions;
             elseif strcmp(bbname, 'LD')
                 obj.BasisType = 0;
                 obj.bf_cell_func = @bf_cell_func_LD;
