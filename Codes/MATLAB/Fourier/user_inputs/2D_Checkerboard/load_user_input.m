@@ -7,26 +7,24 @@ data.Output.file_bool = true;
 data.problem.Dimension = 2;
 data.geometry.type = 'cart';
 data.geometry.x = n;
-% log_xmin = 0; log_xmax = 0; xnum = 1;
-% data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
 data.geometry.ncellx = n;
 data.geometry.ncelly = n;
 data.geometry.ncellz = 1;
 % mat regions
 data.problem.NumberMaterials = 2;
-dy = 1/(n/2);
-for i=1:n/2
-    y0 = (i-1)*dy;
-    y1 = y0 + .5*dy;
-    y2 = y0 + dy;
-    data.geometry.mats(i).ID = 2;
-    data.geometry.mats(i).Region = [0,y1;1,y1;1,y2;0,y2];
-end
-% data.geometry.mats(1).ID = 2;
-% data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
-% data.geometry.mats(2).ID = 2;
-% data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
+% dy = 1/(n/2);
+% for i=1:n/2
+%     y0 = (i-1)*dy;
+%     y1 = y0 + .5*dy;
+%     y2 = y0 + dy;
+%     data.geometry.mats(i).ID = 2;
+%     data.geometry.mats(i).Region = [0,y1;1,y1;1,y2;0,y2];
+% end
+data.geometry.mats(1).ID = 2;
+data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
+data.geometry.mats(2).ID = 2;
+data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;

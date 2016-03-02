@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Fourier Analysis Script - PHI Problem
+%   Title:          Fourier Analysis Script - 2D Checkerboard Problem
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -29,20 +29,20 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_PHI'; addpath([glob.input_path,inp]);
+inp = '2D_Checkerboard'; addpath([glob.input_path,inp]);
 % Problem inputs
 sigt = [10,20,40,80,160,320,640];
 c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
-nstrips = 2;
+ncells = 2;
 ngrid = 101;
-data = load_user_input(nstrips);
+data = load_user_input(ncells);
 % end user input section
 % ------------------------------------------------------------------------------
 % Compute all solutions
 % ---------------------
 print_FA_heading(data);
 b_func = get_build_function(data);
-outdir = sprintf('outputs/PHI/%dD/%s/',data.problem.Dimension,data.geometry.type);
+outdir = sprintf('outputs/Checkerboard/%dD/%s/',data.problem.Dimension,data.geometry.type);
 if data.Neutronics.FEMLumping
     lump = 'L';
 else
@@ -59,7 +59,7 @@ SR = zeros(length(sigt),length(c),length(data.Neutronics.Transport.SnLevels));
 for t=1:length(sigt)
     data = load_user_input(nstrips);
     for cc=1:length(c)
-        data = set_phi_xs(data, sigt(t), c(cc));
+        data = set_check_xs(data, sigt(t), c(cc));
         % Build input space
         [data, inputs] = process_fourier_inputs( data );
         % Run the Search problems
