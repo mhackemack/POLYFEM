@@ -40,6 +40,7 @@ data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
+% data.Neutronics.Transport.SnLevels = [4];
 data.Neutronics.Transport.SnLevels = [2,4,8,16];
 data.Neutronics.Transport.PnOrder = 0;
 % groups

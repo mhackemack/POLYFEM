@@ -57,7 +57,7 @@ if ~isequal(exist(outdir, 'dir'),7),mkdir(outdir); end
 SR = zeros(length(sigt),length(c),length(data.Neutronics.Transport.SnLevels));
 % Loop through total cross sections
 for t=1:length(sigt)
-    data = load_user_input(nstrips);
+    data = load_user_input(ncells);
     for cc=1:length(c)
         data = set_check_xs(data, sigt(t), c(cc));
         % Build input space
