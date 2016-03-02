@@ -29,11 +29,11 @@ glob = get_globals('Office');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '1D_1G_DSA'; addpath([glob.input_path,inp]);
+inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Search';
-data.NumberPhasePerDim = 5;
+data.NumberPhasePerDim = 3;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
