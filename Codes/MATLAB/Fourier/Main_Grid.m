@@ -29,11 +29,11 @@ glob = get_globals('Home');
 glob.print_info = false;
 % Define all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_99G_TG_DSA'; addpath([glob.input_path,inp]);
+inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 21;
+data.NumberPhasePerDim = 121;
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures
@@ -41,6 +41,20 @@ data.NumberPhasePerDim = 21;
 print_FA_heading(data);
 [data, inputs] = process_fourier_inputs( data );
 inputs = build_phase_transformation_matrix(data, inputs);
+% Create directory and output file names
+% --------------------------------------
+outdir = sprintf('outputs/PHI/%dD/%s/',data.problem.Dimension,data.geometry.type);
+if data.Neutronics.FEMLumping
+    lump = 'L';
+else
+    lump = 'U';
+end
+if ~data.Neutronics.PerformAcceleration % Unaccelerated
+    outname = sprintf('%s_%s',data.Neutronics.TransportMethod,data.Neutronics.SpatialMethod);
+elseif data.Neutronics.PerformAcceleration % Accelerated
+    outname = sprintf('%s_%s_C=%d_%s%s%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
+end
+if ~isequal(exist(outdir, 'dir'),7),mkdir(outdir); end
 % Retrieve all spectrum data and postprocess
 % ------------------------------------------
 outputs = calculate_eigenspectrums(data, inputs);

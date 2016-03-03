@@ -34,7 +34,7 @@ inp = '2D_PHI'; addpath([glob.input_path,inp]);
 sigt = [10,20,40,80,160,320,640];
 c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
 nstrips = 2;
-ngrid = 101;
+ngrid = 81;
 data = load_user_input(nstrips);
 % end user input section
 % ------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ else
     lump = 'U';
 end
 if ~data.Neutronics.PerformAcceleration % Unaccelerated
-    outname = sprintf('%s_%s',data.Neutronics.TransportMethod,data.Neutronics.SpatialMethod);
+    outname = sprintf('%s_%s',data.Neutronics.TransportMethod,lump,data.Neutronics.SpatialMethod);
 elseif data.Neutronics.PerformAcceleration % Accelerated
     outname = sprintf('%s_%s_C=%d_%s%s%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
 end
