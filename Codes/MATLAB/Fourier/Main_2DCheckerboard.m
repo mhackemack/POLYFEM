@@ -49,7 +49,7 @@ else
     lump = 'U';
 end
 if ~data.Neutronics.PerformAcceleration % Unaccelerated
-    outname = sprintf('%s_%s',data.Neutronics.TransportMethod,data.Neutronics.SpatialMethod);
+    outname = sprintf('%s_%s',data.Neutronics.TransportMethod,lump,data.Neutronics.SpatialMethod);
 elseif data.Neutronics.PerformAcceleration % Accelerated
     outname = sprintf('%s_%s_C=%d_%s%s%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
 end
