@@ -23,8 +23,8 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % Being User Input Section
 % ------------------------------------------------------------------------------
 dat_in.GeometryType = 'cart';
-dat_in.SpatialMethod = 'MAXENT';
-dat_in.FEMDegree = 2;
+dat_in.SpatialMethod = 'PWLD';
+dat_in.FEMDegree = 1;
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'LS';
@@ -32,7 +32,7 @@ dat_in.SnLevels = 4;
 dat_in.AzimuthalLevels = 24;
 dat_in.PolarLevels = 1;
 % ---
-dat_in.refinementLevels = 27;
+dat_in.refinementLevels = 0;
 dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 1/10;
 dat_in.projectSolution = 1;

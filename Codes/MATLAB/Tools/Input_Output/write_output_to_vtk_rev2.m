@@ -83,6 +83,11 @@ fprintf(fid2,' \n');
 % print cell types
 fprintf(fid2,'CELL_TYPES %d\n',DoF.TotalCells);
 fprintf(fid2,'%d\n',7*ones(DoF.TotalCells,1));
+% print cell material ids
+fprintf(fid2,'CELL_DATA %d\n',DoF.TotalCells);
+fprintf(fid2,'FIELD FieldData 1\n');
+fprintf(fid2,'material 1 %d int\n',DoF.TotalCells);
+fprintf(fid2,'%d\n',mesh.MatID);
 % add solution data
 fprintf(fid2,'POINT_DATA %d %d \n',DoF.TotalDoFs);
 for s=1:length(sol_name)
@@ -155,6 +160,11 @@ end
 fprintf(fid,' \n');
 fprintf(fid,'CELL_TYPES %d\n',DoF.TotalCells);
 fprintf(fid,'%d\n',7*ones(DoF.TotalCells,1));
+% print cell material ids
+fprintf(fid2,'CELL_DATA %d\n',DoF.TotalCells);
+fprintf(fid2,'FIELD FieldData 1\n');
+fprintf(fid2,'material 1 %d int\n',DoF.TotalCells);
+fprintf(fid2,'%d\n',mesh.MatID);
 % Print Solution Information
 % --------------------------
 fprintf(fid,'POINT_DATA %d %d \n',tot_dofs);
