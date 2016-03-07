@@ -50,15 +50,6 @@ classdef DoFHandler < handle
         ConformingFaceNodeNumbering
         ConformingFaceCellNodeNumbering
     end
-    % LD Properties
-    properties (Access = public)
-        LDAveragePosition
-        LDNumCellDoF
-        LDTotalDoFs
-        LDCellDoFs
-        LDCellProjection, LDCellInterpolation
-        LDFaceProjection, LDFaceInterpolation
-    end
     properties (Access = public)
         HasPeriodicFaces = false
         PeriodicFaceDoFs
@@ -134,10 +125,13 @@ classdef DoFHandler < handle
                 end
                 ttime = tic;
                 if glob.print_info, disp('-> Begin Degree of Freedom Construction.'); end
+                % Generate 0th order DoFs
                 if obj.Degree == 0
                     obj = generate0DegDoFs(obj, d);
+                % Generate LD DoFs
                 elseif obj.DoFType == 0
                     obj = generateLDDoFs(obj, d);
+                % Generate all other DoF types
                 else
                     if obj.Dimension == 1
                         obj = generate1DDoFs(obj, d);
@@ -1008,7 +1002,7 @@ global glob
 % Retrieve some mesh information
 ncells = mesh.TotalCells;
 obj.TotalDoFs = ncells;
-obj.NodeLocations = mesh.CellCenters;
+obj.NodeLocations = mesh.CellCenter;
 % Loop through cells and build DoF structures
 for c=1:ncells
     obj.ConnectivityArray{c} = c;
@@ -1018,13 +1012,31 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function obj = generateLDDoFs(obj, mesh)
 global glob
+% Retrieve some mesh information
 ncells = mesh.TotalCells;
 obj.TotalDoFs = ncells*(obj.Dimension+1);
+odofs = ones(obj.Dimension+1,1);
+% Allocate memory space
+obj.NodeLocations = zeros(obj.TotalDoFs,obj.Dimension);
 % Loop through cells and build DoF structures
 counter = 1;
 for c=1:ncells
-    obj.ConnectivityArray{c} = counter:(counter+obj.Dimension+1);
-    
+    cdofs = counter:(counter+obj.Dimension);
+    obj.ConnectivityArray{c} = cdofs;
+    obj.NodeLocations(cdofs,:) = odofs*mesh.CellCenter(c,:);
+    cfaces = mesh.CellFaces{c}; nf = length(cfaces);
+    obj.CellFaceNodes{c} = cell(nf,1);
+    % Loop through cell faces and build structures
+    for f=1:nf
+        obj.CellFaceNodes{c}{f} = cdofs;
+        cf = cfaces(f); fcells = DoF.FaceCells(cf,:);
+        if fcells(1) == c
+            obj.FaceCellNodes{f,1} = cdofs;
+        elseif fcells(2) == c
+            obj.FaceCellNodes{f,2} = cdofs;
+        end
+    end
+    % Update DoF counter
     counter = counter + (obj.Dimension+1);
 end
 end

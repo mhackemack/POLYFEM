@@ -33,9 +33,9 @@ inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-data.NumberPhasePerDim = 121;
-% data.PhaseXSpacing = linspace(0,2*pi,101);
-% data.PhaseYSpacing = linspace(0,2*pi,101);
+data.NumberPhasePerDim = 401;
+data.PhaseXSpacing = linspace(0,2*pi,401);
+data.PhaseYSpacing = linspace(0,2*pi,401);
 % end user input section
 % ------------------------------------------------------------------------------
 % Populate data and output structures

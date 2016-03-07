@@ -20,7 +20,7 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format long e
+clc; close all; format short
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % ------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ glob = get_globals('Office');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
+inp = '1D_99G_MTG_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Search';

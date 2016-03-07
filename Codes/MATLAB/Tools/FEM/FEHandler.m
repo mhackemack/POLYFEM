@@ -165,23 +165,23 @@ classdef FEHandler < handle
                 %
                 % Set Additional LD Preliminaries if Necessary
                 % --------------------------------------------
-                if obj.BasisType == 0
-                    obj.allocate_LD_memory();
-                    for c=1:obj.TotalCells
-                        cv = varargin{2}.ConnectivityArray{c}; ncv = length(cv);
-                        verts = varargin{2}.NodeLocations(cv,:);
-                        cell_center = mean(verts); 
-                        dx = verts - ones(ncv,1)*cell_center;
-                        obj.LDProjection{c}    = zeros(obj.LDNumCellDoF, ncv);
-                        obj.LDInterpolation{c} = zeros(ncv, obj.LDNumCellDoF);
-                        % Projection Matrix
-                        obj.LDProjection{c}(1,:) = 1;
-                        obj.LDProjection{c}(2:end,:) = dx';
-                        % Interpolation Matrix
-                        obj.LDInterpolation{c}(:,1) = 1;
-                        obj.LDInterpolation{c}(:,2:end) = dx;
-                    end
-                end
+%                 if obj.BasisType == 0
+%                     obj.allocate_LD_memory();
+%                     for c=1:obj.TotalCells
+%                         cv = varargin{2}.ConnectivityArray{c}; ncv = length(cv);
+%                         verts = varargin{2}.NodeLocations(cv,:);
+%                         cell_center = mean(verts); 
+%                         dx = verts - ones(ncv,1)*cell_center;
+%                         obj.LDProjection{c}    = zeros(obj.LDNumCellDoF, ncv);
+%                         obj.LDInterpolation{c} = zeros(ncv, obj.LDNumCellDoF);
+%                         % Projection Matrix
+%                         obj.LDProjection{c}(1,:) = 1;
+%                         obj.LDProjection{c}(2:end,:) = dx';
+%                         % Interpolation Matrix
+%                         obj.LDInterpolation{c}(:,1) = 1;
+%                         obj.LDInterpolation{c}(:,2:end) = dx;
+%                     end
+%                 end
                 
                 
                 %
@@ -873,199 +873,4 @@ else
     
 end
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% function [qx, qw] = get_cell_quad(verts, faces, deg, poly_bool)
-% % Get Input Information
-% % ---------------------
-% [nv, dim] = size(verts);
-% % Get Quadrature Info
-% if dim == 1
-%     dx = verts(2) - verts(1);
-%     [qx, qw] = get_legendre_gauss_quad(deg);
-%     qx = qx*dx + verts(1);
-%     qw = qw / dx;
-%     return
-% end
-% if poly_bool
-%     [qx, qw] = get_poly_quad(verts, faces, deg);
-%     return
-% end
-% if dim == 2
-%     if nv == 3
-%         J = get_simplex_jacobian(dim, verts);
-%         sa = det(J)/2;
-%         [qx, qw] = Quad_On_Triangle(deg);
-%         qw = qw / sum(qw) * sa; nt = length(qw);
-%         for q=1:nt
-%             qx(q,:) = verts(1,:) + (J*qx(q,:)')';
-%         end
-%     elseif nv == 4
-%         sa = polygonArea(verts);
-%         [tqx, tqw] = get_legendre_gauss_quad(deg);
-%         qw = tqw*tqw'; qw = qw(:); qw = qw / sum(qw) * sa;
-%         nt = length(tqw);
-%         qxx = zeros(nt, nt); qxy = zeros(nt, nt);
-%         for i=1:nt
-%             qxx(i,:) = tqx(i);
-%             qxy(:,i) = tqx(i);
-%         end
-%         qx = [qxx(:), qxy(:)];
-%         bt = eval_quad_vals(qx);
-%         for q=1:length(qw)
-%             qx(q,:) = [bt(q,:)*verts(:,1),bt(q,:)*verts(:,2)];
-%         end
-%     else
-%         [qx, qw] = get_poly_quad(verts, faces, deg);
-%     end
-% else
-%     if nv == 4
-%         J = get_simplex_jacobian(dim, verts);
-%         vol = det(J)/6;
-%         [qx, qw] = Quad_On_Tetra(deg);
-%         qw = qw / sum(qw) * vol;
-%     elseif nv == 8
-%         [tqx, tqw] = get_legendre_gauss_quad(deg); nt = length(tqw);
-%         qxx = zeros(nt, nt, nt); qxy = zeros(nt, nt, nt); qxz = zeros(nt, nt, nt); 
-%         qw = zeros(nt, nt, nt); qqw = tqw*tqw';
-%         for i=1:nt
-%             qxx(i,:,:) = tqx(i);
-%             qxy(:,i,:) = tqx(i);
-%             qxz(:,:,i) = tqx(i);
-%             qw(:,:,i)  = qqw*tqw(i);
-%         end
-%         qx = [qxx(:), qxy(:), qxz(:)];
-%         qw = qw(:); qw = qw / sum(qw);
-%         bt = eval_hex_vals(qx);
-%         for q=1:length(qw)
-%             qx(q,:) = [bt(q,:)*verts(:,1),bt(q,:)*verts(:,2),bt(q,:)*verts(:,3)];
-%         end
-%     else
-%         [qx, qw] = get_poly_quad(verts, faces, deg);
-%     end
-% end
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% function [qx, qw] = get_poly_quad(verts, fnodes, deg)
-% [nv, dim] = size(verts);
-% vm = mean(verts);
-% if dim == 2
-%     if ~inpoly(vm, verts)
-%         vm = my_centroid(verts); 
-%     end
-%     [tqx, tqw] = Quad_On_Triangle(deg); 
-%     tqw = tqw / sum(tqw); nt = length(tqw);
-%     qx = zeros(nt*nv, dim); qw = zeros(nt*nv, 1);
-%     for i=1:nv
-%         if i==nv
-%             ii = [i, 1];
-%         else
-%             ii = [i, i+1];
-%         end
-%         tv = [verts(ii,:);vm];
-%         sa = heron_triangle_area(tv);
-%         J = get_simplex_jacobian(dim, tv);
-%         nd = (i-1)*nt;
-%         qw(nd+1:nd+nt) = tqw*sa;
-%         for q=1:nt
-%             qx(nd+q,:) = tv(1,:) + (J*tqx(q,:)')';
-%         end
-%     end
-% else
-%     [tqx, tqw] = Quad_On_Tetra(deg);
-%     tqw = tqw / sum(tqw); nt = length(tqw);
-%     qw = []; qx = [];
-%     for i=1:length(fnodes)
-%         ff = fnodes{i};
-%         for j=1:length(ff)
-%             if j==nv
-%                 jj = [j, 1];
-%             else
-%                 jj = [j, j+1];
-%             end
-%             fm = mean(verts(ff,:));
-%             tv = [verts(ff(jj),:);fm;vm];
-%             J = get_simplex_jacobian(dim, tv);
-%             
-%         end
-%     end
-% end
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Calculate the area of a triangle by the length of each side - Heron's Formula
-% function area = heron_triangle_area(v)
-% a = norm(v(2,:) - v(1,:));
-% b = norm(v(3,:) - v(2,:));
-% c = norm(v(1,:) - v(3,:));
-% s = (a+b+c)/2;
-% area = sqrt(s*(s-a)*(s-b)*(s-c));
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% function J = get_simplex_jacobian(dim, verts)
-% J = zeros(dim);
-% vverts = verts';
-% for d=1:dim
-%     J(:,d) = vverts(:,d+1) - vverts(:,1);
-% end
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% function out = evaluate_numerical_jacobian(dim, verts, x)
-% n = size(x,1);
-% out = cell(n,1);
-% % Evaluate Jacobian
-% if dim == 2
-%     xall = verts(1,1) - verts(2,1) + verts(3,1) - verts(4,1);
-%     yall = verts(1,2) - verts(2,2) + verts(3,2) - verts(4,2);
-%     x21 = verts(2,1) - verts(1,1); y21 = verts(2,2) - verts(1,2);
-%     x41 = verts(4,1) - verts(1,1); y41 = verts(4,2) - verts(1,2);
-%     for i=1:n
-%         out{i} = [x21 + xall*x(i,2), x41 + xall*x(i,1);y21 + yall*x(i,2), y41 + yall*x(i,1)];
-%     end
-% elseif dim == 3
-%     db = eval_hex_grads(x);
-%     for i=1:n
-%         out{i} = [db(:,1,i)'*verts(:,1), db(:,2,i)'*verts(:,1), db(:,3,i)'*verts(:,1);...
-%                   db(:,1,i)'*verts(:,2), db(:,2,i)'*verts(:,2), db(:,3,i)'*verts(:,2);...
-%                   db(:,1,i)'*verts(:,3), db(:,2,i)'*verts(:,3), db(:,3,i)'*verts(:,3)];
-%     end
-% end
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% function out = eval_quad_vals(xx)
-% s = xx(:,1); t = xx(:,2);
-% out = [(1-s).*(1-t), s.*(1-t), s.*t, t.*(1-s)];
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% function out = eval_hex_vals(xx)
-% x = xx(1); y = xx(2); z = xx(3);
-% out = [(1-x).*(1-y).*(1-z),...
-%             x.*(1-y).*(1-z),...
-%             x.*y.*(1-z),...
-%             (1-x).*y.*(1-z),...
-%             (1-x).*(1-y).*z,...
-%             x.*(1-y).*z,...
-%             x.*y.*z,...
-%             (1-x).*y.*z];
-% end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% function out = eval_hex_grads(xx)
-% n = size(xx,1); out = zeros(8,3,n);
-% for i=1:n
-% x = xx(i,1); y = xx(i,2); z = xx(i,3);
-% out(:,:,i) = [  -y.*z+y+z-1,  -x.*z+x+z-1,  -x.*y+x+y-1;...
-%                 (1-y).*(1-z),  x.*z-x,       x.*y-x;...
-%                 y.*(1-z),      x.*(1-z),    -x.*y;...
-%                 y.*z-y,       (1-x).*(1-z),  x.*y-y;...
-%                 y.*z-z,       x.*z-z         (1-x).*(1-y);...
-%                 (1-y).*z,     -x.*z          x.*(1-y);...
-%                 y.*z,          x.*z,         x.*y;...
-%                 -y.*z,         (1-x).*z,     (1-x).*y];
-% end
-% end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

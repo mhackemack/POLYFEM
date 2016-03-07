@@ -46,7 +46,9 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
 end
 % Determine DoF Type
 % ------------------------------------------------------------------------------
-if strcmpi(data.Neutronics.SpatialMethod, 'lagrange')
+if strcmpi(data.Neutronics.SpatialMethod, 'ld')
+    data.Neutronics.DoFType = 0;
+elseif strcmpi(data.Neutronics.SpatialMethod, 'lagrange')
     data.Neutronics.DoFType = 1;
 else
     data.Neutronics.DoFType = 2;
@@ -76,7 +78,7 @@ if data.Neutronics.DoFType == 1
         end
     end
 else
-    if strcmp(lower(data.Neutronics.SpatialMethod), 'serendipity')
+    if strcmpi(data.Neutronics.SpatialMethod, 'serendipity')
         if strcmp(geometry.MeshType, 'Polygon') || strcmp(geometry.MeshType, 'Polyhedron')
             error('Standard Serendipity elements do not work on polygons/polyhedra.')
         end

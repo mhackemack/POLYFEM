@@ -21,25 +21,29 @@
 %                   solutions begin to appear or the solution fails to converge.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function plot_1D_solution(~, DoF, FE, x)
+function plot_1D_solution(mesh, DoF, FE, x)
 if iscell(x), x = x{1}; end
 hold on
-xlim([min(DoF.NodeLocations), max(DoF.NodeLocations)])
-for c=1:DoF.TotalCells
-    % Retrieve DoF information for cell
-    cn = DoF.ConnectivityArray{c};
-    nodes = DoF.NodeLocations(cn,:);
-    % Interpolate to all quadrature points - this acts to build a larger
-    % interpolation space and make higher order 1D basis functions not appear
-    % linear when plotted.
-    qx = FE.CellQuadNodes{c};
-    bv = FE.CellBasisValues{c}; yy = x(cn);
-    xlin = [nodes;qx];
-    y = [yy;bv*yy];
-    [xlin, ind]=sort(xlin);
-    y=y(ind);
-    % Plot Values
-    plot(xlin, y, 'k');
+xlim([min(mesh.Vertices), max(mesh.Vertices)])
+if DoF.Degree == 0
+    
+else
+    for c=1:DoF.TotalCells
+        % Retrieve DoF information for cell
+        cn = DoF.ConnectivityArray{c};
+        nodes = DoF.NodeLocations(cn,:);
+        % Interpolate to all quadrature points - this acts to build a larger
+        % interpolation space and make higher order 1D basis functions not appear
+        % linear when plotted.
+        qx = FE.CellQuadNodes{c};
+        bv = FE.CellBasisValues{c}; yy = x(cn);
+        xlin = [nodes;qx];
+        y = [yy;bv*yy];
+        [xlin, ind]=sort(xlin);
+        y=y(ind);
+        % Plot Values
+        plot(xlin, y, 'k');
+    end
 end
 hold off
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

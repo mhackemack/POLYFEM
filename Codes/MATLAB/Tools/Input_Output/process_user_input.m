@@ -55,7 +55,9 @@ if strcmpi(data.problem.TransportMethod, 'diffusion')
 end
 % Process DoF/FE Data
 % ------------------------------------------------------------------------------
-if strcmpi(data.problem.SpatialMethod, 'lagrange')
+if strcmpi(data.problem.SpatialMethod, 'ld')
+    data.problem.DoFType = 1;
+elseif strcmpi(data.problem.SpatialMethod, 'lagrange')
     data.problem.DoFType = 1;
 else
     data.problem.DoFType = 2;
