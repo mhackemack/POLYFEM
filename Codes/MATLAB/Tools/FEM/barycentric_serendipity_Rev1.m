@@ -41,11 +41,11 @@ bout = zeros(nqx, ntot); gout = zeros(ntot,dim,nqx);
 % Get Problem Preliminaries
 % ------------------------------------------------------------------------------
 if nout > 1, grad_bool = true; end
-% h = get_max_diamter( verts ); h0 = eye(dim)/h;
-% scaled_verts = (h0*verts')'; qx = (h0*qx')';
-scaled_verts = verts;
+h = get_max_diamter( verts ); h0 = eye(dim)/h;
+scaled_verts = (h0*verts')'; qx = (h0*qx')';
+% scaled_verts = verts;
 vind = get_adjacent_vertices(nverts);
-[ser_verts, ser_nodes] = get_serendipity_nodes(nverts, scaled_verts, faces);
+% [ser_verts, ser_nodes] = get_serendipity_nodes(nverts, scaled_verts, faces);
 % rva = get_vertex_differences( scaled_verts, qx );
 quad_pairs = get_quad_pairings(nverts);
 diag_pairs = get_diag_pairings(nverts, quad_pairs); num_dp = size(diag_pairs,1);
