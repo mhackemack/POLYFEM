@@ -35,6 +35,9 @@ sol.AverageMaterialFlux = calculate_average_material_QoI(data,geometry,DoF,FE,so
 sol.TotalMaterialFlux = calculate_total_QoI(data,geometry,DoF,FE,sol.flux,'Flux');
 sol.TotalMaterialInteraction = calculate_total_QoI(data,geometry,DoF,FE,sol.flux,'Total');
 sol.TotalMaterialAbsorption = calculate_total_QoI(data,geometry,DoF,FE,sol.flux,'Absorption');
+% Compute mesh cell metrics
+sol.AverageCellMeasure = mean((geometry.CellVolume).^(1/geometry.Dimension));
+sol.MaxCellMeasure = max((geometry.CellVolume).^(1/geometry.Dimension));
 % Calculate MMS Error if necessary
 if mms, sol.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol.flux); end
 % Plot solution for viewer to see
@@ -99,6 +102,9 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         sol{r}.TotalMaterialFlux = calculate_total_QoI(data,geometry,DoF,FE,sol{r}.flux,'Flux');
         sol{r}.TotalMaterialInteraction = calculate_total_QoI(data,geometry,DoF,FE,sol{r}.flux,'Total');
         sol{r}.TotalMaterialAbsorption = calculate_total_QoI(data,geometry,DoF,FE,sol{r}.flux,'Absorption');
+        % Compute mesh cell metrics
+        sol{r}.AverageCellMeasure = mean((geometry.CellVolume).^(1/geometry.Dimension));
+        sol{r}.MaxCellMeasure = max((geometry.CellVolume).^(1/geometry.Dimension));
         % Calculate MMS Error if necessary
         if mms, sol{r}.MMS_error = calculate_MMS_error(data, geometry, DoF, FE, sol{r}.flux); end
         % Save off output objects if necessary

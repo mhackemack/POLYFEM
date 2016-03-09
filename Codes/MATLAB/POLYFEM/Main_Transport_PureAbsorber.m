@@ -17,7 +17,7 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Office');
+global glob; glob = get_globals('Home');
 inp = 'Transport_PureAbsorber';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
@@ -58,7 +58,7 @@ dat_in.QuadAngles  = [1,-1]/norm([1,-1]);  % Angles for manual set
 dat_in.QuadWeights = 1;                  % Weights for manual set
 % ---
 dat_in.refineMesh = 1;
-dat_in.refinementLevels = 3;
+dat_in.refinementLevels = 7;
 dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 0.0;
 dat_in.projectSolution = 0;
@@ -136,11 +136,21 @@ else
                 data = cleanup_neutronics_input_data(data, geometry);
                 [data, sol, geometry, ~, ~] = execute_problem(data, geometry);
                 [dofs,err] = retrieve_MMS_error(data,sol);
-                if dat_in.refineMesh && dat_in.refinementLevels > 0
-                    
-                else
-                    
+                % Build some output structures
+                totcells = zeros(dat_in.refinementLevels+1,1);
+                avecellvol = zeros(dat_in.refinementLevels+1,1);
+                maxcellvol = zeros(dat_in.refinementLevels+1,1);
+                totflux    = zeros(dat_in.refinementLevels+1,1);
+                % Collect results and output
+                for r=1:(dat_in.refinementLevels+1)
+                    rr = r-1;
+                    totcells(r)   = sum(sol{r}.CellVertexNumbers);
+                    avecellvol(r) = sol{r}.AverageCellMeasure;
+                    maxcellvol(r) = sol{r}.MaxCellMeasure;
+                    totflux(r)    = sol{r}.TotalMaterialFlux;
                 end
+                % Output the results
+                dlmwrite(['outputs/',data.problem.Path,'/',data.problem.Name,'_outdata.dat'],[totcells,dofs,avecellvol,maxcellvol,totflux,err]);
             end
         end
     end
