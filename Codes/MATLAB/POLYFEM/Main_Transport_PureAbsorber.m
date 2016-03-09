@@ -29,8 +29,7 @@ poly_run_bool = true;
 % ---
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'tri';
-% pnum = [4,16,64,256,1024,4096];
-pnum = [16384];
+pnum = [4,16,64,256,1024,4096,16384];
 % geom_in.PolyNum = [4,16,64,256,1024,4096,16384,65536];
 geom_in.Lx = 1; geom_in.ncellx = 4;
 geom_in.Ly = 1; geom_in.ncelly = 4;
@@ -50,7 +49,7 @@ geom_in.zmax_val = 0;
 % ---
 % sdm = {'PWLD'};
 sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
-fedeg = [1];
+fedeg = [2];
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 2;
 dat_in.FEMLumping = false;
