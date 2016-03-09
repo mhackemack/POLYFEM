@@ -26,7 +26,6 @@
 function varargout = bf_cell_func_PWLD( varargin )
 % Collect Input/Output Arguments
 % ------------------------------------------------------------------------------
-nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
 faces = varargin{3}; nf = length(faces);

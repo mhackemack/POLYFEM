@@ -1,4 +1,4 @@
-function [data, geometry] = load_user_input(dat_in, geom_in)
+function data = load_user_input(dat_in, geom_in)
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.NumberMaterials = 1;
@@ -76,5 +76,5 @@ data.solver.kyrlovSubspace = [];
 % Get Geometry Specifications
 % ------------------------------------------------------------------------------
 data.problem.Dimension = geom_in.Dimension;
-[data,geometry] = load_geometry_input(data, geom_in);
+% [data,geometry] = load_geometry_input(data, geom_in);
 % ------------------------------------------------------------------------------

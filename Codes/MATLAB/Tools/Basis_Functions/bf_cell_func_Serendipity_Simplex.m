@@ -79,7 +79,7 @@ elseif dim == 3
 end
 nq_V = length(rqw_V);
 nq_S = length(rqw_S);
-zs = ones(nq_S, 1)
+zs = ones(nq_S, 1);
 % Compute Jacobian
 % ----------------
 J = zeros(dim);

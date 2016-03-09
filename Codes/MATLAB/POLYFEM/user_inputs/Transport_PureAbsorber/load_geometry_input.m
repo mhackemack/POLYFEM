@@ -1,5 +1,5 @@
 function [data,geometry] = load_geometry_input(data, geom_in)
-global glob
+data.problem.Dimension = geom_in.Dimension;
 % Get Geometry
 if data.problem.Dimension == 1
     x = linspace(0,geom_in.Lx,geom_in.ncellx+1);

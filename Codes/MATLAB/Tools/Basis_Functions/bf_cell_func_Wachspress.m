@@ -30,12 +30,12 @@ nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
 faces = varargin{3}; nf = length(faces);
-ord = varargin{4};
+order = varargin{4};
 lump_bool = varargin{5};
 v_flags = varargin{6};
 s_flags = varargin{7};
 q_bool = varargin{8};
-q_ord = ord+2;
+q_ord = order+2;
 if nargin > 8
     if ~isempty(varargin{9}),q_ord = varargin{9};end
 end
