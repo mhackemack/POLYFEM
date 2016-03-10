@@ -156,7 +156,7 @@ classdef AMRGeometry < handle
                 obj.CellSurfaceArea         = mesh.CellSurfaceArea;
                 obj.CellFaces               = mesh.CellFaces;
                 obj.CellEdges               = mesh.CellEdges;
-                obj.FaceVerts                   = mesh.FaceVerts;
+                obj.FaceVerts               = mesh.FaceVerts;
                 obj.PeriodicFaceVerts       = mesh.PeriodicFaceVerts;
                 obj.PeriodicOppositeFaces   = mesh.PeriodicOppositeFaces;
                 obj.PeriodicFaceCells       = mesh.PeriodicFaceCells;
@@ -357,12 +357,16 @@ classdef AMRGeometry < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function determine_mesh_type(obj)
             if obj.Dimension == 2
-                if length(obj.CellVertexNumbers) == 3
-                    obj.MeshType = 'Triangle';
-                elseif length(obj.CellVertexNumbers) == 4
-                    obj.MeshType = 'Quadrilateral';
-                else
+                if length(nonzeros(obj.CellVertexNumbers)) > 1
                     obj.MeshType = 'Polygon';
+                else
+                    if length(obj.CellVertexNumbers) == 3
+                        obj.MeshType = 'Triangle';
+                    elseif length(obj.CellVertexNumbers) == 4
+                        obj.MeshType = 'Quadrilateral';
+                    else
+                        obj.MeshType = 'Polygon';
+                    end
                 end
             elseif obj.Dimension == 3
                 if length(obj.CellVertexNumbers) == 4
@@ -460,6 +464,7 @@ classdef AMRGeometry < handle
                 elseif obj.Dimension == 2
                     obj.CellVolume(c) = polygonArea(cverts);
                 elseif obj.Dimension == 3
+                    % THIS IS INCOMPLETE...
                     cc = obj.CellCenter(c,:);
                     for ff=1:length(cfaces)
                         f = cfaces(ff);
@@ -525,7 +530,6 @@ classdef AMRGeometry < handle
                         obj.OrthogonalProjection(ff,2) = h(f);
                     end
                 end
-                
 %                 fcnodes = cell(ncf, 1);
 %                 for f=1:ncf
 %                     ff = cf(f);

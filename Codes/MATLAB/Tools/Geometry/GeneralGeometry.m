@@ -28,6 +28,7 @@ classdef GeneralGeometry < handle
         HasPeriodicFaces = false
         IsOrthogonal = false
         IsExtruded = false
+        AllCellsConvex = true
     end
     properties (Access = public)
         OriginalMeshType
@@ -118,6 +119,7 @@ classdef GeneralGeometry < handle
                         obj.MeshType = 'Quads';
                         obj.OriginalMeshType = 'Quads';
                     end
+                    obj.AllCellsConvex = true;
                     obj.minX = min( obj.Vertices );
                     obj.maxX = max( obj.Vertices );
                     % Calculate Diameter
@@ -158,6 +160,16 @@ classdef GeneralGeometry < handle
                     elseif dy >= dx
                         obj.Diameter = dy;
                     end
+                    % Check for convexity
+                    if ~strcmp(obj.MeshType, 'Triangle')
+                        for c=1:obj.TotalCells
+                            cbool = isConvex(obj.Vertices(obj.CellVerts{c},:),[]);
+                            if ~cbool
+                                obj.AllCellsConvex = false;
+                                break
+                            end
+                        end
+                    end
                 % 3D Construction
                 elseif obj.Dimension == 3
                     if strcmp(varargin{2}, 'Tetgen') || strcmp(varargin{2}, 'tetgen')...
@@ -193,14 +205,12 @@ classdef GeneralGeometry < handle
                     end
                 end
             end
-            
             % Cleanup components
             % ------------------
             obj.determine_faces();
             obj.determine_vertex_components();
             obj.determine_cell_vertex_numbers();
             obj.determine_mesh_type();
-
             % Populate Initial AMR Variables
             % ------------------------------
             obj.OriginalCellCount = obj.TotalCells;
@@ -210,12 +220,10 @@ classdef GeneralGeometry < handle
             obj.MaxRefinementLevel = 0;
             obj.RefinementArray = zeros(obj.TotalCells,2);
             obj.CellRefinementLevel = zeros(obj.TotalCells, 1);
-
             if glob.print_info
                 disp(['-> Total General Generation Time:  ',num2str(toc(ttime))])
                 disp(' ')
             end
-            
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function Constructor_1D(obj, verts)
@@ -381,12 +389,16 @@ classdef GeneralGeometry < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function determine_mesh_type(obj)
             if obj.Dimension == 2
-                if length(obj.CellVertexNumbers) == 3
-                    obj.MeshType = 'Triangle';
-                elseif length(obj.CellVertexNumbers) == 4
-                    obj.MeshType = 'Quadrilateral';
-                else
+                if length(nonzeros(obj.CellVertexNumbers)) > 1
                     obj.MeshType = 'Polygon';
+                else
+                    if length(obj.CellVertexNumbers) == 3
+                        obj.MeshType = 'Triangle';
+                    elseif length(obj.CellVertexNumbers) == 4
+                        obj.MeshType = 'Quadrilateral';
+                    else
+                        obj.MeshType = 'Polygon';
+                    end
                 end
             elseif obj.Dimension == 3
                 if length(obj.CellVertexNumbers) == 4
@@ -448,28 +460,139 @@ classdef GeneralGeometry < handle
             obj.VertexFaces = [obj.VertexFaces;cell(nverts,1)];
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function update_geometry_info_after_modifications(obj)
+            % Update All Counts
+            obj.TotalVertices = size(obj.Vertices, 1);
+            obj.TotalCells = length(obj.CellVerts);
+            obj.TotalFaces = length(obj.FaceVerts);
+            obj.BoundaryFaces = []; obj.TotalBoundaryFaces = 0;
+            obj.InteriorFaces = []; obj.TotalInteriorFaces = 0;
+            % Loop through all faces
+            for f=1:obj.TotalFaces
+                fv = obj.FaceVerts{f}; nfv = length(fv);
+                fid = obj.FaceID(f);
+                if fid == 0
+                    obj.TotalInteriorFaces = obj.TotalInteriorFaces + 1;
+                    %obj.InteriorFaces = [obj.InteriorFaces;f];
+                else
+                    obj.TotalBoundaryFaces = obj.TotalBoundaryFaces + 1;
+                    %obj.BoundaryFaces = [obj.BoundaryFaces;f];
+                end
+                fverts = obj.Vertices(fv,:);
+                obj.FaceCenter(f,:) = mean(fverts);
+                if obj.Dimension == 1
+                    obj.FaceArea(f) = 1;
+                    fc = obj.FaceCenter(f,:);
+                    cc = obj.CellCenter(obj.FaceCells(f,1),:);
+                    obj.FaceNormal(f,:) = (fc-cc)/abs(fc-cc);
+                elseif obj.Dimension == 2
+                    dxf = diff(fverts);
+                    obj.FaceArea(f) = norm(dxf);
+                    fc = obj.FaceCenter(f,:);
+                    cc = obj.CellCenter(obj.FaceCells(f,1),:);
+                    tfnorm = [dxf(2),-dxf(1)]/norm(dxf);
+                    if dot(fc-cc,tfnorm) < 0, tfnorm = -1*tfnorm; end
+                    obj.FaceNormal(f,:) = tfnorm;
+                elseif obj.Dimension == 3
+                    tfnorm = zeros(1,obj.Dimension);
+                    obj.FaceArea(f) = polygonArea3d(fverts);
+                    fc = obj.FaceCenter(f,:); v3 = fc;
+                    for i=1:nfv
+                        ii = [i,mod(i,nfv)+1];
+                        v1 = fverts(ii(1),:);
+                        v2 = fverts(ii(2),:);
+                        dv1 = v2-v1; dv2 = v3 - v1;
+                        tfnorm = tfnorm + cross(dv1,dv2)/2;
+                    end
+                    tfnorm = tfnorm / obj.FaceArea(f);
+                    obj.FaceNormal(f,:) = tfnorm / nfv;
+                end
+            end
+            obj.InteriorFaces = zeros(obj.TotalInteriorFaces, 1);
+            obj.BoundaryFaces = zeros(obj.TotalBoundaryFaces, 1);
+            % Loop through all faces again
+            bfcount = 1; ifcount = 1;
+            for f=1:obj.TotalFaces
+              fid = obj.FaceID(f);
+              if fid == 0
+                obj.InteriorFaces(ifcount) = f;
+                ifcount = ifcount + 1;
+              else
+                obj.BoundaryFaces(bfcount) = f;
+                bfcount = bfcount + 1;
+              end
+            end
+            %obj.TotalBoundaryFaces = length(obj.BoundaryFaces);
+            %obj.TotalInteriorFaces = length(obj.InteriorFaces);
+            % Loop through all cells
+            obj.CellVertexNumbers = [];
+            for c=1:obj.TotalCells
+                cv = obj.CellVerts{c};
+                cverts = obj.Vertices(cv,:);
+                cfaces = obj.CellFaces{c};
+                obj.CellCenter(c,:) = mean(cverts);
+                obj.CellSurfaceArea(c) = sum(obj.FaceArea(cfaces));
+                if obj.Dimension == 1
+                    obj.CellVolume(c) = abs(cverts(2) - cverts(1));
+                elseif obj.Dimension == 2
+                    obj.CellVolume(c) = polygonArea(cverts);
+                elseif obj.Dimension == 3
+                    cc = obj.CellCenter(c,:);
+                    for ff=1:length(cfaces)
+                        f = cfaces(ff);
+                        fc = obj.FaceCenter(f,:);
+                    end
+                end
+            end
+            obj.calculate_orthogonal_projections();
+            obj.determine_cell_vertex_numbers();
+            obj.determine_mesh_type();
+            % Loop through all edges in 3D only
+            if obj.Dimension == 3
+                for e=1:obj.TotalEdges
+                    ev = obj.EdgeVerts(e,:);
+                    everts = obj.Vertices(ev,:);
+                    obj.EdgeCenter(e,:) = mean(everts);
+                    obj.EdgeLength(e) = norm(diff(everts));
+                end
+            end
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function calculate_orthogonal_projections(obj)
             for c=1:obj.TotalCells
-                cf = obj.CellFaces{c}; ncf = length(cf);
+                cf = obj.CellFaces{c}; ncf = length(cf); h = zeros(ncf,1);
                 cv = obj.CellVerts{c}; ncv = length(cv);
-                fcnodes = cell(ncf, 1);
-                for f=1:ncf
-                    ff = cf(f);
-                    fverts = obj.FaceVerts{ff}; nfverts = length(fverts);
-                    tfn = zeros(1, nfverts);
-                    for i=1:nfverts
-                        for j=1:ncv
-                            if fverts(i) == cv(j);
-                                tfn(i) = j;
-                                break
+                if obj.Dimension == 1
+                    h(:) = obj.CellVolume(c);
+                elseif obj.Dimension == 2
+                    cvol = obj.CellVolume(c);
+                    csa = obj.CellSurfaceArea(c);
+                    for f=1:ncf
+                        if ncv == 3
+                            h(f) = 2*cvol/obj.FaceArea(cf(f));
+                        elseif ncv == 4
+                            h(f) = cvol/obj.FaceArea(cf(f));
+                        else
+                            if mod(ncv,2) == 0
+                                h(f) = 4*cvol/csa;
+                            else
+                                h(f) = 2*cvol/csa + sqrt((2*cvol)/(ncv*sin(2*pi/ncv)));
                             end
                         end
                     end
-                    fcnodes{f} = tfn;
+                elseif obj.Dimension == 3
+                    cvol = obj.CellVolume(c);
+                    csa = obj.CellSurfaceArea(c);
+                    for f=1:ncf
+                        if ncv == 4
+                            h(f) = 3*cvol/obj.FaceArea(cf(f));
+                        elseif ncv == 8 && ncf == 6
+                            h(f) = cvol/obj.FaceArea(cf(f));
+                        else
+                            h(f) = 6*cvol/csa;
+                        end
+                    end
                 end
-                v = obj.Vertices(cv,:);
-                h = get_orthogonal_projection(v,fcnodes);
-                % Place projection into array
                 for f=1:ncf
                     ff = cf(f);
                     fcells = obj.FaceCells(ff,:);
@@ -479,6 +602,33 @@ classdef GeneralGeometry < handle
                         obj.OrthogonalProjection(ff,2) = h(f);
                     end
                 end
+%                 fcnodes = cell(ncf, 1);
+%                 for f=1:ncf
+%                     ff = cf(f);
+%                     fverts = obj.FaceVerts{ff}; nfverts = length(fverts);
+%                     tfn = zeros(1, nfverts);
+%                     for i=1:nfverts
+%                         for j=1:ncv
+%                             if fverts(i) == cv(j);
+%                                 tfn(i) = j;
+%                                 break
+%                             end
+%                         end
+%                     end
+%                     fcnodes{f} = tfn;
+%                 end
+%                 v = obj.Vertices(cv,:);
+%                 h = get_orthogonal_projection(v,fcnodes);
+%                 % Place projection into array
+%                 for f=1:ncf
+%                     ff = cf(f);
+%                     fcells = obj.FaceCells(ff,:);
+%                     if fcells(1) == c
+%                         obj.OrthogonalProjection(ff,1) = h(f);
+%                     else
+%                         obj.OrthogonalProjection(ff,2) = h(f);
+%                     end
+%                 end
             end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -788,6 +938,353 @@ classdef GeneralGeometry < handle
             if glob.print_info, disp(' '); end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Function to "split" a mesh along a line - this will bisect some cells and
+        % and could create some polygonal elements. We pass in a slope and a
+        % y-intercept to form the line to do the splitting with.
+        %
+        % y = m*x + b
+        % m - slope
+        % b - y-intercept
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function split_2d_mesh_on_line(obj, slope, yinter)
+            % Small error checking
+            % ------------------------------------------------------------------
+            if obj.Dimension ~= 2, error('This is not a 2D mesh.'); end
+%             if ~obj.AllCellsConvex, error('Can only split meshes with strictly convex cells.'); end
+            % Calculate Bounding Line
+            % ------------------------------------------------------------------
+%             diam = obj.Diameter;
+%             xmin = min(obj.Vertices(:,1)); xmax = max(obj.Vertices(:,1));
+%             vline0 = [xmin-10*diam,yinter+slope*(xmin-10*diam)];
+%             vline1 = [xmax+10*diam,yinter+slope*(xmax+10*diam)];
+            % Allocate memory structures
+            % ------------------------------------------------------------------
+            vint_bool = false(obj.TotalVertices,1);
+            fint_bool = false(obj.TotalFaces,1);
+            cint_bool = false(obj.TotalCells,1);
+            split_face_bool = false(obj.TotalFaces,1);
+            split_cell_bool = false(obj.TotalCells,1);
+            new_vert_count = 0; new_vert_face = []; new_verts = [];
+            new_face_count = 0; prior_face = [];
+            new_cell_count = 0; prior_cell = [];
+            old_face_verts = []; new_face_verts = [];
+            old_face_cells = []; new_face_cells = [];
+            old_cell_verts = []; old_cell_faces = [];
+            new_cell_verts = []; new_cell_faces = [];
+            new_cell_ids   = [];
+            % Loop through vertices to find collisions
+            % ------------------------------------------------------------------
+            for i=1:obj.TotalVertices
+                vv = obj.Vertices(i,:);
+                val = yinter + slope*vv(1);
+                if abs(val - vv(2)) < 1e-13
+                    vint_bool(i) = true;
+                end
+            end
+            % Loop through faces to find intersections and determine splits
+            % ------------------------------------------------------------------
+            for f=1:obj.TotalFaces
+                fverts = obj.FaceVerts{f};
+                % Check if both face vertices are collisions - this indicates a
+                % parallel line that lies on top of the face. Nothing is then
+                % required because we already force mesh faces to be colinear
+                % lines segments.
+                if vint_bool(fverts(1)) && vint_bool(fverts(2))
+                    fint_bool(f) = true;
+                    continue;
+                end
+                % Check if first vertex had collision
+                if vint_bool(fverts(1))
+                    fint_bool(f) = true;
+                    continue;
+                end
+                % Check if second vertes had collision
+                if vint_bool(fverts(2))
+                    fint_bool(f) = true;
+                    continue;
+                end
+                fxmin = min(obj.Vertices(fverts,1));
+                fxmax = max(obj.Vertices(fverts,1));
+                fymin = min(obj.Vertices(fverts,2));
+                fymax = max(obj.Vertices(fverts,2));
+                fv0 = obj.Vertices(fverts(1),:);
+                fv1 = obj.Vertices(fverts(2),:);
+                % Check if face forms a vertical line then test in a different
+                % manner if the segments intersect.
+                if abs(fv1(1) - fv0(1)) < 1e-12
+                    yglob = yinter + slope*fv0(1);
+                    % They intersect!!!
+                    if fymin < yglob && fymax > yglob
+                        fint_bool(f) = true;
+                        split_face_bool(f) = true;
+                        % Update counters
+                        new_vert_count = new_vert_count + 1;
+                        new_verts = [new_verts;[fv0(1),yglob]];
+                        new_vert_face = [new_vert_face;f];
+                        new_face_count = new_face_count + 1;
+                        prior_face = [prior_face;f];
+                        % set new and old face verts
+                        old_face_verts{new_face_count} = [fverts(1),obj.TotalVertices+new_vert_count];
+                        new_face_verts{new_face_count} = [obj.TotalVertices+new_vert_count,fverts(2)];
+                        old_face_cells{new_face_count} = obj.FaceCells(f,:);
+                        new_face_cells{new_face_count} = obj.FaceCells(f,:);
+                    end
+                    continue;
+                end
+                fslope = (fv1(2) - fv0(2))/(fv1(1) - fv0(1));
+                finter = fv0(2) - fslope*fv0(1);
+                % Check if lines are parallel - we skip here because they will
+                % never intersect since it would have just been caught.
+                if abs(fslope - slope) < 1e-13, continue; end
+                % Determine if lines intersect along face - do not have to worry
+                % about divide-by-zero since slopes were checked earlier.
+                xx = (finter - yinter)/(slope - fslope);
+                yy = yinter + slope*xx;
+                if xx > fxmin && xx < fxmax
+                    fint_bool(f) = true;
+                    split_face_bool(f) = true;
+                    % Update counters
+                    new_vert_count = new_vert_count + 1;
+                    new_verts = [new_verts;[xx,yy]];
+                    new_vert_face = [new_vert_face;f];
+                    new_face_count = new_face_count + 1;
+                    prior_face = [prior_face;f];
+                    % set new and old face verts
+                    old_face_verts{new_face_count} = [fverts(1),obj.TotalVertices+new_vert_count];
+                    new_face_verts{new_face_count} = [obj.TotalVertices+new_vert_count,fverts(2)];
+                    old_face_cells{new_face_count} = obj.FaceCells(f,:);
+                    new_face_cells{new_face_count} = obj.FaceCells(f,:);
+                end
+            end
+            % Loop through cells
+            % ------------------------------------------------------------------
+            for c=1:obj.TotalCells
+                cfaces = obj.CellFaces{c}; fnums = 1:length(cfaces); nf = length(cfaces);
+                cverts = obj.CellVerts{c}; vnums = 1:length(cverts); nv = length(cverts);
+                % Check if any cell faces had any kind of intersection
+                if sum(fint_bool(cfaces)) == 0, continue; end
+                % See if intersection is 1 face and 1 vertex
+                if sum(split_face_bool(cfaces)) == 1 && sum(vint_bool(cverts)) == 1
+                    cint_bool(c) = true;
+                    fsplit = fnums(split_face_bool(cfaces) == true);
+                    vsplit = vnums(vint_bool(cverts) == true);
+                    old_face = cfaces(fsplit); old_vert = cverts(vsplit);
+                    cnew_verts = find(new_vert_face==old_face);
+                    ccnewverts = obj.TotalVertices + cnew_verts;
+                    % Update counters
+                    new_cell_count = new_cell_count + 1;
+                    prior_cell = [prior_cell;c];
+                    split_cell_bool(c) = true;
+                    % Update face counters
+                    new_face_count = new_face_count + 1;
+                    prior_face = [prior_face;0];
+                    new_face_verts{new_face_count} = [old_vert,ccnewverts];
+                    new_face_cells{new_face_count} = [c,obj.TotalCells+new_cell_count];
+                    % Build ccw orderings
+                    ccent = obj.CellCenter(c,:);
+                    tverts = [obj.Vertices(cverts,:);new_verts(cnew_verts,:)];
+                    [~,ind] = sort(atan2(tverts(:,2)-ccent(2), tverts(:,1)-ccent(1)));
+                    nvind = find(ind==(nv+1));
+                    if nvind == 1
+                        adjv = ind([end,2]);
+                    else
+                        adjv = ind([nvind-1,mod(nvind,nv+1)+1]);
+                    end
+                    % Get first cell verts/faces
+                    old_cell_verts{new_cell_count} = [];
+                    old_cell_faces{new_cell_count} = [];
+                    % Get second cell verts/faces
+                    new_cell_verts{new_cell_count} = [];
+                    new_cell_faces{new_cell_count} = [];
+                    new_cell_ids = [new_cell_ids;obj.MatID(c)];
+                    % Update other face cells
+                    for i=1:length(new_cell_faces{new_cell_count})
+                        if new_cell_faces{new_cell_count}(i) <= obj.TotalFaces
+                            for j=1:2
+                                if obj.FaceCells(new_cell_faces{new_cell_count}(i),j) == c
+                                    obj.FaceCells(new_cell_faces{new_cell_count}(i),j) = obj.TotalCells + new_cell_count;
+                                end
+                            end
+                        end
+                    end
+                end
+                % See if intersection is 2 faces
+                if sum(split_face_bool(cfaces)) == 2 && sum(vint_bool(cverts)) == 0
+                    cint_bool(c) = true;
+                    fsplit = fnums(split_face_bool(cfaces) == true);
+                    old_faces = cfaces(fsplit);
+                    cnew_verts = [find(new_vert_face==old_faces(1)),find(new_vert_face==old_faces(2))];
+                    ccnewverts = obj.TotalVertices + cnew_verts;
+                    % Update cell counters
+                    new_cell_count = new_cell_count + 1;
+                    prior_cell = [prior_cell;c];
+                    split_cell_bool(c) = true;
+                    % Update face counters
+                    new_face_count = new_face_count + 1;
+                    prior_face = [prior_face;0];
+                    new_face_verts{new_face_count} = ccnewverts;
+                    new_face_cells{new_face_count} = [c,obj.TotalCells+new_cell_count];
+                    % find new/old face ordering
+                    fnewold = zeros(2);
+                    ocv1 = [cverts(fsplit(1)),cverts(mod(fsplit(1),nv)+1)];
+                    ocv2 = [cverts(fsplit(2)),cverts(mod(fsplit(2),nv)+1)];
+                    n1_fv1 = old_face_verts{cnew_verts(1)}; n1_fv2 = new_face_verts{cnew_verts(1)};
+                    n2_fv1 = old_face_verts{cnew_verts(2)}; n2_fv2 = new_face_verts{cnew_verts(2)};
+                    % fno_1
+                    if n1_fv1(1) == ocv1(1) || n1_fv1(2) == ocv1(1)
+                        fnewold(1,1) = old_faces(1);
+                        fnewold(1,2) = obj.TotalFaces + cnew_verts(1);
+                    else
+                        fnewold(1,1) = obj.TotalFaces + cnew_verts(1);
+                        fnewold(1,2) = old_faces(1);
+                    end
+                    % fno_2
+                    if n2_fv1(1) == ocv2(1) || n2_fv1(2) == ocv2(1)
+                        fnewold(2,1) = old_faces(2);
+                        fnewold(2,2) = obj.TotalFaces + cnew_verts(2);
+                    else
+                        fnewold(2,1) = obj.TotalFaces + cnew_verts(2);
+                        fnewold(2,2) = old_faces(2);
+                    end
+                    % Get first cell verts/faces
+                    old_cell_verts{new_cell_count} = [ccnewverts(1),cverts((fsplit(1)+1):fsplit(2)),ccnewverts(2)];
+                    old_cell_faces{new_cell_count} = [fnewold(1,2),cfaces((fsplit(1)+1):(fsplit(2)-1)),fnewold(2,1),(obj.TotalFaces+new_face_count)];
+                    % Get second cell verts/faces
+                    new_cell_verts{new_cell_count} = [cverts(1:fsplit(1)),ccnewverts,cverts((fsplit(2)+1):end)];
+                    new_cell_faces{new_cell_count} = [cfaces(1:(fsplit(1)-1)),fnewold(1,1),(obj.TotalFaces+new_face_count),fnewold(2,2),cfaces((fsplit(2)+1):end)];
+                    new_cell_ids = [new_cell_ids;obj.MatID(c)];
+                    % update old face cells 1
+                    if fnewold(1,1) == old_faces(1)
+                        if old_face_cells{cnew_verts(1)}(1) == c
+                            old_face_cells{cnew_verts(1)}(1) = obj.TotalCells + new_cell_count;
+                        elseif old_face_cells{cnew_verts(1)}(2) == c
+                            old_face_cells{cnew_verts(1)}(2) = obj.TotalCells + new_cell_count;
+                        end
+                    elseif fnewold(1,1) == (obj.TotalFaces + cnew_verts(1))
+                        if new_face_cells{cnew_verts(1)}(1) == c
+                            new_face_cells{cnew_verts(1)}(1) = obj.TotalCells + new_cell_count;
+                        elseif new_face_cells{cnew_verts(1)}(2) == c
+                            new_face_cells{cnew_verts(1)}(2) = obj.TotalCells + new_cell_count;
+                        end
+                    end
+                    % update old face cells 2
+                    if fnewold(2,2) == old_faces(2)
+                        if old_face_cells{cnew_verts(2)}(1) == c
+                            old_face_cells{cnew_verts(2)}(1) = obj.TotalCells + new_cell_count;
+                        elseif old_face_cells{cnew_verts(2)}(2) == c
+                            old_face_cells{cnew_verts(2)}(2) = obj.TotalCells + new_cell_count;
+                        end
+                    elseif fnewold(2,2) == (obj.TotalFaces + cnew_verts(2))
+                        if new_face_cells{cnew_verts(2)}(1) == c
+                            new_face_cells{cnew_verts(2)}(1) = obj.TotalCells + new_cell_count;
+                        elseif new_face_cells{cnew_verts(2)}(2) == c
+                            new_face_cells{cnew_verts(2)}(2) = obj.TotalCells + new_cell_count;
+                        end
+                    end
+                    % Update other face cells
+                    for i=1:length(new_cell_faces{new_cell_count})
+                        if new_cell_faces{new_cell_count}(i) <= obj.TotalFaces
+                            for j=1:2
+                                if obj.FaceCells(new_cell_faces{new_cell_count}(i),j) == c
+                                    obj.FaceCells(new_cell_faces{new_cell_count}(i),j) = obj.TotalCells + new_cell_count;
+                                end
+                            end
+                        end
+                    end
+                end
+                % See if intersection is 2 vertices - need to check that it is
+                % not 2 consecutive points which would mean that a face lies on
+                % the global line. We would not need to split if this case
+                % arises.
+                if sum(split_face_bool(cfaces)) == 0 && sum(vint_bool(cverts)) == 2
+                    cint_bool(c) = true;
+                    actually_split = true;
+                    vsplit = vnums(vint_bool(cverts) == true);
+                    if abs(vsplit(2) - vsplit(1)) == 1, actually_split = false; end
+                    % Perform splitting
+                    if actually_split
+                        % Update cell counters
+                        new_cell_count = new_cell_count + 1;
+                        prior_cell = [prior_cell;c];
+                        split_cell_bool(c) = true;
+                        % Update face counters
+                        new_face_count = new_face_count + 1;
+                        prior_face = [prior_face;0];
+                        new_face_verts{new_face_count} = cverts(vsplit);
+                        new_face_cells{new_face_count} = [c,obj.TotalCells+new_cell_count];
+                        % Get first cell verts/faces
+                        vertnums1 = (vsplit(1):vsplit(2));
+                        old_cell_verts{new_cell_count} = cverts(vertnums1);
+                        old_cell_faces{new_cell_count} = [cfaces(vertnums1(1:(end-1))),obj.TotalFaces+new_face_count];
+                        % Get second cell verts/faces
+                        vertnums2 = vnums; vertnums2((vsplit(1)+1):(vsplit(2)-1)) = [];
+                        new_cell_verts{new_cell_count} = cverts(vertnums2);
+                        new_cell_faces{new_cell_count} = [cfaces(1:(vsplit(1)-1)),(obj.TotalFaces+new_face_count),cfaces(vsplit(2):length(cfaces))];
+                        new_cell_ids = [new_cell_ids;obj.MatID(c)];
+                        % update old face cells to new one
+                        for i=1:length(new_cell_faces{new_cell_count})
+                            nfc = obj.TotalFaces + new_face_count;
+                            if new_cell_faces{new_cell_count}(i) ~= nfc
+                                for j=1:2
+                                    if obj.FaceCells(new_cell_faces{new_cell_count}(i),j) == c
+                                        obj.FaceCells(new_cell_faces{new_cell_count}(i),j) = obj.TotalCells + new_cell_count;
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                % See if intersection is more than 2 vertices - this corresponds
+                % to degenerate polygons. Do not know what to do at this time.
+                if sum(split_face_bool(cfaces)) == 0 && sum(vint_bool(cverts)) > 2
+                    
+                end
+            end
+            % Append new vertex information
+            % ------------------------------------------------------------------
+            obj.TotalVertices = obj.TotalVertices + new_vert_count;
+            obj.Vertices = [obj.Vertices;new_verts];
+            % Update new face information
+            % ------------------------------------------------------------------
+            for ff=1:new_face_count
+                f = prior_face(ff);
+                % brand new face
+                if f == 0
+                    obj.FaceID = [obj.FaceID;0];
+                    obj.FaceVerts{obj.TotalFaces+ff} = new_face_verts{ff};
+                    obj.FaceCells(obj.TotalFaces+ff,:) = new_face_cells{ff};
+                    fv = new_face_verts{ff}; fverts = obj.Vertices(fv,:);
+                    dxf = diff(fverts);
+                    obj.FaceNormal(obj.TotalFaces+ff,:) = [dxf(2),-dxf(1)];
+                else
+                    obj.FaceID = [obj.FaceID;obj.FaceID(f)];
+                    obj.FaceVerts{f} = old_face_verts{ff};
+                    obj.FaceVerts{obj.TotalFaces+ff} = new_face_verts{ff};
+                    obj.FaceCells(f,:) = old_face_cells{ff};
+                    obj.FaceCells(obj.TotalFaces+ff,:) = new_face_cells{ff};
+                    obj.FaceNormal(obj.TotalFaces+ff,:) = obj.FaceNormal(f,:);
+                end
+            end
+            obj.TotalFaces = obj.TotalFaces + new_face_count;
+            % Update new cell information
+            % ------------------------------------------------------------------
+            for cc=1:new_cell_count
+                c = prior_cell(cc);
+                obj.CellVerts{c} = old_cell_verts{cc};
+                obj.CellVerts{obj.TotalCells+cc} = new_cell_verts{cc};
+                obj.CellFaces{c} = old_cell_faces{cc};
+                obj.CellFaces{obj.TotalCells+cc} = new_cell_faces{cc};
+                obj.CellCenter(c,:) = mean(obj.Vertices(old_cell_verts{cc},:));
+                obj.CellCenter(obj.TotalCells+cc,:) = mean(obj.Vertices(new_cell_verts{cc},:));
+            end
+            obj.MatID = [obj.MatID;new_cell_ids];
+            obj.TotalCells = obj.TotalCells + new_cell_count;
+            if new_cell_count > 0
+                obj.IsOrthogonal = false;
+            end
+            obj.update_geometry_info_after_modifications();
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
     methods
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -927,7 +1424,7 @@ end
 function extrude_mesh(obj, levels)
 global glob
 % Get new Geometry Information
-% ----------------------------
+% ------------------------------------------------------------------------------
 new_dim = obj.Dimension + 1;
 nlev = length(levels);
 num_new_verts = obj.TotalVertices * nlev;
@@ -946,7 +1443,7 @@ num_ev = obj.TotalVertices*(nlev-1);
 num_fe = obj.TotalFaces * (nlev - 1);
 num_fb = obj.TotalCells * nlev;
 % Allocate New Memory Information
-% -------------------------------
+% ------------------------------------------------------------------------------
 new_verts = zeros(num_new_verts, new_dim);
 new_cell_verts = cell(num_new_cells, 1);
 new_face_verts = cell(num_new_faces, 1);
@@ -970,6 +1467,7 @@ if new_dim == 3
     new_face_edges = cell(num_new_faces, 1);
 end
 % Loop through levels and get new vertex info
+% ------------------------------------------------------------------------------
 for i=1:nlev
     vv = (i-1)*v_stride+1:i*v_stride;
     new_verts(vv,:) = [obj.Vertices,levels(i)*ones(obj.TotalVertices, 1)];
@@ -990,6 +1488,7 @@ for i=1:nlev
     end
 end
 % Loop through levels and get new cell/face info
+% ------------------------------------------------------------------------------
 if glob.print_info, disp('   -> Begin New Cell and Face Generation.'); end
 cc = 0; ff = 0;
 for i=1:nlev-1
@@ -1069,6 +1568,7 @@ for i=1:nlev-1
     end
 end
 % Loop through all levels
+% ------------------------------------------------------------------------------
 if glob.print_info, disp('   -> Begin Cell and Face Cleanup Operations.'); end
 for i=1:nlev
     fb = num_fe+(i-1)*fb_stride+1:num_fe+i*fb_stride;
@@ -1114,6 +1614,7 @@ for i=1:nlev
     end
 end
 % Loop through faces for orthogonal projections
+% ------------------------------------------------------------------------------
 if glob.print_info, disp('   -> Begin Face Orthogonal Projection Calculations.'); end
 for f=1:num_new_faces
     fcells = new_face_cells(f,:);
@@ -1124,6 +1625,7 @@ for f=1:num_new_faces
     end
 end
 % Set New Information
+% ------------------------------------------------------------------------------
 obj.IsExtruded = true;
 obj.Dimension = new_dim;
 obj.TotalVertices = num_new_verts;
@@ -1151,4 +1653,4 @@ if new_dim == 3
     obj.FaceEdges = new_face_edges;
 end
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

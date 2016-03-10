@@ -20,11 +20,11 @@ data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = 
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
-data.Neutronics.StartingSolution = 'random';
+data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LD';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -62,7 +62,7 @@ data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
-data.Neutronics.Transport.ExtSource = [0.0];
+data.Neutronics.Transport.ExtSource = [1.0];
 % Boundary Conditions
 data.Neutronics.Transport.BCFlags = [glob.Vacuum];
 data.Neutronics.Transport.BCVals  = {0.0};
@@ -90,8 +90,8 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 8;
-% gname = 'PolyMesh_SqDomain_L1_n1024';
+L = 1; ncells = 2;
+gname = 'PolyMesh_SqDomain_L1_n16';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
@@ -100,7 +100,7 @@ L = 1; ncells = 8;
 % gname = 'z_mesh_poly_L1_n20_a0.05';
 % gname = 'smooth_quad_mesh_L1_nc5_emb6_a0.15';
 % gname = 'smooth_poly_mesh_L1_n8_a0.15';
-% load(strcat(glob.geom_path,gname,'.mat'));
+load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
 % tx = linspace(0,L,ncells+1);
@@ -115,11 +115,11 @@ L = 1; ncells = 8;
 % tri = delaunayTriangulation(x,y,z);
 % geometry = GeneralGeometry(3, 'Delaunay', tri);
 
-x=linspace(0,L,ncells+1);
-y=linspace(0,L,ncells+1);
+% x=linspace(0,L,ncells+1);
+% y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
