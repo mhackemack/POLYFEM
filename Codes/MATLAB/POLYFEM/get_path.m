@@ -3,6 +3,7 @@ function out = get_path()
 out = [];
 out = [out, genpath('geometry_inputs')];
 out = [out, genpath('../Tools')];
+out = [out, genpath('../Extensive_Tools/AGMG_3.2.3-aca')];
 out = [out, genpath('../Extensive_Tools/export_fig')];
 out = [out, genpath('../Extensive_Tools/geom_2d')];
 out = [out, genpath('../Extensive_Tools/geom_3d')];

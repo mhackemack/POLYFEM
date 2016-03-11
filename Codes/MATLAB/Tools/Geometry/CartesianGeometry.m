@@ -1541,6 +1541,9 @@ classdef CartesianGeometry < handle
                     cint_bool(c) = true;
                     fsplit = fnums(split_face_bool(cfaces) == true);
                     vsplit = vnums(vint_bool(cverts) == true);
+                    old_face = cfaces(fsplit); old_vert = cverts(vsplit);
+                    cnew_verts = find(new_vert_face==old_face);
+                    ccnewverts = obj.TotalVertices + cnew_verts;
                     % Update counters
                     new_cell_count = new_cell_count + 1;
                     prior_cell = [prior_cell;c];
@@ -1548,7 +1551,40 @@ classdef CartesianGeometry < handle
                     % Update face counters
                     new_face_count = new_face_count + 1;
                     prior_face = [prior_face;0];
-                    
+                    new_face_verts{new_face_count} = [old_vert,ccnewverts];
+                    new_face_cells{new_face_count} = [c,obj.TotalCells+new_cell_count];
+                    % Build ccw orderings
+                    ccent = obj.CellCenter(c,:);
+                    tverts = [obj.Vertices(cverts,:);new_verts(cnew_verts,:)];
+                    [~,ind] = sort(atan2(tverts(:,2)-ccent(2), tverts(:,1)-ccent(1)));
+                    nvind = find(ind==(nv+1));
+                    if nvind == 1
+                        adjfv = ind([end,2]);
+                    else
+                        adjfv = ind([nvind-1,mod(nvind,nv+1)+1]);
+                    end
+                    if vsplit == 1
+                        advv = [nv,2];
+                    else
+                        advv = [vsplit-1,mod(vsplit,nv)+1];
+                    end
+                    % Get first cell verts/faces
+                    old_cell_verts{new_cell_count} = [];
+                    old_cell_faces{new_cell_count} = [];
+                    % Get second cell verts/faces
+                    new_cell_verts{new_cell_count} = [];
+                    new_cell_faces{new_cell_count} = [];
+                    new_cell_ids = [new_cell_ids;obj.MatID(c)];
+                    % Update other face cells
+                    for i=1:length(new_cell_faces{new_cell_count})
+                        if new_cell_faces{new_cell_count}(i) <= obj.TotalFaces
+                            for j=1:2
+                                if obj.FaceCells(new_cell_faces{new_cell_count}(i),j) == c
+                                    obj.FaceCells(new_cell_faces{new_cell_count}(i),j) = obj.TotalCells + new_cell_count;
+                                end
+                            end
+                        end
+                    end
                 end
                 % See if intersection is 2 faces
                 if sum(split_face_bool(cfaces)) == 2 && sum(vint_bool(cverts)) == 0

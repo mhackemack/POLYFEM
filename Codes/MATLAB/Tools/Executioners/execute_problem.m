@@ -27,6 +27,8 @@ FE = FEHandler(geometry, DoF, data.Neutronics.SpatialMethod, data.Neutronics.FEM
 % Allocate Solution Space - gets reallocated after a mesh refinement
 data = prepare_problem_execution(data, geometry);
 [data.Neutronics, sol] = solution_allocation(data.Neutronics, geometry, DoF);
+% Clear persistent variables in DSA routines
+clear perform_MIP_DSA perform_IP_DSA perform_M4S_DSA;
 % Solve the neutronics problem (either source-driven or k-eigenvalue)
 [data, sol] = pcall(data, geometry, DoF, FE, sol);
 sol.CellVertexNumbers = geometry.CellVertexNumbers;
@@ -93,6 +95,8 @@ if data.problem.refineMesh && data.problem.refinementLevels > 0
         if data.problem.projectSolution
             sol{r}.flux = interpolate_ref_flux_Rev1(geometry,DoF0,DoF,FE0,sol{r-1}.flux);
         end
+        % Clear persistent variables in DSA routines
+        clear perform_MIP_DSA perform_IP_DSA perform_M4S_DSA;
         % Compute new flux solution
         [data, tsol] = pcall(data, geometry, DoF, FE, sol{r});
         sol{r} = tsol;
@@ -185,11 +189,22 @@ end
 data.Neutronics = ndat;
 sol.iter        = l;
 sol.DSA_iters   = DSA_its;
+sol.DSA_times   = DSA_times;
 sol.times       = toctime;
 sol.error_L2    = error_L2;
 sol.error_inf   = error_inf;
 sol.norm_L2     = n_L2;
 sol.norm_inf    = n_inf;
+% Clear AGMG memory if it was used - nested loop is used in case input options
+% were not specified.
+% ------------------------------------------------------------------------------
+if strcmpi(data.Neutronics.transportMethod,'transport')
+    if data.Neutronics.Transport.performDSA
+        if strcmpi(data.Neutronics.Transport.DSASolveMethod,'agmg')
+            agmg(mat,[],[],[],[],0,[],-1);
+        end
+    end
+end
 % ------------------------------------------------------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -252,6 +267,7 @@ data.Neutronics = ndat;
 sol.keff        = keff;
 sol.iter        = l;
 sol.DSA_iters   = DSA_its;
+sol.DSA_times   = DSA_times;
 sol.times       = toctime;
 sol.error_L2    = error_L2;
 sol.error_inf   = error_inf;

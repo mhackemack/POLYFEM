@@ -10,6 +10,8 @@
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = perform_MIP_DSA(ndat, solvdat, mesh, DoF, FE, x, A)
+global glob
+persistent agmg_bool
 % Throw error if opposing reflecting boundaries are present - this will be
 % resolved at a later date...maybe
 % ------------------------------------------------------------------------------
@@ -18,8 +20,6 @@ if ndat.Transport.HasOpposingReflectingBoundary
 end
 % ------------------------------------------------------------------------------
 % Get solution information
-global glob
-nout = nargout;
 ndg = DoF.TotalDoFs;
 ndof = ndat.numberEnergyGroups * ndg;
 if nargin < 5 || isempty(x)
@@ -84,6 +84,13 @@ elseif strcmpi(ndat.Transport.DSASolveMethod, 'PCG')
         end
         [x,DSA_it] = solve_func_PCG(A,rhs,x,M1,M2,DSA_tol,DSA_max_iters);
     end
+elseif strcmpi(ndat.Transport.DSASolveMethod, 'AGMG')
+    % Perform agmg setup
+    if isempty(agmg_bool)
+        [~] = agmg(A,[],[],[],[],0,[],1);
+        agmg_bool = true;
+    end
+    [x,~,~,DSA_it] = agmg(A,rhs,1,DSA_tol,DSA_max_iters,0,x,2);
 end
 % ------------------------------------------------------------------------------
 % Outputs

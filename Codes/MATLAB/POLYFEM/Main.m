@@ -20,7 +20,7 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format long e
+clc; close all; format long e; clear persistent;
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ------------------------------------------------------------------------------

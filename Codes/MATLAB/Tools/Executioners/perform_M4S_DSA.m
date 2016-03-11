@@ -10,6 +10,8 @@
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = perform_M4S_DSA(ndat, solvdat, mesh, DoF, FE, x, A)
+global glob
+persistent agmg_bool
 % Throw error if opposing reflecting boundaries are present - this will be
 % resolved at a later date...maybe
 % ------------------------------------------------------------------------------
@@ -18,8 +20,6 @@ if ndat.Transport.HasOpposingReflectingBoundary
 end
 % ------------------------------------------------------------------------------
 % Get solution information
-global glob
-nout = nargout;
 ndg = DoF.TotalDoFs;
 ndof = ndat.numberEnergyGroups * ndg;
 if nargin < 5 || isempty(x)
@@ -49,6 +49,29 @@ end
 ttime = tic;
 if strcmpi(solve_meth, 'direct')
     if length(x) > glob.maxSparse
+        if strcmpi(prec_meth, 'eisenstat')
+            [x,DSA_it] = solve_func_PCG_Eisenstat_Rev1(A,rhs,x,DSA_tol,DSA_max_iters);
+        else
+            if strcmpi(prec_meth, 'none')
+                M1 = []; M2 = [];
+            elseif strcmpi(prec_meth, 'jacobi')
+                ind=(1:ndof)'; M1 = sparse(ind,ind,diag(A));  M2 = [];
+            elseif strcmpi(prec_meth, 'gs')
+                ind=(1:ndof)'; D = sparse(ind,ind,diag(A)); LD = tril(A);
+                M1 = LD*(D\(LD')); M2 = [];
+            elseif strcmpi(prec_meth, 'ilu')
+                [M1, M2] = ilu(A);
+            end
+            [x,DSA_it] = solve_func_PCG(A,rhs,x,M1,M2,DSA_tol,DSA_max_iters);
+        end
+    else
+        x = A\rhs;
+        DSA_it = 0;
+    end
+elseif strcmpi(ndat.Transport.DSASolveMethod, 'PCG')
+    if strcmpi(prec_meth, 'eisenstat')
+        [x,DSA_it] = solve_func_PCG_Eisenstat_Rev1(A,rhs,x,DSA_tol,DSA_max_iters);
+    else
         if strcmpi(prec_meth, 'none')
             M1 = []; M2 = [];
         elseif strcmpi(prec_meth, 'jacobi')
@@ -60,24 +83,14 @@ if strcmpi(solve_meth, 'direct')
             [M1, M2] = ilu(A);
         end
         [x,DSA_it] = solve_func_PCG(A,rhs,x,M1,M2,DSA_tol,DSA_max_iters);
-%         [x,flag,res,DSA_it] = pcg(A,rhs,DSA_tol,DSA_max_iters,M1,M2);
-    else
-        x = A\rhs;
-        DSA_it = 0;
     end
-elseif strcmpi(ndat.Transport.DSASolveMethod, 'PCG')
-    if strcmpi(prec_meth, 'none')
-        M1 = []; M2 = [];
-    elseif strcmpi(prec_meth, 'jacobi')
-        ind=(1:ndof)'; M1 = sparse(ind,ind,diag(A));  M2 = [];
-    elseif strcmpi(prec_meth, 'gs')
-        ind=(1:ndof)'; D = sparse(ind,ind,diag(A)); LD = tril(A);
-        M1 = LD*(D\(LD')); M2 = [];
-    elseif strcmpi(prec_meth, 'ilu')
-        [M1, M2] = ilu(A);
+elseif strcmpi(ndat.Transport.DSASolveMethod, 'AGMG')
+    % Perform agmg setup
+    if isempty(agmg_bool)
+        [~] = agmg(A,[],[],[],[],0,[],1);
+        agmg_bool = true;
     end
-    [x,DSA_it] = solve_func_PCG(A,rhs,x,M1,M2,DSA_tol,DSA_max_iters);
-%     [x,flag,res,DSA_it] = pcg(A,rhs,DSA_tol,DSA_max_iters,M1,M2);
+    [x,~,~,DSA_it] = agmg(A,rhs,0,DSA_tol,DSA_max_iters,0,x,2);
 end
 % ------------------------------------------------------------------------------
 % Outputs
