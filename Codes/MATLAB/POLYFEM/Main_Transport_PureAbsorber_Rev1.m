@@ -23,7 +23,7 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % Being User Input Section
 % ------------------------------------------------------------------------------
 prob_name = 'IncidentLeftFace_2D_45degDown_LS4';
-tri_run_bool  = true;
+tri_run_bool  = false;
 cart_run_bool = true;
 poly_run_bool = true;
 % ---
@@ -140,6 +140,7 @@ if tri_run_bool
             end
         end
     end
+    clear tri_geoms;
 end
 % Run triangular problem
 % ------------------------------------------------------------------------------
