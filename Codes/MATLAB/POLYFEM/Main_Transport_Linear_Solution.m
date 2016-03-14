@@ -24,7 +24,6 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % ------------------------------------------------------------------------------
 print_heading(now, date);
 [data, ~] = load_user_input();
-
 % Begin User Input Section
 % ------------------------------------------------------------------------------
 BF_names = {'PWLD','WACHSPRESS','MV'};
@@ -58,7 +57,6 @@ data.problem.Dimension = 2;
 % x=x(:); y=y(:);
 % tri = delaunayTriangulation(x,y);
 % geometry = GeneralGeometry(2, 'Delaunay', tri);
-% % geometry = set_lin_sol_face_flags(geometry);
 % for b=1:length(BF_names)
 %     now_name = BF_names{b};
 %     data.Neutronics.SpatialMethod = BF_names{b};

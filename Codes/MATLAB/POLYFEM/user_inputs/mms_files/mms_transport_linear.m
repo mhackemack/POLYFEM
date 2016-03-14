@@ -1,5 +1,5 @@
 function [code_rhs, code_sol, code_angsol] = mms_transport_linear()
-syms a b c d e mu eta x y sigma_t
+syms a b c d e f mu eta x y sigma_t
 % Functional forms
 ang_sol = a*x + b*y + c*mu + d*eta + e;
 s_sol   = 2*pi*(a*x + b*y + e);

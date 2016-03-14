@@ -1543,6 +1543,7 @@ classdef CartesianGeometry < handle
                     vsplit = vnums(vint_bool(cverts) == true);
                     old_face = cfaces(fsplit); old_vert = cverts(vsplit);
                     cnew_verts = find(new_vert_face==old_face);
+                    pface = prior_face(cnew_verts);
                     ccnewverts = obj.TotalVertices + cnew_verts;
                     % Update counters
                     new_cell_count = new_cell_count + 1;
@@ -1564,16 +1565,60 @@ classdef CartesianGeometry < handle
                         adjfv = ind([nvind-1,mod(nvind,nv+1)+1]);
                     end
                     if vsplit == 1
-                        advv = [nv,2];
+                        adjvv = [nv,2];
                     else
-                        advv = [vsplit-1,mod(vsplit,nv)+1];
+                        adjvv = [vsplit-1,mod(vsplit,nv)+1];
+                    end
+                    % Isolate 1st vertices
+                    vnums1 = vnums; tvnums2 = vnums;
+                    if fsplit > vsplit && vsplit > 1
+                        trnums = vnums1(1:(vsplit-1));
+                        if adjfv(2) ~= 1
+                            trnums = [trnums,(adjfv(2):nv)];
+                        end
+                        vnums1(trnums) = [];
+                    elseif fsplit > vsplit && vsplit == 1
+                        vnums1(adjfv(2):nv) = [];
+                    elseif fsplit < vsplit
+                        vnums1 = [vsplit:nv,1:adjfv(1)];
+                    end
+                    % Isolate 2nd vetices
+                    tvnums1 = vnums1; tvnums1(vnums1==vsplit) = [];
+                    tvnums2(tvnums1) = []; ind = find(tvnums2==vsplit);
+                    if ind == 1
+                        vnums2 = tvnums2(2:end);
+                    elseif ind == length(tvnums2)
+                        vnums2 = tvnums2(1:(ind-1));
+                    else
+                        vnums2 = [tvnums2((ind+1):end),tvnums2(1:(ind-1))];
+                    end
+                    pfverts1 = old_face_verts{cnew_verts};
+                    pfverts2 = new_face_verts{cnew_verts};
+                    % Determine appropriate faces
+                    cv1 = cverts(vnums2(1));
+                    if cv1 == pfverts1(1) || cv1 == pfverts1(2)
+                        tf1 = obj.TotalFaces + cnew_verts;
+                        tf2 = pface;
+                        if old_face_cells{cnew_verts}(1) == c
+                            old_face_cells{cnew_verts}(1) = obj.TotalCells + new_cell_count;
+                        elseif old_face_cells{cnew_verts}(2) == c
+                            old_face_cells{cnew_verts}(2) = obj.TotalCells + new_cell_count;
+                        end
+                    elseif cv1 == pfverts2(1) || cv1 == pfverts2(2)
+                        tf1 = pface;
+                        tf2 = obj.TotalFaces + cnew_verts;
+                        if new_face_cells{cnew_verts}(1) == c
+                            new_face_cells{cnew_verts}(1) = obj.TotalCells + new_cell_count;
+                        elseif new_face_cells{cnew_verts}(2) == c
+                            new_face_cells{cnew_verts}(2) = obj.TotalCells + new_cell_count;
+                        end
                     end
                     % Get first cell verts/faces
-                    old_cell_verts{new_cell_count} = [];
-                    old_cell_faces{new_cell_count} = [];
+                    old_cell_verts{new_cell_count} = [cverts(vnums1),ccnewverts];
+                    old_cell_faces{new_cell_count} = [cfaces(vnums1(1:(end-1))),tf1,(obj.TotalFaces+new_face_count)];
                     % Get second cell verts/faces
-                    new_cell_verts{new_cell_count} = [];
-                    new_cell_faces{new_cell_count} = [];
+                    new_cell_verts{new_cell_count} = [cverts(vsplit),ccnewverts,cverts(vnums2)];
+                    new_cell_faces{new_cell_count} = [(obj.TotalFaces+new_face_count),tf2,cfaces(vnums2)];
                     new_cell_ids = [new_cell_ids;obj.MatID(c)];
                     % Update other face cells
                     for i=1:length(new_cell_faces{new_cell_count})

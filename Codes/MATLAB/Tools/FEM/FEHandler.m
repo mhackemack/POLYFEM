@@ -587,6 +587,8 @@ classdef FEHandler < handle
 %                 else
 %                     error(['Cannot read basis set name: ',obj.BasisName])
 %                 end
+            else
+                error('Cannot recognize basis function type.')
             end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -34,6 +34,9 @@ elseif strcmpi(geom_in.GeometryType, 'tet')
 elseif strcmpi(geom_in.GeometryType, 'poly')
     gname = strcat('PolyMesh_SqDomain_L1_n',num2str(geom_in.PolyNum),'.mat');
     load(gname);
+elseif strcmpi(geom_in.GeometryType, 'split_poly')
+    gname = strcat('SplitPolyMesh_slope=-1_yint=1_n',num2str(geom_in.PolyNum),'.mat');
+    load(gname);
 end
 % Boundary Condition Flags
 if data.problem.Dimension == 1
