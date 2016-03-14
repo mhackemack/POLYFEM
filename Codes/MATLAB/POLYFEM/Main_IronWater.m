@@ -27,19 +27,19 @@ dat_in.SpatialMethod = 'MAXENT';
 dat_in.FEMDegree = 2;
 dat_in.FEMLumping = false;
 % ---
-dat_in.QuadType = 'PGLC';
+dat_in.QuadType = 'LS';
 dat_in.SnLevels = 4;
 dat_in.AzimuthalLevels = 24;
 dat_in.PolarLevels = 1;
 % ---
 dat_in.refinementLevels = 27;
 dat_in.AMRIrregularity = 1;
-dat_in.refinementTolerance = 1/5;
+dat_in.refinementTolerance = 1/10;
 dat_in.projectSolution = 1;
 % ---
-dat_in.DSASolveMethod = 'PCG';
-dat_in.DSAPreconditioner = 'eisenstat';
-dat_in.DSATolerance = 1e-2;
+dat_in.DSASolveMethod = 'agmg';
+dat_in.DSAPreconditioner = 'agmg';
+dat_in.DSATolerance = 1e-3;
 % Load data and perform error checking
 % ------------------------------------------------------------------------------
 print_heading(now, date);
