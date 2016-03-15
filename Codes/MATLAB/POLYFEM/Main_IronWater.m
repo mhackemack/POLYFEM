@@ -35,7 +35,7 @@ dat_in.PolarLevels = 1;
 dat_in.refinementLevels = 27;
 dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 1/4;
-dat_in.projectSolution = 1;
+dat_in.projectSolution = 0;
 % ---
 dat_in.DSASolveMethod = 'agmg';
 dat_in.DSAPreconditioner = 'agmg';

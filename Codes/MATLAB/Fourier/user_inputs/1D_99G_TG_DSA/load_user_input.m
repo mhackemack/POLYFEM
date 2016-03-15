@@ -15,7 +15,7 @@ data.geometry.ncellx = 2;
 data.geometry.ncelly = 1;
 data.geometry.ncellz = 1;
 % mat regions
-data.problem.NumberMaterials = 2;
+data.problem.NumberMaterials = 9;
 data.geometry.mats(1).ID = 2;
 data.geometry.mats(1).Region = [0.5;1];
 % data.geometry.mats(2).ID = 2;
@@ -57,19 +57,37 @@ data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 data = add_xs_component_contribution(data, 1, 2, 'PolyH1_99G', 8.1570E-2);
 data = add_xs_component_contribution(data, 1, 2, 'FG_CNat_99G', 4.0787E-2);
 % BHPDE
-% data = add_xs_component_contribution(data, 1, 3, 'PolyH1_99G', 5.0859E-2);
-% data = add_xs_component_contribution(data, 1, 3, 'FG_CNat_99G', 2.5429E-2);
-% data = add_xs_component_contribution(data, 1, 3, 'B10_99G', 6.6256E-3);
-% data = add_xs_component_contribution(data, 1, 3, 'B11_99G', 2.6669E-2);
-% Air
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 7.4906E-9);
-% data = add_xs_component_contribution(data, 1, 1, 'N14_99G', 3.9123E-5);
-% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
-% data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
+data = add_xs_component_contribution(data, 1, 3, 'PolyH1_99G', 5.0859E-2);
+data = add_xs_component_contribution(data, 1, 3, 'FG_CNat_99G', 2.5429E-2);
+data = add_xs_component_contribution(data, 1, 3, 'B10_99G', 6.6256E-3);
+data = add_xs_component_contribution(data, 1, 3, 'B11_99G', 2.6669E-2);
 % Wood
-% data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0376E-2);
+data = add_xs_component_contribution(data, 1, 4, 'FG_H1_99G', 2.0752E-2);
+data = add_xs_component_contribution(data, 1, 4, 'FG_CNat_99G', 1.4520E-2);
+data = add_xs_component_contribution(data, 1, 4, 'O16_99G', 1.0376E-2);
+% AmBe
+data = add_xs_component_contribution(data, 1, 5, 'Am241_99G', 1.1649E-3);
+data = add_xs_component_contribution(data, 1, 5, 'Be9_99G', 1.9077E-1);
+data = add_xs_component_contribution(data, 1, 5, 'O16_99G', 2.3298E-3);
+% Steel
+data = add_xs_component_contribution(data, 1, 6, 'Cr52_99G', 1.7428E-2);
+data = add_xs_component_contribution(data, 1, 6, 'Mn55_99G', 1.7363E-3);
+data = add_xs_component_contribution(data, 1, 6, 'Fe56_99G', 5.9358E-2);
+data = add_xs_component_contribution(data, 1, 6, 'Ni58_99G', 7.7199E-3);
+% Boral
+data = add_xs_component_contribution(data, 1, 7, 'Al_99G', 3.8193E-2);
+data = add_xs_component_contribution(data, 1, 7, 'B10_99G', 7.1036E-3);
+data = add_xs_component_contribution(data, 1, 7, 'B11_99G', 2.8593E-2);
+data = add_xs_component_contribution(data, 1, 7, 'FG_CNat_99G', 8.9241E-3);
+% BF3
+data = add_xs_component_contribution(data, 1, 8, 'B10_99G', 6.4458E-6);
+data = add_xs_component_contribution(data, 1, 8, 'B11_99G', 2.6858E-7);
+data = add_xs_component_contribution(data, 1, 8, 'F19_99G', 2.0143E-5);
+% Air
+data = add_xs_component_contribution(data, 1, 9, 'FG_CNat_99G', 7.4906E-9);
+data = add_xs_component_contribution(data, 1, 9, 'N14_99G', 3.9123E-5);
+data = add_xs_component_contribution(data, 1, 9, 'O16_99G', 1.0511E-5);
+data = add_xs_component_contribution(data, 1, 9, 'Ar40_99G', 2.3297E-7);
 % Restrict Energy Groups
 data.XS.TotalXS = data.XS.TotalXS(:,data.Neutronics.ThermalGroups);
 data.XS.AbsorbXS = data.XS.AbsorbXS(:,data.Neutronics.ThermalGroups);
