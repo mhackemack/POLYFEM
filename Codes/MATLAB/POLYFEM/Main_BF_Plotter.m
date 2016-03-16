@@ -32,6 +32,8 @@ glob = get_globals('Office');
 % Input/Output informatin
 % -----------------------
 out_dir = 'outputs/BF_Plots/';
+% ncont = [-.001,-.002,-.004,-.006,-.008,-.01,-.02,-.04,-.06,-.08,-.1,linspace(0,1,55)];
+ncont = 80;
 % Basis function information
 % --------------------------
 p = 1;
@@ -46,15 +48,15 @@ BF(p).Degree = 2;
 BF(p).BasisFunction = @PWLD_basis_functions;
 p = p + 1;
 % BF3
-BF(p).Name = 'WACHSPRESS';
-BF(p).Degree = 1;
-BF(p).BasisFunction = @wachspress_basis_functions;
-p = p + 1;
+% BF(p).Name = 'WACHSPRESS';
+% BF(p).Degree = 1;
+% BF(p).BasisFunction = @wachspress_basis_functions;
+% p = p + 1;
 % BF4
-BF(p).Name = 'WACHSPRESS';
-BF(p).Degree = 2;
-BF(p).BasisFunction = @wachspress_basis_functions;
-p = p + 1;
+% BF(p).Name = 'WACHSPRESS';
+% BF(p).Degree = 2;
+% BF(p).BasisFunction = @wachspress_basis_functions;
+% p = p + 1;
 % BF5
 BF(p).Name = 'MV';
 BF(p).Degree = 1;
@@ -74,7 +76,7 @@ p = p + 1;
 BF(p).Name = 'MAXENT';
 BF(p).Degree = 2;
 BF(p).BasisFunction = @max_entropy_basis_functions;
-p = p + 1;
+% p = p + 1;
 % % BF9
 % BF(p).Name = 'LAGRANGE';
 % BF(p).Degree = 1;
@@ -93,38 +95,37 @@ ns = 301;
 xxs = xs(:); yys = ys(:);
 qxs = [xxs,yys];
 p = 1;
-% Geometry1
-Geometry(p).Name = 'square';
-Geometry(p).Vertices = [0,0;1,0;1,1;0,1];
-Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,1]};
-Geometry(p).Quad = qxs;
-Geometry(p).QuadGrid = {xs, ys};
-Geometry(p).QuadPerDim = ns;
-p = p + 1;
-% Geometry2
-Geometry(p).Name = 'deg_square';
-Geometry(p).Vertices = [0,0;1,0;1,1;.5,1;0,1];
-Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,1]};
-Geometry(p).Quad = qxs;
-Geometry(p).QuadGrid = {xs, ys};
-Geometry(p).QuadPerDim = ns;
-p = p + 1;
-% % Geometry3
-% Geometry(p).Name = 'L-domain';
-% Geometry(p).Vertices = [0,0;1,0;1,0.5;0.5,0.5;0.5,1;0,1];
-% Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]};
+% % Geometry1
+% Geometry(p).Name = 'square';
+% Geometry(p).Vertices = [0,0;1,0;1,1;0,1];
+% Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,1]};
 % Geometry(p).Quad = qxs;
 % Geometry(p).QuadGrid = {xs, ys};
 % Geometry(p).QuadPerDim = ns;
 % p = p + 1;
-% % Geometry4
+% % Geometry2
+% Geometry(p).Name = 'deg_square';
+% Geometry(p).Vertices = [0,0;1,0;1,1;.5,1;0,1];
+% Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,1]};
+% Geometry(p).Quad = qxs;
+% Geometry(p).QuadGrid = {xs, ys};
+% Geometry(p).QuadPerDim = ns;
+% p = p + 1;
+% Geometry3
+Geometry(p).Name = 'L-domain';
+Geometry(p).Vertices = [0,0;1,0;1,0.5;0.5,0.5;0.5,1;0,1];
+Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]};
+Geometry(p).Quad = qxs;
+Geometry(p).QuadGrid = {xs, ys};
+Geometry(p).QuadPerDim = ns;
+p = p + 1;
+% Geometry4
 % Geometry(p).Name = 'triangle';
 % Geometry(p).Vertices = [0,0;1,0;0,1];
 % Geometry(p).Faces = {[1,2],[2,3],[3,1]};
 % Geometry(p).Quad = qxs;
 % Geometry(p).QuadGrid = {xs, ys};
 % Geometry(p).QuadPerDim = ns;
-% p = p + 1;
 % ------------------------------------------------------------------------------
 % End user input section
 % ------------------------------------------------------------------------------
@@ -144,6 +145,8 @@ for g=1:ng
     inp = inpolygon(q(:,1), q(:,2), geom.Vertices(:,1), geom.Vertices(:,2));
     % Loop through basis functions
     for b = 1:nbf
+        msg = sprintf('Generating plot: %d of %d geometries and %d of %d basis functions.',g,ng,b,nbf);
+        disp(msg);
         % Generate basis function values
         if strcmpi(BF(b).Name, 'lagrange')
             bvals = BF(b).BasisFunction(BF(b).Degree, q);
@@ -159,7 +162,7 @@ for g=1:ng
             % Generate contour plot
             clf; hold on; ax = gca;
             patch(v(:,1),v(:,2),[1,1,1])
-            contour(qg{1}, qg{2}, bbr, 60);
+            contour(qg{1}, qg{2}, bbr, ncont);
             ax.XTick = (0:.1:1);
             ax.YTick = (0:.1:1);
             axis square;
@@ -168,16 +171,15 @@ for g=1:ng
             print(gcf,'-dpng',[out_dir,out_name,'_contour_b',num2str(i)]);
             print(gcf,'-depsc',[out_dir,out_name,'_contour_b',num2str(i)]);
             % Generate surf plot
-            clf; hold on; ax = gca;
-            surf(qg{1}, qg{2}, bbr,'linestyle','none');
-%             patch(v(:,1),v(:,2),-1*ones(nv,1),[1,1,1])
-            ax.XTick = (0:.1:1);
-            ax.YTick = (0:.1:1);
-            axis square;
-            % Save surf plot
-            saveas(gcf, [out_dir,out_name,'_surf_b',num2str(i)], 'fig');
-            print(gcf,'-dpng',[out_dir,out_name,'_surf_b',num2str(i)]);
-            print(gcf,'-depsc',[out_dir,out_name,'_surf_b',num2str(i)]);
+%             clf; hold on; ax = gca;
+%             surf(qg{1}, qg{2}, bbr,'linestyle','none');
+%             ax.XTick = (0:.1:1);
+%             ax.YTick = (0:.1:1);
+%             axis square;
+%             % Save surf plot
+%             saveas(gcf, [out_dir,out_name,'_surf_b',num2str(i)], 'fig');
+%             print(gcf,'-dpng',[out_dir,out_name,'_surf_b',num2str(i)]);
+%             print(gcf,'-depsc',[out_dir,out_name,'_surf_b',num2str(i)]);
         end
         % Save aggregate basis function output
         save([out_dir,out_name,'_BasisFunctions.mat'],'bvals');

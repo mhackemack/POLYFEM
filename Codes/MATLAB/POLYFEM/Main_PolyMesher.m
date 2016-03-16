@@ -13,11 +13,18 @@
 %   Notes:
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear; close all; clc; fclose all;
-dim = 2; out_dir = 'geometry_inputs/precompiled/';
+if exist('pbool', 'var')
+    clearvars -except pbool
+else
+    clear; pbool = false;
+end
+clc; close all; format long e; clear persistent;
+if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
+dim = 2; out_dir = '';
+% dim = 2; out_dir = 'geometry_inputs/precompiled/';
 L = 1; dom = @SqDomain_L1; gname = 'PolyMesh_SqDomain';
-tol = 1e-5; maxit = 2e3;
-nele = [256^2];
+tol = 1e-5; maxit = 1e4;
+nele = [256^2,512^2];
 % nele = [2^2, 4^2, 8^2, 16^2, 32^2];
 % nele = [64^2, 128^2, 256^2];
 
