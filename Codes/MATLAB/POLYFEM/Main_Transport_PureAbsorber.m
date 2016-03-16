@@ -50,7 +50,7 @@ geom_in.zmax_val = 0;
 % ---
 % sdm = {'PWLD'};
 sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
-fedeg = [1,2];
+fedeg = [2];
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 2;
 dat_in.FEMLumping = false;
