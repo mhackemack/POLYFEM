@@ -30,8 +30,8 @@ split_poly_run_bool = true;
 % ---
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'tri';
-pnum = [16,64,256,1024,4096,16384];
-% pnum = [65536];
+% pnum = [16,64,256,1024,4096,16384];
+pnum = [65536];
 % geom_in.PolyNum = [4,16,64,256,1024,4096,16384,65536];
 geom_in.Lx = 1; geom_in.ncellx = 4;
 geom_in.Ly = 1; geom_in.ncelly = 4;
