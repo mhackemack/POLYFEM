@@ -23,7 +23,7 @@ data.geometry.mats = [];
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 2;
 data.Neutronics.FEMLumping = false;
-data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
@@ -34,7 +34,7 @@ data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4,8];
+data.Neutronics.Transport.SnLevels = [16];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;
