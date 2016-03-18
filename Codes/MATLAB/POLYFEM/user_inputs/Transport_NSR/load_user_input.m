@@ -43,8 +43,8 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % -----------------------
-data.solver.absoluteTolerance = 1e-8;
-data.solver.relativeTolerance = 1e-8;
+data.solver.absoluteTolerance = 1e-20;
+data.solver.relativeTolerance = 1e-20;
 data.solver.maxIterations = 20;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];

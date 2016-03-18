@@ -48,9 +48,9 @@ geom_in.ymax_val = 0;
 geom_in.zmin_val = 0;
 geom_in.zmax_val = 0;
 % ---
-% sdm = {'PWLD'};
-sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
-fedeg = [2];
+sdm = {'MAXENT'};
+% sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
+fedeg = [1];
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 2;
 dat_in.FEMLumping = false;

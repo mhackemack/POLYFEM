@@ -25,18 +25,18 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = false;
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bf, quad, bc
 bf_name = 'PWQ';
 fdeg = 2;
-q_type = 'LS'; sn_levels = [2,4,8];
+q_type = 'LS'; sn_levels = [4,8];
 bc_type = 'Vacuum';
 % geometry
 dim = 2; m_type = 'quad';
-dx_num_start = 17; L = 1;
+dx_num_start = 21; L = 1;
 dx_start = linspace(0,L,dx_num_start);
 % xs
 c = 0.9999;
@@ -44,7 +44,7 @@ mfp_lower = 2; mfp_upper = 51;
 mfp_min = 0; mfp_max = 3;
 mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
-diff_type = 'MIP'; C_IP = [4,2];
+diff_type = 'MIP'; C_IP = [4];
 % End user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
