@@ -22,16 +22,16 @@ inp = 'Transport_PureAbsorber';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-prob_name = 'IncidentLeftTopFace_2D_45degDown_LS4';
-tri_run_bool  = false;
+prob_name = 'IncidentLeftFace_2D_45degDown_LS4';
 cart_run_bool = false;
+tri_run_bool  = true;
 poly_run_bool = false;
-split_poly_run_bool = true;
+split_poly_run_bool = false;
 % ---
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'tri';
 % pnum = [16,64,256,1024,4096,16384];
-pnum = [65536];
+pnum = [262144];
 % geom_in.PolyNum = [4,16,64,256,1024,4096,16384,65536];
 geom_in.Lx = 1; geom_in.ncellx = 4;
 geom_in.Ly = 1; geom_in.ncelly = 4;
@@ -39,19 +39,19 @@ geom_in.Lz = 1; geom_in.ncellz = 4;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
 geom_in.ymin_bound_type = glob.Vacuum;
-geom_in.ymax_bound_type = glob.Function;
+geom_in.ymax_bound_type = glob.Vacuum;
 geom_in.zmin_bound_type = glob.Reflecting;
 geom_in.zmax_bound_type = glob.Reflecting;
 geom_in.xmin_val = @BoundaryFunc_IncidentLeftFace_2D_45degDown_LS4;
 geom_in.xmax_val = 0;
 geom_in.ymin_val = 0;
-geom_in.ymax_val = @BoundaryFunc_IncidentTopFace_2D_45degDown_LS4;
+geom_in.ymax_val = 0;
 geom_in.zmin_val = 0;
 geom_in.zmax_val = 0;
 % ---
-% sdm = {'PWLD'};
-sdm = {'PWLD','WACHSPRESS','MV'};
-fedeg = [1,2];
+sdm = {'PWLD'};
+% sdm = {'PWLD','WACHSPRESS','MV'};
+fedeg = [1];
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 2;
 dat_in.FEMLumping = false;
@@ -78,6 +78,60 @@ dat_in.SolFunc = {@ExactSol_IncidentLeftFace_2D_45degDown_LS4_sigt10};
 % ------------------------------------------------------------------------------
 print_heading(now, date);
 pmax = log2(sqrt(max(pnum)));
+% Run cartesian problem
+% ------------------------------------------------------------------------------
+if cart_run_bool
+    geom_in.GeometryType = 'cart';
+    problem_path = ['Transport/PureAbsorber/',prob_name,'/Cartesian'];
+    % Loop through FEM degrees
+    for k=1:length(fedeg)
+        dat_in.FEMDegree = fedeg(k);
+        % Loop through basis functions
+        for s=1:length(sdm)
+            dat_in.SpatialMethod = sdm{s};
+            % Loop through total cross sections
+            for t=1:length(sigt)
+                dat_in.TotalXS = sigt(t);
+                dat_in.SolFunc{1} = str2func(['ExactSol_',prob_name,'_sigt',num2str(sigt(t))]);
+                % Build some output structures
+                totcells = zeros(length(pnum),1);
+                avecellvol = zeros(length(pnum),1);
+                maxcellvol = zeros(length(pnum),1);
+                totflux    = zeros(length(pnum),1);
+                dofs       = zeros(length(pnum),1);
+                err        = zeros(length(pnum),1);
+                % Loop through meshes
+                for g=1:length(pnum)
+                    msg = sprintf('fedeg: %d of %d, sdm: %d of %d, sigt: %d of %d, n: %d of %d.',k,length(fedeg),s,length(sdm),t,length(sigt),g,length(pnum));
+                    disp(msg);
+                    geom_in.ncellx = (pnum(g))^(1/geom_in.Dimension);
+                    geom_in.ncelly = (pnum(g))^(1/geom_in.Dimension);
+                    geom_in.ncellz = (pnum(g))^(1/geom_in.Dimension);
+                    % Load data and build problem name
+                    data = load_user_input(dat_in, geom_in);
+                    [data,geometry] = load_geometry_input(data, geom_in);
+                    data.problem.Name = sprintf('%s%d_sigt%d_n%d',sdm{s},fedeg(k),sigt(t),pnum(g));
+                    data.problem.Path = problem_path;
+                    % Run problem iteration
+                    [data, geometry] = process_input_data(data, geometry);
+                    data = cleanup_neutronics_input_data(data, geometry);
+                    [data, sol, ~, ~, ~] = execute_problem(data, geometry);
+                    [tdofs,terr] = retrieve_MMS_error(data,sol);
+                    % Collect results and output
+                    totcells(g)   = sum(sol.CellVertexNumbers);
+                    avecellvol(g) = sol.AverageCellMeasure;
+                    maxcellvol(g) = sol.MaxCellMeasure;
+                    totflux(g)    = sol.TotalMaterialFlux;
+                    dofs(g)       = tdofs;
+                    err(g)        = terr;
+                end
+                % Output the results
+                data.problem.Name = sprintf('%s%d_sigt%d',sdm{s},fedeg(k),sigt(t));
+                dlmwrite(['outputs/',data.problem.Path,'/',data.problem.Name,'_n',num2str(pmax),'_outdata.dat'],[totcells,dofs,avecellvol,maxcellvol,totflux,err]);
+            end
+        end
+    end
+end
 % Run triangular problem
 % ------------------------------------------------------------------------------
 if tri_run_bool
@@ -142,60 +196,6 @@ if tri_run_bool
         end
     end
     clear tri_geoms;
-end
-% Run triangular problem
-% ------------------------------------------------------------------------------
-if cart_run_bool
-    geom_in.GeometryType = 'cart';
-    problem_path = ['Transport/PureAbsorber/',prob_name,'/Cartesian'];
-    % Loop through FEM degrees
-    for k=1:length(fedeg)
-        dat_in.FEMDegree = fedeg(k);
-        % Loop through basis functions
-        for s=1:length(sdm)
-            dat_in.SpatialMethod = sdm{s};
-            % Loop through total cross sections
-            for t=1:length(sigt)
-                dat_in.TotalXS = sigt(t);
-                dat_in.SolFunc{1} = str2func(['ExactSol_',prob_name,'_sigt',num2str(sigt(t))]);
-                % Build some output structures
-                totcells = zeros(length(pnum),1);
-                avecellvol = zeros(length(pnum),1);
-                maxcellvol = zeros(length(pnum),1);
-                totflux    = zeros(length(pnum),1);
-                dofs       = zeros(length(pnum),1);
-                err        = zeros(length(pnum),1);
-                % Loop through meshes
-                for g=1:length(pnum)
-                    msg = sprintf('fedeg: %d of %d, sdm: %d of %d, sigt: %d of %d, n: %d of %d.',k,length(fedeg),s,length(sdm),t,length(sigt),g,length(pnum));
-                    disp(msg);
-                    geom_in.ncellx = (pnum(g))^(1/geom_in.Dimension);
-                    geom_in.ncelly = (pnum(g))^(1/geom_in.Dimension);
-                    geom_in.ncellz = (pnum(g))^(1/geom_in.Dimension);
-                    % Load data and build problem name
-                    data = load_user_input(dat_in, geom_in);
-                    [data,geometry] = load_geometry_input(data, geom_in);
-                    data.problem.Name = sprintf('%s%d_sigt%d_n%d',sdm{s},fedeg(k),sigt(t),pnum(g));
-                    data.problem.Path = problem_path;
-                    % Run problem iteration
-                    [data, geometry] = process_input_data(data, geometry);
-                    data = cleanup_neutronics_input_data(data, geometry);
-                    [data, sol, ~, ~, ~] = execute_problem(data, geometry);
-                    [tdofs,terr] = retrieve_MMS_error(data,sol);
-                    % Collect results and output
-                    totcells(g)   = sum(sol.CellVertexNumbers);
-                    avecellvol(g) = sol.AverageCellMeasure;
-                    maxcellvol(g) = sol.MaxCellMeasure;
-                    totflux(g)    = sol.TotalMaterialFlux;
-                    dofs(g)       = tdofs;
-                    err(g)        = terr;
-                end
-                % Output the results
-                data.problem.Name = sprintf('%s%d_sigt%d',sdm{s},fedeg(k),sigt(t));
-                dlmwrite(['outputs/',data.problem.Path,'/',data.problem.Name,'_n',num2str(pmax),'_outdata.dat'],[totcells,dofs,avecellvol,maxcellvol,totflux,err]);
-            end
-        end
-    end
 end
 % Run polygonal problem
 % ------------------------------------------------------------------------------
