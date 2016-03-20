@@ -1,4 +1,4 @@
-function data = load_user_input(dim, bf, bc_type)
+function data = load_user_input(dim, bf, fdeg, bc_type)
 global glob
 % Problem Input Parameters
 % ------------------------
@@ -17,8 +17,10 @@ data.problem.plotSolution = 0;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = bf;
+data.Neutronics.FEMDegree = fdeg;
 data.Neutronics.FEMLumping = false;
 data.Neutronics.numberEnergyGroups = 1;
+data.Neutronics.StartingSolution = 'random';
 
 % Transport Properties
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
