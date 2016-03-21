@@ -244,6 +244,7 @@ classdef CartesianGeometry < handle
     methods (Access = public)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function Constructor_1D(obj)
+            global glob
             obj.Lx = length(obj.x);
             % Define Total Geometry Space
             obj.MeshType = 'Quads';
@@ -310,6 +311,7 @@ classdef CartesianGeometry < handle
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function Constructor_2D(obj)
+            global glob
             % Get 2D Mesh Grid
             obj.Lx = length(obj.x);
             obj.Ly = length(obj.y);
@@ -325,6 +327,7 @@ classdef CartesianGeometry < handle
             obj.TotalBoundaryFaces = 2 * ((obj.Lx - 1) + (obj.Ly - 1));
             obj.TotalInteriorFaces = obj.TotalFaces - obj.TotalBoundaryFaces;
             % Build Remaining Structures
+            if glob.print_info, disp('   -> Build cell structures.'); end
             obj.Allocate_Arrays();
             c=0; cn = (obj.Lx-1) * obj.Ly;
             for j=1:obj.Ly-1
@@ -373,6 +376,7 @@ classdef CartesianGeometry < handle
                 end
             end
             % Loop through horizontal faces
+            if glob.print_info, disp('   -> Build horizontal faces.'); end
             f = 0;
             for j=1:obj.Ly
                 for i=1:obj.Lx - 1
@@ -402,6 +406,7 @@ classdef CartesianGeometry < handle
                 end
             end
             % Loop through vertical faces
+            if glob.print_info, disp('   -> Build vertical faces.'); end
             cn = (obj.Lx-1) * obj.Ly;
             for j=1:obj.Ly - 1
                 for i=1:obj.Lx
@@ -445,6 +450,7 @@ classdef CartesianGeometry < handle
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function Constructor_3D(obj)
+            global glob
             % Get 3D Mesh Grid
             obj.Lx = length(obj.x);
             obj.Ly = length(obj.y);
@@ -477,6 +483,7 @@ classdef CartesianGeometry < handle
                              ((obj.Lx-1)*obj.Lz + (obj.Lz-1)*obj.Lx)*obj.Ly + ...
                              ((obj.Lz-1)*obj.Ly + (obj.Ly-1)*obj.Lz)*obj.Lx;
             % Build Remaining Structures
+            if glob.print_info, disp('   -> Build cell structures.'); end
             obj.Allocate_Arrays();
             c = 0; 
             npz = obj.Lx*obj.Ly; nnpz = (obj.Lx-1)*(obj.Ly-1);
@@ -503,6 +510,7 @@ classdef CartesianGeometry < handle
                 end
             end
             % Loop through z-direction faces
+            if glob.print_info, disp('   -> Build z-direction faces.'); end
             f = 0;
             fn = (obj.Lx-1)*(obj.Ly-1);
             for k=1:obj.Lz
@@ -536,6 +544,7 @@ classdef CartesianGeometry < handle
                 end
             end
             % Loop through y-direction faces
+            if glob.print_info, disp('   -> Build y-direction faces.'); end
             for k=1:obj.Lz-1
                 vn = (k-1)*obj.Lx*obj.Ly;
                 vn2 = k*obj.Lx*obj.Ly;
@@ -568,6 +577,7 @@ classdef CartesianGeometry < handle
                 end
             end
             % Loop through x-direction faces
+            if glob.print_info, disp('   -> Build x-direction faces.'); end
             for k=1:obj.Lz-1
                 vn = (k-1)*obj.Lx*obj.Ly;
                 vn2 = k*obj.Lx*obj.Ly;

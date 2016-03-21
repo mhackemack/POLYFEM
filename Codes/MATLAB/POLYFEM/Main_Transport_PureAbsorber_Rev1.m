@@ -22,8 +22,8 @@ inp = 'Transport_PureAbsorber';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-prob_name = 'IncidentLeftFace_2D_45degDown_LS4';
-cart_run_bool = false;
+prob_name = 'IncidentLeftTopFace_2D_45degDown_LS4';
+cart_run_bool = true;
 tri_run_bool  = true;
 poly_run_bool = false;
 split_poly_run_bool = false;
@@ -39,13 +39,13 @@ geom_in.Lz = 1; geom_in.ncellz = 4;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
 geom_in.ymin_bound_type = glob.Vacuum;
-geom_in.ymax_bound_type = glob.Vacuum;
+geom_in.ymax_bound_type = glob.Function;
 geom_in.zmin_bound_type = glob.Reflecting;
 geom_in.zmax_bound_type = glob.Reflecting;
 geom_in.xmin_val = @BoundaryFunc_IncidentLeftFace_2D_45degDown_LS4;
 geom_in.xmax_val = 0;
 geom_in.ymin_val = 0;
-geom_in.ymax_val = 0;
+geom_in.ymax_val = @BoundaryFunc_IncidentTopFace_2D_45degDown_LS4;
 geom_in.zmin_val = 0;
 geom_in.zmax_val = 0;
 % ---
