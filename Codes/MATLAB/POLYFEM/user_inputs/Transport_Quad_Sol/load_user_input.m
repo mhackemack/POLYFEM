@@ -2,18 +2,18 @@ function [data, geometry] = load_user_input()
 global glob
 % Problem Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.Path = 'Transport/Linear_Solution';
+data.problem.Path = 'Transport/Quadratic_Solution';
 data.problem.Name = '';
 data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 1;
+data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 0;
-data.problem.refinementLevels = 1;
-data.problem.refinementTolerance = 0.2;
+data.problem.refinementLevels = 3;
+data.problem.refinementTolerance = 0.0;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
@@ -32,7 +32,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % MMS Properties
 data.Neutronics.Transport.MMS = true;
-data.Neutronics.Transport.QuadOrder = 8;
+data.Neutronics.Transport.QuadOrder = 6;
 data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1);
 data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties

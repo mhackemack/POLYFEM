@@ -44,6 +44,7 @@ end
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
+h = get_max_diamter( verts );
 ntot = get_num_serendipity_points( dim, nverts, nf, order);
 f_dofs = get_face_dofs(nv, faces, order);
 % Quick Error Checking
@@ -99,7 +100,7 @@ if v_flags(3)
     end
 end
 % Face-Wise Values
-[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, order);
+[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, order, h, s_flags(2));
 for f=1:nf
     nqx = length(qw_s{f});
     for q=1:nqx
@@ -123,6 +124,18 @@ varargout{4} = {qx_s, qw_s, bms, gms};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxiallary Function Calls
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out_max = get_max_diamter( verts )
+nv = size(verts,1);
+out_max = 0;
+for i=1:nv
+    vi = verts(i,:);
+    for j=1:nv
+        if i==j, continue; end
+        h = norm(verts(j,:) - vi);
+        if h > out_max, out_max = h; end
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_face_dofs(nv, faces, ord)
 if ord == 1
     out = faces;
@@ -134,7 +147,7 @@ else % only 2D allowed here
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord)
+function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord, h, sgrad_bool)
 nf = length(faces);
 qx_s = cell(nf, 1);
 qw_s = cell(nf, 1);

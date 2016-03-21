@@ -74,11 +74,11 @@ f_dofs = get_face_dofs(nv, faces, order);
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
 if order == 1
     [bmv, gmv] = max_entropy_O1_basis_functions(verts, qx_v, faces, order, nverts);
-    [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, order, q_ord, h);
 elseif order == 2
     [bmv, gmv] = max_entropy_O2_basis_functions(verts, qx_v, faces, order, nverts);
-    [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, order, q_ord, h);
 end
+% Calculate surface basis functions and gradients
+[qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, order, q_ord, h, s_flags(2));
 % mass matrix
 for q=1:nqx
     bt = bmv(q,:);
@@ -156,7 +156,7 @@ else % only 2D allowed here
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, ord, q_ord, h)
+function [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, ord, q_ord, h, sgrad_bool)
 nf = length(faces);
 qx_s = cell(nf, 1);
 qw_s = cell(nf, 1);
@@ -167,7 +167,7 @@ if dim == 1
     qx_s{1} = verts(1); qx_s{2} = verts(2);
     qw_s{1} = 1; qw_s{2} = 1;
     bms{1} = 1; bms{2} = 1;
-    gms{1} = [-1/h;1/h]; gms{2} = [1/h;-1/h];
+    if sgrad_bool, gms{1} = [-1/h;1/h]; gms{2} = [1/h;-1/h]; end
 elseif dim == 2
     [tqx, tqw] = get_legendre_gauss_quad(q_ord); ntqx = length(tqw);
     ttqx1 = []; ttqx2 = [];
@@ -190,15 +190,17 @@ elseif dim == 2
         end
     end
     % Get Gradient Estimates
-    if ord == 1
-        [~,tg] = max_entropy_O1_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
-    elseif ord == 2
-        [~,tg] = max_entropy_O2_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
-    end
-    % Rebuild Surface Gradients
-    for f=1:nf
-        iif = ntqx*(f-1)+1:ntqx*f;
-        gms{f} = tg(:,:,iif);
+    if sgrad_bool
+        if ord == 1
+            [~,tg] = max_entropy_O1_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
+        elseif ord == 2
+            [~,tg] = max_entropy_O2_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
+        end
+        % Rebuild Surface Gradients
+        for f=1:nf
+            iif = ntqx*(f-1)+1:ntqx*f;
+            gms{f} = tg(:,:,iif);
+        end
     end
 elseif dim == 3
     for f=1:nf

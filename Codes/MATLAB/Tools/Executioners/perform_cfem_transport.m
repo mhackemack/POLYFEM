@@ -12,7 +12,7 @@
 function varargout = perform_cfem_transport(ndat, solvdat, mesh, DoF, FE, x, A)
 global glob
 % Setup Solution Space
-% --------------------
+% ------------------------------------------------------------------------------
 flux_out = clear_flux_moments(x, DoF.TotalDoFs);
 if ndat.Transport.HasReflectingBoundary || ndat.Transport.HasPeriodicBoundary
     ndat.Transport.ReflectingFluxesOld = ndat.Transport.ReflectingFluxes;
@@ -22,7 +22,7 @@ ndat.Transport.OutgoingCurrentsOld = ndat.Transport.OutgoingCurrents;
 ndat.Transport.IncomingCurrentsOld = ndat.Transport.IncomingCurrents;
 ndat = zero_partial_currents(ndat, mesh, DoF);
 % Loop through Quadrature Directions
-% ----------------------------------
+% ------------------------------------------------------------------------------
 rev_str = [];
 for m=1:ndat.Transport.NumberAngularDirections
     if glob.print_info
@@ -43,8 +43,8 @@ for m=1:ndat.Transport.NumberAngularDirections
     % Add to the partial boundary currents
     ndat = compute_partial_boundary_currents(ndat, mesh, DoF, m, y);
 end
-
 % Perform DSA Update
+% ------------------------------------------------------------------------------
 if ndat.Transport.performDSA
     if glob.print_info
         msg = '   Performing DSA Correction Calculation.';
@@ -61,18 +61,14 @@ if ndat.Transport.performDSA
         flux_out{g,1} = flux_out{g,1} + dx{g};
     end
 end
-
 % Outputs
+% ------------------------------------------------------------------------------
 nout = nargout;
 varargout{1} = ndat;
 varargout{2} = flux_out;
-if nout == 3
-    if exist('A', 'var')
-        varargout{3} = A; 
-    else
-        varargout{3} = []; 
-    end
-end
+if nout > 2, varargout{3} = A; end
+if nout > 3, varargout{4} = 0; end
+if nout > 4, varargout{5} = 0; end
 % Clear Command Line Text
 if glob.print_info, fprintf(rev_str); end
 

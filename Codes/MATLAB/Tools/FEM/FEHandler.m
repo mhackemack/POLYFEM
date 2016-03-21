@@ -268,44 +268,44 @@ classdef FEHandler < handle
                     end
                     % Form Additional LD Matrices from Original PWLD Matrices
                     % ----------------------------------------------------------
-                    if obj.BasisType == 0
-                        P = varargin{2}.LDCellProjection{c};
-                        J = varargin{2}.LDCellInterpolation{c};
-                        M = obj.CellMassMatrix{c};
-                        G = obj.CellGradientMatrix{c};
-                        K = obj.CellStiffnessMatrix{c};
-                        % LD Cell Matrices
-                        obj.LDCellRHSMassMatrix{c} = P*M;
-                        obj.LDCellMassMatrix{c} = obj.LDCellRHSMassMatrix{c}*J;
-                        obj.LDCellStiffnessMatrix{c} = P*K*J;
-                        for d=1:obj.Dimension
-                            obj.LDCellGradientMatrix{c}{d} = P*G{d}*J;
-                        end
-                        % LD Face Matrices
-                        tvz = zeros(nvverts);
-                        for f=1:nfaces
-                            ff = cfaces(f);
-                            fvn = fcnodes{f}; nfvn = length(fvn);
-                            fcells = varargin{1}.FaceCells(ff,:);
-                            if fcells(1) == c
-                                tc = 1;
-                            elseif fcells(2) == c
-                                tc = 2;
-                            end
-%                             fP = varargin{2}.LDFaceProjection{ff,tc};
-%                             fJ = varargin{2}.LDFaceInterpolation{ff,tc};
-                            fM = obj.FaceMassMatrix{ff,tc};
-                            fG = obj.FaceGradientMatrix{ff,tc};
-                            tfM = tvz;
-                            tfM(fvn,fvn) = fM;
-                            obj.LDFaceMassMatrix{ff,tc} = P*tfM*J;
-                            obj.LDFaceRHSMassMatrix{ff,tc} = P(:,fvn)*fM;
-                            for d=1:obj.Dimension
-                                obj.LDFaceGradientMatrix{ff,tc}{d} = P*fG{d}*J;
-                                
-                            end
-                        end
-                    end
+%                     if obj.BasisType == 0
+%                         P = varargin{2}.LDCellProjection{c};
+%                         J = varargin{2}.LDCellInterpolation{c};
+%                         M = obj.CellMassMatrix{c};
+%                         G = obj.CellGradientMatrix{c};
+%                         K = obj.CellStiffnessMatrix{c};
+%                         % LD Cell Matrices
+%                         obj.LDCellRHSMassMatrix{c} = P*M;
+%                         obj.LDCellMassMatrix{c} = obj.LDCellRHSMassMatrix{c}*J;
+%                         obj.LDCellStiffnessMatrix{c} = P*K*J;
+%                         for d=1:obj.Dimension
+%                             obj.LDCellGradientMatrix{c}{d} = P*G{d}*J;
+%                         end
+%                         % LD Face Matrices
+%                         tvz = zeros(nvverts);
+%                         for f=1:nfaces
+%                             ff = cfaces(f);
+%                             fvn = fcnodes{f}; nfvn = length(fvn);
+%                             fcells = varargin{1}.FaceCells(ff,:);
+%                             if fcells(1) == c
+%                                 tc = 1;
+%                             elseif fcells(2) == c
+%                                 tc = 2;
+%                             end
+% %                             fP = varargin{2}.LDFaceProjection{ff,tc};
+% %                             fJ = varargin{2}.LDFaceInterpolation{ff,tc};
+%                             fM = obj.FaceMassMatrix{ff,tc};
+%                             fG = obj.FaceGradientMatrix{ff,tc};
+%                             tfM = tvz;
+%                             tfM(fvn,fvn) = fM;
+%                             obj.LDFaceMassMatrix{ff,tc} = P*tfM*J;
+%                             obj.LDFaceRHSMassMatrix{ff,tc} = P(:,fvn)*fM;
+%                             for d=1:obj.Dimension
+%                                 obj.LDFaceGradientMatrix{ff,tc}{d} = P*fG{d}*J;
+%                                 
+%                             end
+%                         end
+%                     end
                 end
                 % Generate Coupling Face Gradient Terms
                 % -------------------------------------

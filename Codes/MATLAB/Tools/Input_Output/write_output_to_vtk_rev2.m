@@ -95,7 +95,7 @@ for s=1:length(sol_name)
     ssol = sol{s};
     fprintf(fid2,'SCALARS %s double \n',s_name);
     fprintf(fid2,'LOOKUP_TABLE   default \n');
-    fprintf(fid2,'%f\n',ssol);
+    fprintf(fid2,'%1.8e\n',ssol);
     fprintf(fid2, ' \n');
 end
 fclose(fid2);
@@ -173,7 +173,7 @@ for s=1:length(sol_name)
     ssol = sol{s};
     fprintf(fid,'SCALARS %s double \n',s_name);
     fprintf(fid,'LOOKUP_TABLE   default \n');
-    fprintf(fid,'%f\n',ssol(dofs_used));
+    fprintf(fid,'%1.8e\n',ssol(dofs_used));
     fprintf(fid, ' \n');
 end
 fclose(fid);

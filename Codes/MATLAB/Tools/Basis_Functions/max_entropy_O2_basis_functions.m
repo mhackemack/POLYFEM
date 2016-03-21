@@ -186,8 +186,6 @@ for q=1:nqx
         ca(6,i,q) = trv(i,1)*trv(i,2);
         ca(4,an,q) = trv(an,1)*trv(an,1) - xba(1)*xba(1)/4;
         ca(5,an,q) = trv(an,2)*trv(an,2) - xba(2)*xba(2)/4;
-%         ca(4,an,q) = trv(an,1)*trv(an,1) - xba(1)*xba(1)/4;
-%         ca(5,an,q) = trv(an,2)*trv(an,2) - xba(2)*xba(2)/4;
         ca(6,an,q) = trv(an,1)*trv(an,2) - xba(1)*xba(2)/4;
     end
 end
