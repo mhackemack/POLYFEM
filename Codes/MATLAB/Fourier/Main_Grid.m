@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % -----------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = false;
 % Define all user inputs
 % ------------------------------------------------------------------------------
@@ -33,9 +33,11 @@ inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-n = 121;
+n = 101;
 data.NumberPhasePerDim = n;
-wn_norm = 2*pi; pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
+% pmin = 0; pmax = 1/10;
+pmin = 0; pmax = 2*pi;
+% wn_norm = 2*pi; pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
 data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
 data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
 % end user input section
