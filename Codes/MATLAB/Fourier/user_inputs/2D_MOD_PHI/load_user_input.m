@@ -25,8 +25,8 @@ data.problem.NumberMaterials = 2;
 % end
 % data.geometry.mats(1).ID = 2;
 % data.geometry.mats(1).Region = [0,0;.5,0;.5,.5;0,.5];
-data.geometry.mats(2).ID = 2;
-data.geometry.mats(2).Region = [0,.5;1,.5;1,1;0,1];
+data.geometry.mats(1).ID = 2;
+data.geometry.mats(1).Region = [0,.5;1,.5;1,1;0,1];
 % fem
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;

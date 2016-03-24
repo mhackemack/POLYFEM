@@ -15,7 +15,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = set_phi_xs(data, sigt, c)
 % Set Cross Sections
-sigt = [1/sigt;1];
+sigt = [1;1/sigt];
 data.Neutronics.TotalXS = sigt;
 data.Neutronics.DiffusionXS = (1/3)./sigt;
 data.Neutronics.ScatteringXS = c*sigt;
