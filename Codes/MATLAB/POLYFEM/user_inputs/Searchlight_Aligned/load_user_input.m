@@ -12,7 +12,7 @@ data.problem.saveVTKSolution = 1;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 1;
-data.problem.refinementLevels = 6;
+data.problem.refinementLevels = 2;
 data.problem.refinementTolerance = 0.0;
 data.problem.AMRIrregularity = 1;
 data.problem.projectSolution = 0;
@@ -23,7 +23,7 @@ data.Neutronics.PowerLevel = 1.0;
 data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'MV';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.FEMLumping = false;
 data.Neutronics.numberEnergyGroups = 1;
@@ -37,8 +37,8 @@ data.Neutronics.Transport.QuadType = 'manual';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
-data.Neutronics.Transport.QuadAngles  = [1,.4]/norm([1,.4]);  % Angles for manual set
-data.Neutronics.Transport.QuadWeights = [1];                  % Weights for manual set
+data.Neutronics.Transport.QuadAngles  = [1,0];
+data.Neutronics.Transport.QuadWeights = [1];
 % Sweep Operations
 data.Neutronics.Transport.performSweeps = 0;
 data.Neutronics.Transport.visualizeSweeping = 0;
