@@ -35,7 +35,7 @@ data.Neutronics.numberEnergyGroups = 1;
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 4;
+data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
@@ -50,7 +50,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e0; c = 0.5;
+txs = 1e0; c = 0.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -64,8 +64,10 @@ data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
 data.Neutronics.Transport.ExtSource = [1.0];
 % Boundary Conditions
-data.Neutronics.Transport.BCFlags = [glob.Vacuum];
-data.Neutronics.Transport.BCVals  = {0.0};
+data.Neutronics.Transport.BCFlags = [glob.Vacuum,glob.IncidentIsotropic];
+data.Neutronics.Transport.BCVals  = {0.0;2.0};
+% data.Neutronics.Transport.BCFlags = [glob.Vacuum];
+% data.Neutronics.Transport.BCVals  = {0.0};
 % data.Neutronics.Transport.BCFlags = [glob.Vacuum, glob.IncidentIsotropic, glob.Reflecting];
 % data.Neutronics.Transport.BCVals = {0.0; 1.0; 0.0};
 
@@ -89,9 +91,9 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 2;
-% L = 1; ncells = 24;
-gname = 'PolyMesh_SqDomain_L1_n16';
+data.problem.Dimension = 1;
+L = 1; ncells = 4;
+% gname = 'PolyMesh_SqDomain_L1_n16';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
 % gname = 'random_poly_mesh_L1_n16_a0.9';
@@ -100,7 +102,7 @@ gname = 'PolyMesh_SqDomain_L1_n16';
 % gname = 'z_mesh_poly_L1_n20_a0.05';
 % gname = 'smooth_quad_mesh_L1_nc5_emb6_a0.15';
 % gname = 'smooth_poly_mesh_L1_n8_a0.15';
-load(strcat(glob.geom_path,gname,'.mat'));
+% load(strcat(glob.geom_path,gname,'.mat'));
 % data = get_SimpleReactor_XS(data);
 
 % tx = linspace(0,L,ncells+1);
@@ -115,10 +117,10 @@ load(strcat(glob.geom_path,gname,'.mat'));
 % tri = delaunayTriangulation(x,y,z);
 % geometry = GeneralGeometry(3, 'Delaunay', tri);
 
-% x=linspace(0,L,ncells+1);
+x=linspace(0,L,ncells+1);
 % y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
-% geometry = CartesianGeometry(1,x);
+geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
@@ -127,7 +129,7 @@ load(strcat(glob.geom_path,gname,'.mat'));
 % geometry.extrude_mesh_2D_to_3D(linspace(0,L,ncells+1));
 % geometry.extrude_mesh_2D_to_3D([0,1/3,2/3,1]);
 
-% geometry.set_face_flag_on_surface(2,0.0);
+geometry.set_face_flag_on_surface(2,0.0);
 % geometry.set_face_flag_on_surface(2,[0,.2*L;0,.4*L]);
 % geometry.set_face_flag_on_surface(2,[0,0;0,L]);
 % geometry.set_face_flag_on_surface(3,[0,L;L,L]);

@@ -31,10 +31,11 @@ glob.print_info = false;
 % ------------------------------------------------------------------------------
 inp = '2D_MOD_PHI'; addpath([glob.input_path,inp]);
 % Problem inputs
-% sigt = 10000;
-sigt = [10,100,1000,10000];
-c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
-ncells = 4;
+sigt = 10000;
+c = 0.9999;
+% sigt = [10,100,1000,10000];
+% c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
+ncells = 20;
 ngrid = 101;
 data = load_user_input(ncells);
 % end user input section
@@ -66,6 +67,9 @@ for t=1:length(sigt)
         % Run the Search problems
         data.Type = 'Search';
         data.NumberPhasePerDim = 5;
+        pmin = sqrt(eps); pmax = 2*pi - sqrt(eps);
+        data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
+        data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
         inputs = build_phase_transformation_matrix(data, inputs);
         outputs = calculate_eigenspectrums(data, inputs);
         % Process Search outputs - also calculate maximum case for eigenspectrum
@@ -84,6 +88,9 @@ for t=1:length(sigt)
         % Run the Grid problems
         data.Type = 'Grid';
         data.NumberPhasePerDim = ngrid;
+        pmin = 0; pmax = 2*pi;
+        data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
+        data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
         inputs = build_phase_transformation_matrix(data, inputs);
         outputs = calculate_eigenspectrums(data, inputs);
         % Process Grid outputs
@@ -103,7 +110,7 @@ for t=1:length(sigt)
             dlmwrite([outdir,fulloutname,'_GridData',num2str(data.NumberPhasePerDim),'.dat'],z);
             savefig(gcf,[outdir,fulloutname,'_contour.fig']);
             print(gcf,'-dpng',[outdir,fulloutname,'_contour.png']);
-            print(gcf,'-depsc',[outdir,fulloutname,'_contour.eps']);
+%             print(gcf,'-depsc',[outdir,fulloutname,'_contour.eps']);
             close(gcf);
         end
     end
@@ -114,8 +121,8 @@ x = inputs.phase{1}.WN{1}; x = x./max(max(x))*2*pi;
 y = inputs.phase{1}.WN{2}; y = y./max(max(y))*2*pi;
 dlmwrite([outdir,'GridX',num2str(ngrid),'.dat'],x);
 dlmwrite([outdir,'GridY',num2str(ngrid),'.dat'],y);
-% Save off maximum spectral radii information
-% ------------------------------------------------------------------------------
+% % Save off maximum spectral radii information
+% % ------------------------------------------------------------------------------
 for q=1:length(data.Neutronics.Transport.SnLevels)
     qlvl = data.Neutronics.Transport.SnLevels(q);
     fulloutname = sprintf('%s_%s%d',outname,data.Neutronics.Transport.QuadType,qlvl);

@@ -33,7 +33,7 @@ data.Neutronics.Transport.QuadOrder = 4;
 % data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = dat_in.QuadType;
 data.Neutronics.Transport.SnLevels = dat_in.SnLevels;
 data.Neutronics.Transport.AzimuthalLevels = dat_in.AzimuthalLevels;

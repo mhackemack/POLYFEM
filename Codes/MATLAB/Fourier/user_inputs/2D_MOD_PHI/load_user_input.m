@@ -1,8 +1,8 @@
 function data = load_user_input(n)
 global glob
 % outputs
-data.Output.plotting_bool = true;
-data.Output.file_bool = true;
+data.Output.plotting_bool = false;
+data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
 data.geometry.type = 'cart';
@@ -42,7 +42,7 @@ data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4,8,16];
+data.Neutronics.Transport.SnLevels = [4];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;
