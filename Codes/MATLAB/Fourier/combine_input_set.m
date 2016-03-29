@@ -16,15 +16,17 @@
 function [out, p] = combine_input_set(data, inputs, m, q)
 % Data Inputs
 % ------------------------------------------------------------------------------
-out.data.TotalXS      = data.Neutronics.TotalXS;
-out.data.AbsorbXS     = data.Neutronics.AbsorbXS;
-out.data.ScatteringXS = data.Neutronics.ScatteringXS;
-out.data.DiffusionXS  = data.Neutronics.DiffusionXS;
-out.data.BCFlags      = data.Neutronics.BCFlags;
-out.data.BCVals       = data.Neutronics.BCVals;
-out.data.IP_Constant  = data.Neutronics.IP_Constant;
-out.data.AccelType    = data.Neutronics.AccelType;
-out.data.ErrorShape   = data.Neutronics.ErrorShape;
+out.data.TotalXS       = data.Neutronics.TotalXS;
+out.data.AbsorbXS      = data.Neutronics.AbsorbXS;
+out.data.ScatteringXS  = data.Neutronics.ScatteringXS;
+out.data.DiffusionXS   = data.Neutronics.DiffusionXS;
+out.data.BCFlags       = data.Neutronics.BCFlags;
+out.data.BCVals        = data.Neutronics.BCVals;
+out.data.IP_Constant   = data.Neutronics.IP_Constant;
+out.data.AccelType     = data.Neutronics.AccelType;
+out.data.ErrorShape    = data.Neutronics.ErrorShape;
+out.data.SpatialMethod = data.Neutronics.SpatialMethod;
+out.data.FEMDegree     = data.Neutronics.FEMDegree;
 % Average Cross Sections
 out.data.numberEnergyGroups = data.Neutronics.numberEnergyGroups;
 out.data.AveTotalXS         = data.Neutronics.AveTotalXS;

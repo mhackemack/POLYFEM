@@ -124,7 +124,3 @@ if data.Output.plotting_bool
     ylabel('Spectral Radius', 'FontName', 'Times New Roman', 'FontSize', font_size, 'FontWeight', 'bold');
 end
 
-
-
-
-

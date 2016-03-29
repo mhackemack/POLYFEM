@@ -172,7 +172,7 @@ elseif dim == 2
     [tqx, tqw] = get_legendre_gauss_quad(q_ord); ntqx = length(tqw);
     ttqx1 = []; ttqx2 = [];
     fones = ones(ntqx,1);
-    % Loop through cells and build some information
+    % Loop through faces and build some information
     for f=1:nf
         fv = faces{f};
         v = verts(fv,:);

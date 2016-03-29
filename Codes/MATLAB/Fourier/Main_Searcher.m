@@ -34,7 +34,7 @@ data = load_user_input();
 % additional inputs
 data.Type = 'Search';
 data.NumberPhasePerDim = 3;
-% wn_norm = 2*pi; pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
+% wn_norm = 2*pi; pmin = sqrt(eps),; pmax = wn_norm - sqrt(eps);
 % data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
 % data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
 % end user input section

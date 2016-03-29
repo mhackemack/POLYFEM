@@ -100,14 +100,18 @@ if v_flags(3)
     end
 end
 % Face-Wise Values
-[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, order, h, s_flags(2));
+[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, order, q_ord, h, s_flags(2));
 for f=1:nf
     nqx = length(qw_s{f});
+    fv = f_dofs{f};
     for q=1:nqx
         bt = bms{f}(q,:);
         MM{f} = MM{f} + qw_s{f}(q) * (bt'*bt);
         if s_flags(2)
-            
+            gt = gms{f};
+            for d=1:dim
+                G2{f}{d}(:,fv) = G2{f}{d}(:,fv) + qw_s{f}(q) * gt(:,d,q)*bt;
+            end
         end
     end
 end
@@ -147,26 +151,46 @@ else % only 2D allowed here
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord, h, sgrad_bool)
+function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord, q_ord, h, sgrad_bool)
 nf = length(faces);
 qx_s = cell(nf, 1);
 qw_s = cell(nf, 1);
 bms  = cell(nf, 1);
 gms  = cell(nf, 1);
 if dim == 2
-    [tqx, tqw] = lgwt(ord+2,0,1); ntqx = length(tqw);
+    [tqx, tqw] = get_legendre_gauss_quad(q_ord); ntqx = length(tqw);
+    ttqx1 = []; ttqx2 = [];
     fones = ones(ntqx,1);
+    % Loop through faces and build some information
     for f=1:nf
         fv = faces{f};
         v = verts(fv,:);
-        dv = v(2,:) - v(1,:);
+        dx = v(2,:) - v(1,:);
         len = norm(diff(v));
+        n = [dx(2), -dx(1)]/len;
         qw_s{f} = tqw*len;
-        qx_s{f} = fones*v(1,:) + tqx*dv;
+        qx_s{f} = fones*v(1,:) + tqx*dx;
+        if sgrad_bool
+            ttqx1 = [ttqx1;qx_s{f} - fones*n*h/1e3];
+            ttqx2 = [ttqx2;qx_s{f} - fones*n*h/2e3];
+        end
         if ord == 1
             bms{f} = [1-tqx, tqx];
         elseif ord == 2
              bms{f} = [(1-tqx).^2, tqx.^2, 2*tqx.*(1-tqx)];
+        end
+    end
+    % Get Gradient Estimates
+    if sgrad_bool
+        if ord == 1
+            [~,tg] = wachspress_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
+        elseif ord == 2
+            [~,tg] = wachspress_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
+        end
+        % Rebuild Surface Gradients
+        for f=1:nf
+            iif = ntqx*(f-1)+1:ntqx*f;
+            gms{f} = tg(:,:,iif);
         end
     end
 elseif dim == 3
