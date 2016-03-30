@@ -1,4 +1,4 @@
-function data = load_user_input(n)
+function data = load_user_input(n,L)
 global glob
 % outputs
 data.Output.plotting_bool = false;
@@ -6,7 +6,7 @@ data.Output.file_bool = false;
 % geometry
 data.problem.Dimension = 2;
 data.geometry.type = 'cart';
-data.geometry.x = n;
+data.geometry.x = L;
 % log_xmin = 0; log_xmax = 0; xnum = 1;
 % data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
@@ -36,7 +36,7 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
-data.Neutronics.PerformAcceleration = true;
+data.Neutronics.PerformAcceleration = false;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;

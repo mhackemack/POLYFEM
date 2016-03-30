@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Office');
+glob = get_globals('Home');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
@@ -35,9 +35,10 @@ sigt = 10000;
 c = 0.9999;
 % sigt = [10,100,1000,10000];
 % c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
-ncells = 20;
+ncells = 10;
+L = 1;
 ngrid = 101;
-data = load_user_input(ncells);
+data = load_user_input(ncells,L);
 % end user input section
 % ------------------------------------------------------------------------------
 % Compute all solutions
@@ -51,15 +52,15 @@ else
     lump = 'U';
 end
 if ~data.Neutronics.PerformAcceleration % Unaccelerated
-    outname = sprintf('%s_%s%s%d_ncells=%d',data.Neutronics.TransportMethod,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree,ncells);
+    outname = sprintf('%s_%s%s%d_ncells=%d_L=%d',data.Neutronics.TransportMethod,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree,ncells,L);
 elseif data.Neutronics.PerformAcceleration % Accelerated
-    outname = sprintf('%s_%s_C=%d_%s%s%d_ncells=%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree,ncells);
+    outname = sprintf('%s_%s_C=%d_%s%s%d_ncells=%d_L=%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree,ncells,L);
 end
 if ~isequal(exist(outdir, 'dir'),7),mkdir(outdir); end
 SR = zeros(length(sigt),length(c),length(data.Neutronics.Transport.SnLevels));
 % Loop through total cross sections
 for t=1:length(sigt)
-    data = load_user_input(ncells);
+    data = load_user_input(ncells,L);
     for cc=1:length(c)
         data = set_phi_xs(data, sigt(t), c(cc));
         % Build input space
