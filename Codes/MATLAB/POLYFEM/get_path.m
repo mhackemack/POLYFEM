@@ -11,4 +11,5 @@ out = [out, genpath('../Extensive_Tools/matlab_bgl')];
 out = [out, genpath('../Extensive_Tools/mftoolbox')];
 out = [out, genpath('../Extensive_Tools/Mesh2d')];
 out = [out, genpath('../Extensive_Tools/PolyMesher')];
+out = [out, genpath('../Extensive_Tools/SC_Mapping')];
 out = [out, genpath('../Extensive_Tools/viz_random')];
