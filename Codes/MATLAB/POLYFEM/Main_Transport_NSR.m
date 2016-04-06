@@ -31,7 +31,8 @@ addpath([glob.input_path,'Transport_NSR']);
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bf, quad, bc
-bf_name = {'PWLD','WACHSPRESS','MV','MAXENT'};
+bf_name = {'WACHSPRESS','MV'};
+% bf_name = {'PWLD','WACHSPRESS','MV','MAXENT'};
 fdeg = [1];
 q_type = 'LS'; sn_levels = [2,4,8];
 bc_type = 'Vacuum';
@@ -45,7 +46,7 @@ mfp_lower = 2; mfp_upper = 51;
 mfp_min = 0; mfp_max = 3;
 mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
-diff_type = 'MIP'; C_IP = [4];
+diff_type = 'MIP'; C_IP = [4,2];
 % End user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
