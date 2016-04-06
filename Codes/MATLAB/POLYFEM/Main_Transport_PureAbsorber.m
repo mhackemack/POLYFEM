@@ -22,15 +22,16 @@ inp = 'Transport_PureAbsorber';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-prob_name = 'IncidentLeftTopFace_2D_45degDown_LS4';
+prob_name = 'IncidentLeftFace_2D_45degDown_LS4';
 tri_run_bool  = false;
 cart_run_bool = false;
-poly_run_bool = true;
-split_poly_run_bool = false;
+poly_run_bool = false;
+split_poly_run_bool = true;
 % ---
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'tri';
-pnum = [4,16,64,256,1024,4096,16384];
+pnum = [16,64,256,1024,4096,16384];
+% pnum = [4,16,64,256,1024,4096,16384];
 % geom_in.PolyNum = [4,16,64,256,1024,4096,16384,65536];
 geom_in.L  = 1;
 geom_in.Lx = geom_in.L;
@@ -42,19 +43,19 @@ geom_in.ncellz = 4;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
 geom_in.ymin_bound_type = glob.Vacuum;
-geom_in.ymax_bound_type = glob.Function;
+geom_in.ymax_bound_type = glob.Vacuum;
 geom_in.zmin_bound_type = glob.Reflecting;
 geom_in.zmax_bound_type = glob.Reflecting;
 geom_in.xmin_val = @BoundaryFunc_IncidentLeftFace_2D_45degDown_LS4;
 geom_in.xmax_val = 0;
 geom_in.ymin_val = 0;
-geom_in.ymax_val = @BoundaryFunc_IncidentTopFace_2D_45degDown_LS4;
+geom_in.ymax_val = 0;
 geom_in.zmin_val = 0;
 geom_in.zmax_val = 0;
 % ---
 % sdm = {'PWLD'};
 sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
-fedeg = [2];
+fedeg = [1,2];
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 1;
 dat_in.FEMLumping = false;
