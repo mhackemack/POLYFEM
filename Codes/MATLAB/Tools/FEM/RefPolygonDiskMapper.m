@@ -81,7 +81,7 @@ classdef RefPolygonDiskMapper < handle
             [obj.PolyVertices,obj.PolyFaceNodes] = RegularPolygon(obj.NumberVertices,1/2);
             % Convert to Imaginary Polygon and Generate SCCM Disk
             % ------------------------------------------------------------------
-            obj.ImagPolyNodes = obj.PolyVertices(:,1)+1i*obj.PolyVertices(:,2);
+            obj.ImagPolyNodes = obj.PolyVertices(:,1) + 1i*obj.PolyVertices(:,2);
             obj.ImagPoly = polygon(obj.ImagPolyNodes);
             % SCCM build options
             opt.TraceSolution = 'off'; opt.Tolerance = 1e-10;
@@ -106,6 +106,8 @@ classdef RefPolygonDiskMapper < handle
     %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods (Access = private)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Set basis function generation functor
         function set_basis_functions(obj)
             if strcmpi(obj.BasisFunctionName, 'LD')
                 obj.BasisFunc = @LD_basis_functions;
@@ -120,6 +122,12 @@ classdef RefPolygonDiskMapper < handle
             elseif strcmpi(obj.BasisFunctionName, 'PWLD')
                 obj.BasisFunc = @PWLD_basis_functions;
             end
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Calculate reference polygon basis functions/gradients
+        function calculate_ref_bfgs(obj)
+            % Calculate volume basis functions/gradients
+            [bv, gv] = obj.BasisFunc();
         end
     end
 end

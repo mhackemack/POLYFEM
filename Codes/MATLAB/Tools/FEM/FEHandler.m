@@ -374,6 +374,7 @@ classdef FEHandler < handle
     %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods (Access = public)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Get volume quadrature nodes by cell number
         function out = get_cell_quad_nodes(obj, cellID)
             out = obj.CellQuadNodes{cellID};
