@@ -13,7 +13,7 @@
 %   Inputs:         1) Number of Polygon Vertices
 %                   2) Basis Function Name
 %                   3) Basis Function Order
-%                   4) Polynomial Completeness Order
+%                   4) Quadrature Order
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classdef RefPolygonDiskMapper < handle
@@ -22,7 +22,7 @@ classdef RefPolygonDiskMapper < handle
         NumberVertices
         BasisFunctionName
         BasisFunctionOrder
-        PolynomialOrder
+        QuadratureOrder
     end
     % Reference Polygon Variables
     properties (Access = public)
@@ -42,9 +42,11 @@ classdef RefPolygonDiskMapper < handle
     % Unit Disk Variables
     properties (Access = public)
         DiskMap
+        
     end
     % Reference Triangle Variables
     properties (Access = private)
+        NumberRefTriNodes
         RefTriNodes
         RefTriWeights
     end
@@ -69,13 +71,14 @@ classdef RefPolygonDiskMapper < handle
             obj.NumberVertices     = varargin{1};
             obj.BasisFunctionName  = varargin{2};
             obj.BasisFunctionOrder = varargin{3};
-            obj.PolynomialOrder    = varargin{4};
+            obj.QuadratureOrder    = varargin{4};
             % Build Unit Line
             % ------------------------------------------------------------------
-            [obj.RefLineNodes, obj.RefLineWeights] = get_legendre_gauss_quad(obj.PolynomialOrder);
+            [obj.RefLineNodes, obj.RefLineWeights] = get_legendre_gauss_quad(obj.QuadratureOrder);
             % Build Reference Triangle
             % ------------------------------------------------------------------
-            [obj.RefTriNodes, obj.RefTriWeights] = TriGaussPoints(obj.PolynomialOrder);
+            [obj.RefTriNodes, obj.RefTriWeights] = TriGaussPoints(obj.QuadratureOrder);
+            obj.NumberRefTriNodes = length(obj.RefTriWeights);
             % Build Reference Polygon
             % ------------------------------------------------------------------
             [obj.PolyVertices,obj.PolyFaceNodes] = RegularPolygon(obj.NumberVertices,1/2);
@@ -122,6 +125,47 @@ classdef RefPolygonDiskMapper < handle
             elseif strcmpi(obj.BasisFunctionName, 'PWLD')
                 obj.BasisFunc = @PWLD_basis_functions;
             end
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Build all volume quadrature points
+        function generate_volume_quadrature(obj)
+            % Allocate memory space
+            % ------------------------------------------------------------------
+            nqx = obj.NumberRefTriNodes * obj.NumberVertices;
+            obj.CellQuadNodes   = zeros(nqx, 2);
+            obj.CellQuadWeights = zeros(nqx, 1);
+            obj.CellBasisValues = zeros(nqx, obj.NumberVertices);
+            obj.CellBasisGrads  = zeros(obj.NumberVertices, 2, nqx);
+            % Loop through sub-triangles
+            % ------------------------------------------------------------------
+            for i=1:obj.NumberVertices
+                ii = [i,mod(i,obj.NumberVertices)+1];
+                vv = [obj.PolyVertices(ii,:);[0,0]];
+                J = get_simplex_jacobian(2, vv);
+                detJ = J(1,1)*J(2,2)-J(2,1)*J(1,2);
+                invJ = [J(2,2),-J(1,2);-J(2,1),J(1,1)]/detJ;
+                
+            end
+            % Build basis functions/gradients
+            % ------------------------------------------------------------------
+            
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Build all surface quadrature points
+        function generate_surface_quadrature(obj)
+            % Allocate memory space
+            % ------------------------------------------------------------------
+            obj.FaceQuadNodes   = cell(obj.NumberVertices,1);
+            obj.FaceQuadWeights = cell(obj.NumberVertices,1);
+            obj.FaceBasisValues = cell(obj.NumberVertices,1);
+            obj.FaceBasisGrads  = cell(obj.NumberVertices,1);
+            % Loop through faces
+            % ------------------------------------------------------------------
+            for f=1:obj.NumberVertices
+                fv = obj.PolyFaceNodes{f};
+                fverts = obj.PolyVertices(fv,:);
+                
+            end     
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Calculate reference polygon basis functions/gradients

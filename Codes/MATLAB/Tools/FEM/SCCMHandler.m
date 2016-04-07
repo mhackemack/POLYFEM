@@ -23,7 +23,7 @@ classdef SCCMHandler < handle
         FaceVerts
         BasisFunctionName
         BasisFunctionOrder
-        PolynomialOrder
+        QuadratureOrder
     end
     % Unit Disk Variables
     properties (Access = public)
@@ -64,7 +64,7 @@ classdef SCCMHandler < handle
             % ------------------------------------------------------------------
             obj.BasisFunctionName  = varargin{1}.BasisFunctionName;
             obj.BasisFunctionOrder = varargin{1}.BasisFunctionOrder;
-            obj.PolynomialOrder    = varargin{1}.PolynomialOrder;
+            obj.QuadratureOrder    = varargin{1}.QuadratureOrder;
             % Retrieve unit disk data
             % ------------------------------------------------------------------
             obj.DiskMap = varargin{1}.DiskMap;
