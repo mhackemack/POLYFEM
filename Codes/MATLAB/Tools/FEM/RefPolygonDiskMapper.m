@@ -87,10 +87,6 @@ classdef RefPolygonDiskMapper < handle
             % Build Reference Polygon
             % ------------------------------------------------------------------
             [obj.PolyVertices,obj.PolyFaceNodes] = RegularPolygon(obj.NumberVertices,1/2);
-            obj.PolyFaceNodes = cell(obj.NumberVertices,1);
-            for f=1:obj.NumberVertices
-                obj.PolyFaceNodes{f} = [f,mod(f,obj.NumberVertices)+1];
-            end
             % Convert to Imaginary Polygon and Generate SCCM Disk
             % ------------------------------------------------------------------
             obj.ImagPolyNodes = obj.PolyVertices(:,1) + 1i*obj.PolyVertices(:,2);
