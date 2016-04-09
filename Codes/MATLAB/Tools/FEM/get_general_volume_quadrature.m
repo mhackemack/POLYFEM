@@ -126,7 +126,8 @@ end
 function [qx, qw] = get_reference_quadrature(ctype, dim, deg, pb)
 if pb || ctype ~= 2
     if dim == 2
-        [qx, qw] = Quad_On_Triangle(deg);
+        [qx, qw] = TriGaussPoints(deg);
+%         [qx, qw] = Quad_On_Triangle(deg);
     else
         [qx, qw] = Quad_On_Tetra(deg);
     end
