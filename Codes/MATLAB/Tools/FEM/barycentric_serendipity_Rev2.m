@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Quadratic Serendipity Generator (Rev1)
+%   Title:          Quadratic Serendipity Generator (Rev2)
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
@@ -19,7 +19,7 @@
 %                   https://en.wikipedia.org/wiki/Moore-Penrose_pseudoinverse
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = barycentric_serendipity_Rev1(varargin)
+function varargout = barycentric_serendipity_Rev2(varargin)
 nout = nargout;
 grad_bool = false;
 % Collect Input Arguments
