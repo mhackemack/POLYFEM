@@ -21,6 +21,7 @@ classdef SCCMHandler < handle
         NumberVertices
         Vertices
         FaceVerts
+        NumberBasisFunctions
         BasisFunctionName
         BasisFunctionOrder
         QuadratureOrder
@@ -62,9 +63,10 @@ classdef SCCMHandler < handle
             obj.FaceVerts = varargin{3};
             % Retrieve basis function data
             % ------------------------------------------------------------------
-            obj.BasisFunctionName  = varargin{1}.BasisFunctionName;
-            obj.BasisFunctionOrder = varargin{1}.BasisFunctionOrder;
-            obj.QuadratureOrder    = varargin{1}.QuadratureOrder;
+            obj.NumberBasisFunctions = varargin{1}.NumberBasisFunctions;
+            obj.BasisFunctionName    = varargin{1}.BasisFunctionName;
+            obj.BasisFunctionOrder   = varargin{1}.BasisFunctionOrder;
+            obj.QuadratureOrder      = varargin{1}.QuadratureOrder;
             % Retrieve unit disk data
             % ------------------------------------------------------------------
             obj.DiskMap = varargin{1}.DiskMap;
