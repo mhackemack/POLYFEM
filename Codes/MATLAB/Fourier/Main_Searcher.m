@@ -20,7 +20,7 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format short
+clc; close all; format long e;
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % ------------------------------------------------------------------------------

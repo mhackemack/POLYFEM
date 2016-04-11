@@ -20,7 +20,7 @@ if exist('pbool', 'var')
 else
     clear; pbool = false;
 end
-clc; close all; format long e
+clc; close all; %format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Define Path
 % -----------
@@ -33,7 +33,7 @@ inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-n = 101;
+n = 2;
 data.NumberPhasePerDim = n;
 % pmin = 0; pmax = 1/10;
 pmin = 0; pmax = 2*pi;

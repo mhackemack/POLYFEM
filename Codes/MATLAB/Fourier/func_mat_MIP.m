@@ -22,7 +22,6 @@ mesh = input.mesh;
 dof  = input.dof;
 fe   = input.fe;
 off  = input.offset;
-% E    = data.ErrorShape;
 % Retrieve Preliminary Data
 % ------------------------------------------------------------------------------
 dim = mesh.Dimension;
@@ -38,39 +37,15 @@ A = zeros(ndofs); %R = zeros(ndofs);
 % Loop through Cells and Build Matrices
 % ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
-%     tp = 0;
     cn    = dof.ConnectivityArray{c};
     matid = mesh.MatID(c);
     M     = fe.CellMassMatrix{c};
     K     = fe.CellStiffnessMatrix{c};
-%     sxs = data.ScatteringXS(mat);
     axs = data.AveAbsorbXS(matid);
     D   = data.AveDiffusionXS(matid);
-%     R(cn,cn) = R(cn,cn) + sxs*M;
     A(cn,cn) = A(cn,cn) + axs*M + D*K;
-%     if data.AccelType == glob.Accel_WGS_DSA
-%         for g=1:ng
-%             for gg=1:ng
-%                 tp = tp + data.ScatteringXS(matid,g,gg);
-%             end
-%         end
-%     elseif data.AccelType == glob.Accel_AGS_TG
-%         for g=1:ng
-%             for gg=g+1:ng
-%                 tp = tp + data.ScatteringXS(matid,g,gg);
-%             end
-%         end
-%     elseif data.AccelType == glob.Accel_AGS_MTG
-%         for g=1:ng
-%             for gg=g:ng
-%                 tp = tp + data.ScatteringXS(matid,g,gg);
-%             end
-%         end
-%     end
-%     R(cn,cn) = R(cn,cn) + tp * M;
 end
 % Apply Volumetric Phase Shift
-% R = R * PM;
 A = A * PM;
 % Loop through Faces and Build Matrices
 % ------------------------------------------------------------------------------
@@ -105,6 +80,23 @@ for f=1:mesh.TotalFaces
         % Build all interior face-coupling matrix contributions
         % ----------------------------------------------------------------------
 %         Gf1 = G1(:,fcnn1); Gf2 = G2(:,fcnn2);
+%         % ( [[b]] , [[u]] )
+%         A(fn1,fn1) = A(fn1,fn1) + k*M1*PMf1;   % (-,-)
+%         A(fn1,fn2) = A(fn1,fn2) - k*MM1*PMf2;  % (-,+)
+%         A(fn2,fn1) = A(fn2,fn1) - k*MM2*PMf1;  % (+,-)
+%         A(fn2,fn2) = A(fn2,fn2) + k*M2*PMf2;   % (+,+)
+%         % ( [[b]] , {{Du}} )
+%         A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;   % (-,-)
+%         A(cn1,cn2) = A(cn1,cn2) - D(2)/2*CG2'*PMc2;  % (-,+)
+%         A(cn2,cn1) = A(cn2,cn1) + D(1)/2*CG1'*PMc1;  % (+,-)
+%         A(cn2,cn2) = A(cn2,cn2) + D(2)/2*G2'*PMc2;   % (+,+)
+%         % ( {{Db}} , [[u]] )
+%         A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;    % (-,-)
+%         A(cn1,cn2) = A(cn1,cn2) + D(1)/2*CG1*PMc2;   % (-,+)
+%         A(cn2,cn1) = A(cn2,cn1) - D(2)/2*CG2*PMc1;   % (+,-)
+%         A(cn2,cn2) = A(cn2,cn2) + D(2)/2*G2*PMc2;    % (+,+)
+
+
         % ( [[b]] , [[u]] )
         A(fn1,fn1) = A(fn1,fn1) + k*M1*PMf1;   % (-,-)
         A(fn1,fn2) = A(fn1,fn2) - k*MM1*PMf2;  % (-,+)
@@ -120,6 +112,8 @@ for f=1:mesh.TotalFaces
         A(cn1,cn2) = A(cn1,cn2) + D(1)/2*CG1*PMc2;   % (-,+)
         A(cn2,cn1) = A(cn2,cn1) - D(2)/2*CG2*PMc1;   % (+,-)
         A(cn2,cn2) = A(cn2,cn2) + D(2)/2*G2*PMc2;    % (+,+)
+        
+        
 %         % ( [[b]] , {{Du}} )
 %         A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1'*PMc1;  % (-,-)
 %         A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf2'*PMc2;  % (-,+)
@@ -144,10 +138,13 @@ for f=1:mesh.TotalFaces
         cn1   = dof.ConnectivityArray{fcells(1)};
         cn2   = dof.ConnectivityArray{op_c};
         fcnn1 = dof.FaceCellNodeNumbering{f,1};
-        fcnn2 = dof.FaceCellNodeNumbering{op_f,1};
+        fcnn2 = dof.ConformingFaceCellNodeNumbering{op_f,1};
+%         fcnn2 = dof.FaceCellNodeNumbering{op_f,1};
         M     = fe.FaceMassMatrix{f,1};
         G1    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{f,1});
         G2    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{op_f,1});
+%         CG1   = cell_dot(dim,fnorm,fe.FaceCouplingGradientMatrix{f,1});
+%         CG2   = cell_dot(dim,fnorm,fe.FaceCouplingGradientMatrix{f,2});
         t_off = zeros(1,dim); t_off(1,off(f,1)) = off(f,2);
         PMf1  = PM(fn1, fn1); PMf2 = PM(fn2, fn2)*exp(1i*t_off*lam);
         PMc1  = PM(cn1, cn1); PMc2 = PM(cn2, cn2)*exp(1i*t_off*lam);
@@ -166,16 +163,26 @@ for f=1:mesh.TotalFaces
             % ( {{Db}} , [[u]] )
             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
+            
+%             % ( [[b]] , [[u]] )
+%             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
+%             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
+%             % ( [[b]] , {{Du}} )
+%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
+%             A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
+%             % ( {{Db}} , [[u]] )
+%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
+%             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
         else
             % ( [[b]] , [[u]] )
             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
             % ( {{Du}} , [[b]] )
-%           A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
-%           A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf1t*PMc2;
+            A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
+            A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf1t*PMc2;
             % ( [[u]] , {{Db}} )
-%           A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
-%           A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf2*PMf2;
+            A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
+            A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf2*PMf2;
         end
     end
 end
