@@ -30,6 +30,7 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 print_heading(now, date);
 [data, geometry] = load_user_input();
 data.problem.Path = sprintf('%s/%s_k%d',data.problem.Path,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
+data.problem.Name = sprintf('%s_Irr=%d_tol=%g',data.problem.Name,data.problem.AMRIrregularity,data.problem.refinementTolerance);
 % Execute Problem Suite
 % ------------------------------------------------------------------------------
 [data, geometry] = process_input_data(data, geometry);

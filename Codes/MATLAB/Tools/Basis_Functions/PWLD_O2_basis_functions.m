@@ -32,9 +32,9 @@ if nv ~= nverts, error('Number of vertices does not align. Go fix your code.'); 
 % ------------------------------------------------------------------------------
 nout = nargout;
 if nout == 1
-    bout = barycentric_serendipity_Rev1(verts, qx, faces, @PWLD_O1_basis_functions);
+    bout = barycentric_serendipity_Rev2(verts, qx, faces, @PWLD_O1_basis_functions);
 elseif nout == 2
-    [bout, gout] = barycentric_serendipity_Rev1(verts, qx, faces, @PWLD_O1_basis_functions);
+    [bout, gout] = barycentric_serendipity_Rev2(verts, qx, faces, @PWLD_O1_basis_functions);
 end
 % Assign Output Arguments
 % ------------------------------------------------------------------------------
