@@ -18,22 +18,18 @@
 clc; close all; format long e
 fpath = get_path(); addpath(fpath);
 global glob; glob = get_globals('Home');
-inp = 'Searchlight_Aligned';
+inp = 'Searchlight_Rev1';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
-% Load data and perform error checking
+% Being User Input Section
 % ------------------------------------------------------------------------------
-print_heading(now, date);
-[data, geometry] = load_user_input();
-% Modify path
-data.problem.Path = sprintf('Transport/Searchlight_Aligned/%s_k%d',data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
-[data, geometry] = process_input_data(data, geometry);
-data = cleanup_neutronics_input_data(data, geometry);
-% Execute Problem Suite
-% ------------------------------------------------------------------------------
-[data, ~, ~, ~, ~] = execute_problem(data, geometry);
-% Process Outputs
-% ------------------------------------------------------------------------------
-adir = data.Neutronics.Transport.QuadAngles';
-% Build data storage structures
-nr = data.problem.refinementLevels + 1;
-dofnum = zeros(nr,1);
+geom_in.Dimension = 2;
+geom_in.GeometryType = 'cart';
+geom_in.Lx = 1; geom_in.ncellx = 5;
+geom_in.Ly = 1; geom_in.ncelly = 5;
+% ---
+fedeg = [2];
+sdm = {'PWLD','MV'};
+% ---
+dat_in.lvls = 30;
+dat_in.irr = 1;
+dat_in.tol = 0.1;
