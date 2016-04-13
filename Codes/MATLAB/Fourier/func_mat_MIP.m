@@ -154,16 +154,6 @@ for f=1:mesh.TotalFaces
         Gf1t = Gf1'; Gf2t = Gf2';
         % THIS WORKS FOR LINEARS!!!
         if data.FEMDegree == 1
-            % ( [[b]] , [[u]] )
-            A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
-            A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
-            % ( [[b]] , {{Du}} )
-            A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
-            % ( {{Db}} , [[u]] )
-            A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
-            
 %             % ( [[b]] , [[u]] )
 %             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
 %             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
@@ -173,6 +163,16 @@ for f=1:mesh.TotalFaces
 %             % ( {{Db}} , [[u]] )
 %             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
 %             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
+            % WORKING ON TRIANLGES HERE!!!
+            % ( [[b]] , [[u]] )
+            A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
+            A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
+            % ( [[b]] , {{Du}} )
+            A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
+            A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
+            % ( {{Db}} , [[u]] )
+            A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
+            A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
         else
             % ( [[b]] , [[u]] )
             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;

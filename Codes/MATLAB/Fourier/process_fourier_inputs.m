@@ -51,10 +51,16 @@ elseif data.problem.Dimension == 2
 %                 inputs.meshes{c} = CartesianGeometry(2, [0,x(i)], [0,x(i)*yz(j)]);
             elseif strcmp(data.geometry.type,'tri')
                 [xx,yy] = meshgrid(linspace(0,x(i),ncellx+1), linspace(0,x(i)*yz(j),ncelly+1));
-%                 [xx,yy] = meshgrid([0,x(i)], [0,x(i)*yz(j)]);
                 xx=xx(:);yy=yy(:);
-                tri = delaunayTriangulation(xx,yy);
+                
+                % THIS IS A HACK!!!
+                tri = triangulation([4,1,3;1,4,2],xx,yy);
+%                 tri = triangulation([3,4,1;2,1,4],xx,yy);
                 inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
+                
+                
+%                 tri = delaunayTriangulation(xx,yy);
+%                 inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
             end
             inputs.meshes{c}.set_periodic_flag(1, 'x');
             inputs.meshes{c}.set_periodic_flag(1, 'y');
