@@ -21,7 +21,7 @@ addpath(fpath);
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Office');
+glob = get_globals('Home');
 glob.print_info = true;
 inp = 'Transport_MMS_Rev1';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
@@ -35,10 +35,12 @@ geom_in.GeometryType = 'cart';
 geom_in.Lx = 1; geom_in.ncellx = 4;
 geom_in.Ly = 1; geom_in.ncelly = 4;
 % ---
-fedeg = [1,2];
-sdm = {'PWLD','MV','MAXENT'};
+fedeg = [2];
+sdm = {'MAXENT'};
+% fedeg = [1,2];
+% sdm = {'PWLD','MV','MAXENT'};
 % ---
-dat_in.lvls = 2;
+dat_in.lvls = 6;
 dat_in.irr = 1;
 dat_in.tol = 0.0;
 % Execute Problem Suite
