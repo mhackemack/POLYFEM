@@ -25,13 +25,13 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 prob_name = 'IncidentLeftFace_2D_45degDown_LS4';
 cart_run_bool = true;
 tri_run_bool  = true;
-poly_run_bool = true;
+poly_run_bool = false;
 split_poly_run_bool = false;
 % ---
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'tri';
 % pnum = [16,64,256,1024,4096,16384];
-pnum = [65536];
+pnum = [262144];
 % geom_in.PolyNum = [4,16,64,256,1024,4096,16384,65536];
 geom_in.Lx = 1; geom_in.ncellx = 4;
 geom_in.Ly = 1; geom_in.ncelly = 4;
@@ -51,7 +51,7 @@ geom_in.zmax_val = 0;
 % ---
 % sdm = {'PWLD'};
 sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
-fedeg = [1,2];
+fedeg = [1];
 dat_in.SpatialMethod = 'PWLD';
 dat_in.FEMDegree = 2;
 dat_in.FEMLumping = false;
