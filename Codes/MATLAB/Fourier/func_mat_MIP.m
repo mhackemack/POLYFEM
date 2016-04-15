@@ -29,6 +29,12 @@ dim = mesh.Dimension;
 ndofs = dof.TotalDoFs;
 node_locs = dof.NodeLocations;
 if dim == size(lam,2); lam=lam'; end
+
+% THIS IS A HACK!!!
+% lam=[1;2];
+
+
+
 PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
@@ -141,8 +147,10 @@ for f=1:mesh.TotalFaces
         fcnn2 = dof.ConformingFaceCellNodeNumbering{op_f,1};
 %         fcnn2 = dof.FaceCellNodeNumbering{op_f,1};
         M     = fe.FaceMassMatrix{f,1};
+        fpnorm= mesh.FaceNormal(op_f,:);
         G1    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{f,1});
-        G2    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{op_f,1});
+        G2    = cell_dot(dim,fpnorm,fe.FaceGradientMatrix{op_f,1});
+%         G2    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{op_f,1});
 %         CG1   = cell_dot(dim,fnorm,fe.FaceCouplingGradientMatrix{f,1});
 %         CG2   = cell_dot(dim,fnorm,fe.FaceCouplingGradientMatrix{f,2});
         t_off = zeros(1,dim); t_off(1,off(f,1)) = off(f,2);
@@ -153,7 +161,7 @@ for f=1:mesh.TotalFaces
         Gf1 = G1(:,fcnn1); Gf2 = G2(:,fcnn2);
         Gf1t = Gf1'; Gf2t = Gf2';
         % THIS WORKS FOR LINEARS!!!
-        if data.FEMDegree == 1
+%         if data.FEMDegree == 1
 %             % ( [[b]] , [[u]] )
 %             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
 %             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
@@ -163,27 +171,41 @@ for f=1:mesh.TotalFaces
 %             % ( {{Db}} , [[u]] )
 %             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
 %             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
+
+
             % WORKING ON TRIANLGES HERE!!!
             % ( [[b]] , [[u]] )
             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
             % ( [[b]] , {{Du}} )
             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
+            A(cn1,cn2) = A(cn1,cn2) + D(2)/2*G1'*PMc2;
             % ( {{Db}} , [[u]] )
             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
-        else
-            % ( [[b]] , [[u]] )
-            A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
-            A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
-            % ( {{Du}} , [[b]] )
-            A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
-            A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf1t*PMc2;
-            % ( [[u]] , {{Db}} )
-            A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
-            A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf2*PMf2;
-        end
+            
+%             % ( [[b]] , [[u]] )
+%             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
+%             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
+%             % ( [[b]] , {{Du}} )
+%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
+%             A(cn1,cn2) = A(cn1,cn2) + D(2)/2*G1'*PMc2;
+%             % ( {{Db}} , [[u]] )
+%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
+%             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
+            
+            
+%         else
+%             % ( [[b]] , [[u]] )
+%             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
+%             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
+%             % ( {{Du}} , [[b]] )
+%             A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
+%             A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf1t*PMc2;
+%             % ( [[u]] , {{Db}} )
+%             A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
+%             A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf2*PMf2;
+%         end
     end
 end
 return
