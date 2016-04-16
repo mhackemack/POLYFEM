@@ -43,6 +43,11 @@ bout = zeros(nqx, ntot); gout = zeros(ntot,dim,nqx);
 if nout > 1, grad_bool = true; end
 h = get_max_diamter( verts ); h0 = eye(dim)/h;
 scaled_verts = (h0*verts')'; qx = (h0*qx')';
+
+msv = mean(scaled_verts);
+scaled_verts = scaled_verts - ones(nverts,1)*msv;
+qx = qx - ones(nqx,1)*msv;
+
 % scaled_verts = verts;
 vind = get_adjacent_vertices(nverts);
 [ser_verts, ser_nodes] = get_serendipity_nodes(nverts, scaled_verts, faces);

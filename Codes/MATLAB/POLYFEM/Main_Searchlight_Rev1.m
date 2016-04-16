@@ -17,7 +17,7 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Home');
+global glob; glob = get_globals('Office');
 inp = 'Searchlight_Rev1';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
@@ -32,7 +32,7 @@ geom_in.Ly = 1; geom_in.ncelly = 5;
 fedeg = [2];
 sdm = {'MV'};
 % ---
-dat_in.lvls = 30;
+dat_in.lvls = 24;
 dat_in.irr = 1;
 dat_in.tol = 0.1;
 % Execute Problem Suite

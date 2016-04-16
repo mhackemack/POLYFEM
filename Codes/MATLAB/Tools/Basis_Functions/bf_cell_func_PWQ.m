@@ -70,20 +70,19 @@ f_dofs = get_face_dofs(nv, faces, order);
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
 [bmv, gmv] = PWLD_O2_basis_functions(verts, qx_v, faces, order, nverts);
 % Build surface quadrature
-qx_s = cell(nf,1); qw_s = cell(nf,1); qs_ind = cell(nf,1);
-qxs_list = []; qws_list = []; counter = 0;
-for f=1:nf
-    [qx_s{f}, qw_s{f}] = get_general_surface_quadrature(verts, faces{f}, q_ord);
-    qxs_list = [qxs_list; qx_s{f}]; qws_list = [qws_list; qw_s{f}];
-    nx = length(qw_s{f}); tind = 1:nx; qs_ind{f} = counter + tind;
-    counter = counter + nx;
-end
-[tbms, tgms] = PWLD_O2_basis_functions(verts, qxs_list, faces, order, nverts);
-bms = cell(nf,1); gms = cell(nf,1);
-for f=1:nf
-    bms{f} = tbms(qs_ind{f},:);
-    gms{f} = tgms(:,:,qs_ind{f});
-end
+% qx_s = cell(nf,1); qw_s = cell(nf,1); qs_ind = cell(nf,1);
+% qxs_list = []; qws_list = []; counter = 0;
+% for f=1:nf
+%     [qx_s{f}, qw_s{f}] = get_general_surface_quadrature(verts, faces{f}, q_ord);
+%     qxs_list = [qxs_list; qx_s{f}]; qws_list = [qws_list; qw_s{f}];
+%     nx = length(qw_s{f}); tind = 1:nx; qs_ind{f} = counter + tind;
+%     counter = counter + nx;
+% end
+% if s_flags(2)
+%     [tbms, tgms] = PWLD_O2_basis_functions(verts, qxs_list, faces, order, nverts);
+% else
+%     tbms = PWLD_O2_basis_functions(verts, qxs_list, faces, order, nverts);
+% end
 % mass matrix
 for q=1:nqx
     bt = bmv(q,:);
@@ -106,12 +105,15 @@ if v_flags(3)
         end
     end
 end
+% Face-Wise Values
+[qx_s, qw_s, bms, gms] = get_surface_values(verts, faces, order, q_ord, s_flags(2));
 % surface matrices
 for f=1:nf
-    nqx = length(qw_s{f}); fv = f_dofs{f};
+    nqx = length(qw_s{f});
+    fv = f_dofs{f};
     tbmsf = bms{f};
     for q=1:nqx
-        bt = tbmsf(q,fv);
+        bt = tbmsf(q,:);
         MM{f} = MM{f} + qw_s{f}(q) * (bt'*bt);
         if s_flags(2)
             gt = gms{f};
@@ -142,6 +144,47 @@ else % only 2D allowed here
     out = cell(nf,1);
     for f=1:nf
         out{f} = [faces{f},nv+f];
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [qx_s, qw_s, bms, gms] = get_surface_values(verts, faces, ord, q_ord, sgrad_bool)
+nf = length(faces);
+qx_s = cell(nf, 1);
+qw_s = cell(nf, 1);
+bms  = cell(nf, 1);
+gms  = cell(nf, 1);
+[tqx, tqw] = get_legendre_gauss_quad(q_ord); ntqx = length(tqw);
+% ttqx1 = []; ttqx2 = [];
+fones = ones(ntqx,1);
+for f=1:nf
+    fv = faces{f};
+    v = verts(fv,:);
+    dx = v(2,:) - v(1,:);
+    len = norm(diff(v));
+%     n = [dx(2), -dx(1)]/len;
+    qw_s{f} = tqw*len;
+    qx_s{f} = fones*v(1,:) + tqx*dx;
+%     if sgrad_bool
+%         ttqx1 = [ttqx1;qx_s{f} - fones*n*h/1e3];
+%         ttqx2 = [ttqx2;qx_s{f} - fones*n*h/2e3];
+%     end
+    if ord == 1
+        bms{f} = [1-tqx, tqx];
+    elseif ord == 2
+        bms{f} = [(1-tqx).^2, tqx.^2, 2*tqx.*(1-tqx)];
+    end
+end
+% Get Gradient Estimates
+if sgrad_bool
+    if ord == 1
+        [~,tg] = PWLD_O2_basis_functions(verts, qx_s, faces, ord, size(verts,1));
+    elseif ord == 2
+        [~,tg] = PWLD_O2_basis_functions(verts, qx_s, faces, ord, size(verts,1));
+    end
+    % Rebuild Surface Gradients
+    for f=1:nf
+        iif = ntqx*(f-1)+1:ntqx*f;
+        gms{f} = tg(:,:,iif);
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
