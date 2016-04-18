@@ -38,7 +38,7 @@ geom_in.Ly = 1; geom_in.ncelly = 4;
 fedeg = [1];
 % sdm = {'PWLD'};
 % fedeg = [1,2];
-sdm = {'PWLD','MV'};
+sdm = {'MAXENT'};
 % ---
 dat_in.lvls = 28;
 dat_in.irr = 3;
