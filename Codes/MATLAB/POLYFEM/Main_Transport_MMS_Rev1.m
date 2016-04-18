@@ -36,12 +36,12 @@ geom_in.Lx = 1; geom_in.ncellx = 4;
 geom_in.Ly = 1; geom_in.ncelly = 4;
 % ---
 fedeg = [1];
-sdm = {'PWLD'};
+% sdm = {'PWLD'};
 % fedeg = [1,2];
-% sdm = {'PWLD','MV','MAXENT'};
+sdm = {'PWLD','MV'};
 % ---
-dat_in.lvls = 24;
-dat_in.irr = 1;
+dat_in.lvls = 28;
+dat_in.irr = 3;
 dat_in.tol = 0.1;
 % Execute Problem Suite
 % ------------------------------------------------------------------------------
