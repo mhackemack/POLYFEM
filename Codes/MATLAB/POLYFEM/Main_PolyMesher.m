@@ -20,11 +20,11 @@ else
 end
 clc; close all; format long e; clear persistent;
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
-dim = 2; out_dir = '';
-% dim = 2; out_dir = 'geometry_inputs/precompiled/';
+% dim = 2; out_dir = '';
+dim = 2; out_dir = 'geometry_inputs/precompiled/';
 L = 1; dom = @SqDomain_L1; gname = 'PolyMesh_SqDomain';
 tol = 1e-6; maxit = 1e4;
-nele = [128^2,256^2];
+nele = [400^2];
 % nele = [2^2, 4^2, 8^2, 16^2, 32^2];
 % nele = [64^2, 128^2, 256^2];
 
