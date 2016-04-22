@@ -26,7 +26,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % ------------------------------------------------------------------------------
 slope = -1;
 yintercept = 1;
-n = [16384,65536];
+n = [160000];
 % n = [4,16,64,256,1024,4096,16384,65536];
 oname = 'SplitPolyMesh_slope=-1_yint=1';
 % End user input section
