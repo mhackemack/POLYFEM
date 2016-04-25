@@ -25,7 +25,7 @@ grad_bool = false;
 % Collect Input Arguments
 % ------------------------------------------------------------------------------
 verts = varargin{1};
-qx = varargin{2};
+qx    = varargin{2};
 faces = varargin{3};
 basis = varargin{4};
 % Prepare Vertices and Dimensional Space
