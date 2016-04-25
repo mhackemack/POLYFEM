@@ -15,7 +15,7 @@ global glob
 % Setup Solution Space
 % ------------------------------------------------------------------------------
 [ndat, flux_out] = setup_solution_space(ndat, mesh, DoF);
-DSA_iterations = 0;
+DSA_iterations = 0;  DSA_time = 0;
 % Loop through Angle Sets
 % ------------------------------------------------------------------------------
 groups = 1:ndat.numberEnergyGroups;
