@@ -25,28 +25,32 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = false;
 addpath([glob.input_path,'Transport_NSR']);
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bf, quad, bc
 % bf_name = {'WACHSPRESS','MV'};
-bf_name = {'PWLD','WACHSPRESS','MV','MAXENT'};
-fdeg = [2];
-q_type = 'LS'; sn_levels = [8];
+% bf_name = {'PWLD','WACHSPRESS','MV','MAXENT'};
+bf_name = {'PWLD'};
+fdeg = [1];
+q_type = 'LS'; sn_levels = [2,4];
 bc_type = 'Vacuum';
 % geometry
 dim = 2; m_type = 'quad';
-dx_num_start = 21; L = 1;
+dx_num_start = 2; L = 1;
+% dx_num_start = 21; L = 1;
 dx_start = linspace(0,L,dx_num_start);
 % xs
 c = 0.9999;
-mfp_lower = 2; mfp_upper = 51;
-mfp_min = 0; mfp_max = 3;
+% mfp_lower = 2; mfp_upper = 51;
+% mfp_min = 0; mfp_max = 3;
+mfp_lower = 0; mfp_upper = 41;
+mfp_min = -1; mfp_max = 3;
 mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
-diff_type = 'MIP'; C_IP = [4,2,1];
+diff_type = 'MIP'; C_IP = [4];
 % End user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

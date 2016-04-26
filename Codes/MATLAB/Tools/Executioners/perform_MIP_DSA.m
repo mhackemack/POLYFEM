@@ -15,9 +15,9 @@ persistent agmg_bool
 % Throw error if opposing reflecting boundaries are present - this will be
 % resolved at a later date...maybe
 % ------------------------------------------------------------------------------
-if ndat.Transport.HasOpposingReflectingBoundary
-    error('Currently cannot support opposing reflecting boundaries.');
-end
+% if ndat.Transport.HasOpposingReflectingBoundary
+%     error('Currently cannot support opposing reflecting boundaries.');
+% end
 % ------------------------------------------------------------------------------
 % Get solution information
 ndg = DoF.TotalDoFs;
@@ -470,6 +470,8 @@ else
     out = c*D/h;
 end
 out = max(out, 0.25);
+% THIS IS A HACK FOR TESTING!!!
+% if out > 0.5, out = 0.5; end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = cell_dot(dim,vec1, vec2)
 if dim == 1
