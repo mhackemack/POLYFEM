@@ -13,17 +13,17 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Main_Diffusion_Limit(out_dir)
+function Main_Diffusion_Limit_Convergence(out_dir)
 clearvars -except out_dir; close all; clc;
 % Specify some parameters
 % linear_BFs = {'PWLD'};
 % quadratic_BFs = {'MAXENT'};
 % geom_types = {'Sq_poly'};
-linear_BFs = {'MAXENT','PWLD','WACHSPRESS','MV'};
-quadratic_BFs = {'MAXENT','PWLD','WACHSPRESS','MV'};
-geom_types = {'quad','tri','Sq_poly'};
+linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
+quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
+geom_types = {'quad','Sq_poly'};
 % ep_log_vals = [-5];
-ep_log_vals = [-1,-2,-3,-4,-5];
+ep_log_vals = [-1,-2,-3,-4,-5,-6];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
 glob = get_globals('Office');
@@ -33,60 +33,53 @@ addpath([glob.input_path,'DL_Transport']);
 transdata = load_user_input();
 addpath([glob.input_path,'DL_Diffusion']);
 diffdata = load_user_input();
+% Allocate memory space
+lin_sol_err  = zeros(length(ep_log_vals), length(linear_BFs), length(geom_types));
+quad_sol_err = zeros(length(ep_log_vals), length(quadratic_BFs), length(geom_types));
 % Loop through all geometry types
 for g=1:length(geom_types)
     geometry = get_geometry(geom_types{g});
-    % Run Linear Transport Examples
-    data = transdata;
-    data.Neutronics.FEMDegree = 1;
+    % Run Linear Cases
+    tdata = transdata; tdata.Neutronics.FEMDegree = 1;
+    ddata = diffdata; ddata.Neutronics.FEMDegree = 1;
+    % Loop through basis functions
     for i=1:length(linear_BFs)
         tBF = linear_BFs{i};
         if ~check_BF_geom_combo(tBF, geometry), continue; end
+        % Diffusion problem
+        ddata = modify_diffusion_data(ddata, 1, tBF);
+        [ddata, geometry] = process_input_data(ddata, geometry);
+        ddata = cleanup_neutronics_input_data(ddata, geometry);
+        [ddata, dsol, ~, DoF, FE] = execute_problem(ddata, geometry);
+        % Transport problems
         for j=1:length(ep_log_vals)
-            data = modify_transport_data(data, 10^(ep_log_vals(j)), tBF);
-            [data, geometry] = process_input_data(data, geometry);
-            data = cleanup_neutronics_input_data(data, geometry);
-            [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-            print_output([out_dir,'/Transport'],data,geometry,DoF,FE,sol.flux,geom_types{g},ep_log_vals(j));
+            tdata = modify_transport_data(tdata, 10^(ep_log_vals(j)), tBF);
+            [tdata, geometry] = process_input_data(tdata, geometry);
+            tdata = cleanup_neutronics_input_data(tdata, geometry);
+            [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
+            lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol,tsol);
         end
     end
-    % Run Quadratic Transport Examples
-    data = transdata;
-    data.Neutronics.FEMDegree = 2;
+    % Run Quadratic Cases
+    tdata = transdata; tdata.Neutronics.FEMDegree = 2;
+    ddata = diffdata; ddata.Neutronics.FEMDegree = 2;
+    % Loop through basis functions
     for i=1:length(quadratic_BFs)
         tBF = quadratic_BFs{i};
         if ~check_BF_geom_combo(tBF, geometry), continue; end
+        % Diffusion problem
+        ddata = modify_diffusion_data(ddata, 1, tBF);
+        [ddata, geometry] = process_input_data(ddata, geometry);
+        ddata = cleanup_neutronics_input_data(ddata, geometry);
+        [ddata, dsol, ~, DoF, FE] = execute_problem(ddata, geometry);
+        % Transport problems
         for j=1:length(ep_log_vals)
-            data = modify_transport_data(data, 10^(ep_log_vals(j)), tBF);
-            [data, geometry] = process_input_data(data, geometry);
-            data = cleanup_neutronics_input_data(data, geometry);
-            [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-             print_output([out_dir,'/Transport'],data,geometry,DoF,FE,sol.flux,geom_types{g},ep_log_vals(j));
+            tdata = modify_transport_data(tdata, 10^(ep_log_vals(j)), tBF);
+            [tdata, geometry] = process_input_data(tdata, geometry);
+            tdata = cleanup_neutronics_input_data(tdata, geometry);
+            [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
+            quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol,tsol);
         end
-    end
-    % Run Linear Diffusion Examples
-    data = diffdata;
-    data.Neutronics.FEMDegree = 1;
-    for i=1:length(linear_BFs)
-        tBF = linear_BFs{i};
-        if ~check_BF_geom_combo(tBF, geometry), continue; end
-        data = modify_diffusion_data(data, 1, tBF);
-        [data, geometry] = process_input_data(data, geometry);
-        data = cleanup_neutronics_input_data(data, geometry);
-        [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-        print_output([out_dir,'/Diffusion'],data,geometry,DoF,FE,sol.flux,geom_types{g});
-    end
-    % Run Quadratic Diffusion Examples
-    data = diffdata;
-    data.Neutronics.FEMDegree = 2;
-    for i=1:length(quadratic_BFs)
-        tBF = quadratic_BFs{i};
-        if ~check_BF_geom_combo(tBF, geometry), continue; end
-        data = modify_diffusion_data(data, 1, tBF);
-        [data, geometry] = process_input_data(data, geometry);
-        data = cleanup_neutronics_input_data(data, geometry);
-        [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-        print_output([out_dir,'/Diffusion'],data,geometry,DoF,FE,sol.flux,geom_types{g});
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,47 +140,19 @@ else
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function print_output(out_dir,data,mesh,DoF,FE,flux,gtype,ep_val)
-% Check if output directories exist
-if ~isequal(exist([out_dir,'/x-y'], 'dir'),7),mkdir([out_dir,'/x-y']); end
-if ~isequal(exist([out_dir,'/isomorphic'], 'dir'),7),mkdir([out_dir,'/isomorphic']); end
-close('all'); fclose('all');
-% Get some output info
-BF = data.Neutronics.SpatialMethod;
-k  = data.Neutronics.FEMDegree;
-if exist('ep_val','var')
-    f_name = sprintf('%s_%s_k=%d_ep=1e%d',gtype,BF,k,ep_val);
-else
-    f_name = sprintf('%s_%s_k=%d',gtype,BF,k);
+function out = calc_diff_trans_error(mesh,DoF,FE,dsol,tsol)
+out = 0;
+% Loop through cells
+for c=1:mesh.TotalCells
+    cf = mesh.CellFaces{c};
+    cfflags = mesh.FaceID(cf); cfflags = cfflags(cfflags~=0);
+    if isempty(cfflags)
+        cdofs = DoF.ConnectivityArray{c};
+        M = FE.CellMassMatrix{c};
+        dval = dsol.flux{1}(cdofs);
+        tval = tsol.flux{1}(cdofs);
+        out = out + sum(M*(dval-tval).*(dval-tval));
+    end
 end
-% Create x-y output
-figure(1); H = gcf; ax = gca;
-plot_solution(mesh,DoF,FE,flux{:});
-colorbar();
-xlabel('x-axis')
-ylabel('y-axis')
-caxis([0,0.25])
-ax.XTick = [0,.2,.4,.6,.8,1];
-ax.YTick = [0,.2,.4,.6,.8,1];
-savefig(H,[out_dir,'/x-y/',f_name])
-print(H,'-dpng',[out_dir,'/x-y/',f_name])
-print(H,'-deps',[out_dir,'/x-y/',f_name])
-% Create isomorphic output
-figure(2); H = gcf; ax = gca;
-plot_solution(mesh,DoF,FE,flux{:});
-box on;
-view([-48, 32]);
-axis([0 1 0 1 0 1/4]);
-xlabel('x-axis')
-ylabel('y-axis')
-caxis([0,0.25])
-ax.XTick = [0,.2,.4,.6,.8,1];
-ax.YTick = [0,.2,.4,.6,.8,1];
-ax.ZTick = [0,.05,.1,.15,.2,.25];
-set(ax,'XGrid','on','XMinorGrid','off');
-set(ax,'YGrid','on','YMinorGrid','off');
-set(ax,'ZGrid','on','ZMinorGrid','off');
-savefig(gcf,[out_dir,'/isomorphic/',f_name])
-print(H,'-dpng',[out_dir,'/isomorphic/',f_name])
-print(H,'-deps',[out_dir,'/isomorphic/',f_name])
+out = sqrt(out);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

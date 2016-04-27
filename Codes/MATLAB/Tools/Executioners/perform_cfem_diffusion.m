@@ -39,13 +39,9 @@ x = vector_to_cell(x,DoF);
 nout = nargout;
 varargout{1} = ndat;
 varargout{2} = x;
-if nout == 3
-    if exist('A', 'var')
-        varargout{3} = A; 
-    else
-        varargout{3} = []; 
-    end
-end
+varargout{3} = A;
+varargout{4} = 0;
+varargout{5} = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
