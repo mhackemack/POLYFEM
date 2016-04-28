@@ -20,34 +20,27 @@ fpath = get_path(); addpath(fpath);
 global glob; glob = get_globals('Office');
 % Being User Input Section
 % ------------------------------------------------------------------------------
-polynums = 3;
 quads = 1:8;
-outdir = 'outputs/RefPolyQuadPlots/';
+outdir = 'outputs/RefTriQuadPlots/';
 % Execute suite and save images
 % ------------------------------------------------------------------------------
-% Loop through polygons
-for p=1:length(polynums)
-    nv = polynums(p);
-    [gv,gf] = RegularPolygon(nv,1); gc = mean(gv);
-    % Loop through quadrature orders
-    for q=1:length(quads)
-        qq = quads(q);
-        [qx, qw] = get_general_volume_quadrature(gv, gf, qq, true);
-        % Plot quadrature on reference polygon
-        hold on;
-        axis([-1 1 -1 1]); axis square;
-        patch(gv(:,1),gv(:,2),[1,1,1]);
-        scatter(qx(:,1), qx(:,2), 'xr')
-        % Loop through vertices and apply dashed lines
-        for i=1:nv
-            plot([gv(i,1);gc(1)],[gv(i,2);gc(2)],'--k')
-        end
-        hold off;
-        % Save output plots
-        name = sprintf('%sV%d_Q%d',outdir,nv,qq);
-        savefig(gcf,name);
-        print(gcf,'-depsc',name);
-        print(gcf,'-dpng',name);
-    end
+verts = [0,0;1,0;0,1];
+% Loop through quadrature orders
+for q=1:length(quads)
+    qq = quads(q);
+    [qx, qw] = TriGaussPoints(qq);
+    % Plot quadrature on reference triangle
+    hold on; ax = gca;
+    axis([0 1 0 1]); axis square;
+    patch(verts(:,1), verts(:,2), [1,1,1]);
+    scatter(qx(:,1), qx(:,2), 75, 'xr')
+    hold off;
+    ax.FontSize = 11;
+    ax.XTick = linspace(0,1,6);
+    ax.YTick = linspace(0,1,6);
+    name = sprintf('%sRefTriQuad_Q%d',outdir,qq);
+    savefig(gcf,name);
+    print(gcf,'-depsc',name);
+    print(gcf,'-dpng',name);
     fclose all;
 end

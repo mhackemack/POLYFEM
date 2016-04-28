@@ -23,7 +23,7 @@ geom_types = {'quad'};
 % quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 % geom_types = {'quad','Sq_poly'};
 % ep_log_vals = [-6];
-ep_log_vals = [-1,-2,-3,-4];
+ep_log_vals = [0,-1,-2,-3];
 % ep_log_vals = [-1,-2,-3,-4,-5,-6];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
@@ -112,7 +112,7 @@ function geometry = get_geometry(gtype)
 global glob
 if strcmpi(gtype, 'quad')
 %     geometry = CartesianGeometry(2,linspace(0,1,11),linspace(0,1,11));
-    geometry = CartesianGeometry(2,linspace(0,1,31),linspace(0,1,31));
+    geometry = CartesianGeometry(2,linspace(0,1,21),linspace(0,1,21));
 elseif strcmpi(gtype, 'tri')
     tx = linspace(0,1,11);
     [x,y]=meshgrid(tx,tx);
