@@ -14,16 +14,17 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function Main_Diffusion_Limit_Convergence(out_dir)
-clearvars -except out_dir; close all; clc;
+clearvars -except out_dir; close all; clc; format long e;
 % Specify some parameters
-% linear_BFs = {'PWLD'};
-% quadratic_BFs = {'MAXENT'};
-% geom_types = {'Sq_poly'};
-linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
-quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
-geom_types = {'quad','Sq_poly'};
-% ep_log_vals = [-5];
-ep_log_vals = [-1,-2,-3,-4,-5,-6];
+linear_BFs = {'PWLD'};
+quadratic_BFs = {'MAXENT'};
+geom_types = {'quad'};
+% linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
+% quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
+% geom_types = {'quad','Sq_poly'};
+% ep_log_vals = [-6];
+ep_log_vals = [-1,-2,-3,-4];
+% ep_log_vals = [-1,-2,-3,-4,-5,-6];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
 glob = get_globals('Office');
@@ -57,7 +58,7 @@ for g=1:length(geom_types)
             [tdata, geometry] = process_input_data(tdata, geometry);
             tdata = cleanup_neutronics_input_data(tdata, geometry);
             [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
-            lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol,tsol);
+            lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
     % Run Quadratic Cases
@@ -78,10 +79,11 @@ for g=1:length(geom_types)
             [tdata, geometry] = process_input_data(tdata, geometry);
             tdata = cleanup_neutronics_input_data(tdata, geometry);
             [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
-            quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol,tsol);
+            quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
 end
+return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = modify_transport_data(data, ep, BF)
 data.Neutronics.SpatialMethod = BF;
@@ -110,7 +112,7 @@ function geometry = get_geometry(gtype)
 global glob
 if strcmpi(gtype, 'quad')
 %     geometry = CartesianGeometry(2,linspace(0,1,11),linspace(0,1,11));
-    geometry = CartesianGeometry(2,linspace(0,1,11),linspace(0,1,11));
+    geometry = CartesianGeometry(2,linspace(0,1,31),linspace(0,1,31));
 elseif strcmpi(gtype, 'tri')
     tx = linspace(0,1,11);
     [x,y]=meshgrid(tx,tx);
@@ -149,9 +151,9 @@ for c=1:mesh.TotalCells
     if isempty(cfflags)
         cdofs = DoF.ConnectivityArray{c};
         M = FE.CellMassMatrix{c};
-        dval = dsol.flux{1}(cdofs);
-        tval = tsol.flux{1}(cdofs);
-        out = out + sum(M*(dval-tval).*(dval-tval));
+        dval = dsol(cdofs);
+        tval = tsol(cdofs);
+        out = out + (M*(dval-tval))'*(dval-tval);
     end
 end
 out = sqrt(out);
