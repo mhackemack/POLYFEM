@@ -32,14 +32,14 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % MMS Properties
 data.Neutronics.Transport.MMS = true;
-data.Neutronics.Transport.QuadOrder = 6;
+data.Neutronics.Transport.QuadOrder = 16;
 data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1);
 data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'all';
+data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 6;
+data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 % Sweep Operations

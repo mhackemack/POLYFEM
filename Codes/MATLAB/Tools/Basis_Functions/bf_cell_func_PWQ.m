@@ -154,7 +154,7 @@ qw_s = cell(nf, 1);
 bms  = cell(nf, 1);
 gms  = cell(nf, 1);
 [tqx, tqw] = get_legendre_gauss_quad(q_ord); ntqx = length(tqw);
-% ttqx1 = []; ttqx2 = [];
+ttqx1 = [];
 fones = ones(ntqx,1);
 for f=1:nf
     fv = faces{f};
@@ -164,10 +164,7 @@ for f=1:nf
 %     n = [dx(2), -dx(1)]/len;
     qw_s{f} = tqw*len;
     qx_s{f} = fones*v(1,:) + tqx*dx;
-%     if sgrad_bool
-%         ttqx1 = [ttqx1;qx_s{f} - fones*n*h/1e3];
-%         ttqx2 = [ttqx2;qx_s{f} - fones*n*h/2e3];
-%     end
+    ttqx1 = [ttqx1;qx_s{f}];
     if ord == 1
         bms{f} = [1-tqx, tqx];
     elseif ord == 2
@@ -177,9 +174,9 @@ end
 % Get Gradient Estimates
 if sgrad_bool
     if ord == 1
-        [~,tg] = PWLD_O2_basis_functions(verts, qx_s, faces, ord, size(verts,1));
+        [~,tg] = PWLD_O2_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
     elseif ord == 2
-        [~,tg] = PWLD_O2_basis_functions(verts, qx_s, faces, ord, size(verts,1));
+        [~,tg] = PWLD_O2_basis_functions(verts, ttqx1, faces, ord, size(verts,1));
     end
     % Rebuild Surface Gradients
     for f=1:nf

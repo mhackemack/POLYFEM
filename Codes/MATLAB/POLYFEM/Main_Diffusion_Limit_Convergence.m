@@ -14,17 +14,15 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function Main_Diffusion_Limit_Convergence(out_dir)
-clearvars -except out_dir; close all; clc; format long e;
-% Specify some parameters
-linear_BFs = {'PWLD'};
-quadratic_BFs = {'MAXENT'};
-geom_types = {'quad'};
-% linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
-% quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
-% geom_types = {'quad','Sq_poly'};
-% ep_log_vals = [-6];
+close all; clc; format long e;
+% linear_BFs = {'WACHSPRESS'};
+% quadratic_BFs = {'WACHSPRESS'};
+% geom_types = {'quad'};
+% ep_log_vals = [0];
+linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
+quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
+geom_types = {'quad','Sq_poly'};
 ep_log_vals = [0,-1,-2,-3];
-% ep_log_vals = [-1,-2,-3,-4,-5,-6];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
 glob = get_globals('Office');
@@ -61,6 +59,9 @@ for g=1:length(geom_types)
             lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
+    % Print Linear Cases
+    fname = sprintf('%s/Convergence/DL_Linear_Convergence_%s.dat',out_dir,geom_types{g});
+    dlmwrite(fname,lin_sol_err(:,:,g));
     % Run Quadratic Cases
     tdata = transdata; tdata.Neutronics.FEMDegree = 2;
     ddata = diffdata; ddata.Neutronics.FEMDegree = 2;
@@ -82,6 +83,9 @@ for g=1:length(geom_types)
             quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
+    % Print Quadratic Cases
+    fname = sprintf('%s/Convergence/DL_Quadratic_Convergence_%s.dat',out_dir,geom_types{g});
+    dlmwrite(fname,quad_sol_err(:,:,g));
 end
 return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -112,7 +116,7 @@ function geometry = get_geometry(gtype)
 global glob
 if strcmpi(gtype, 'quad')
 %     geometry = CartesianGeometry(2,linspace(0,1,11),linspace(0,1,11));
-    geometry = CartesianGeometry(2,linspace(0,1,21),linspace(0,1,21));
+    geometry = CartesianGeometry(2,linspace(0,1,41),linspace(0,1,41));
 elseif strcmpi(gtype, 'tri')
     tx = linspace(0,1,11);
     [x,y]=meshgrid(tx,tx);
@@ -123,7 +127,7 @@ elseif strcmpi(gtype, 'smooth_poly')
     gname = 'smooth_poly_mesh_L1_n8_a0.15';
     load(strcat(glob.geom_path,gname,'.mat'));
 elseif strcmpi(gtype, 'Sq_poly')
-    gname = 'PolyMesh_SqDomain_L1_n256';
+    gname = 'PolyMesh_SqDomain_L1_n1024';
     load(strcat(glob.geom_path,gname,'.mat'));
 elseif strcmpi(gtype, 'z-poly')
     gname = 'z_mesh_poly_L1_n9_a0.05';

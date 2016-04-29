@@ -8,7 +8,7 @@ data.problem.NumberMaterials = 1;
 data.problem.problemType = 'SourceDriven';
 data.problem.plotSolution = 0;
 data.problem.saveSolution = 0;
-data.problem.saveVTKSolution = 1;
+data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
 data.problem.refineMesh = 0;
@@ -35,7 +35,7 @@ data.Neutronics.numberEnergyGroups = 1;
 data.Neutronics.Transport.PnOrder = 0;
 data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = 6;
+data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
