@@ -240,23 +240,23 @@ classdef FEHandler < handle
                             obj.FaceFunctionMatrix{ff,1}       = MS{1}{f}*ones(nvf, 1);
                             obj.FaceConformingMassMatrix{ff,1} = MS{1}{f}(:,varargin{2}.ConformingFaceNodeNumbering{ff,1});
                             obj.FaceGradientMatrix{ff,1}       = MS{2}{f};
-                            if obj.MMSBool || obj.Dimension == 1
-                                obj.FaceQuadNodes{ff,1}   = QS{1}{f};
-                                obj.FaceQuadWeights{ff,1} = QS{2}{f};
-                                obj.FaceBasisValues{ff,1} = QS{3}{f};
-                                obj.FaceBasisGrads{ff,1}  = QS{4}{f};
-                            end
+%                             if obj.MMSBool || obj.Dimension == 1
+%                                 obj.FaceQuadNodes{ff,1}   = QS{1}{f};
+%                                 obj.FaceQuadWeights{ff,1} = QS{2}{f};
+%                                 obj.FaceBasisValues{ff,1} = QS{3}{f};
+%                                 obj.FaceBasisGrads{ff,1}  = QS{4}{f};
+%                             end
                         elseif fcells(2) == c
                             obj.FaceMassMatrix{ff,2}           = MS{1}{f};
                             obj.FaceFunctionMatrix{ff,2}       = MS{1}{f}*ones(nvf, 1);
                             obj.FaceConformingMassMatrix{ff,2} = MS{1}{f}(:,varargin{2}.ConformingFaceNodeNumbering{ff,2});
                             obj.FaceGradientMatrix{ff,2}       = MS{2}{f};
-                            if obj.MMSBool || obj.Dimension == 1
-                                obj.FaceQuadNodes{ff,2}   = QS{1}{f};
-                                obj.FaceQuadWeights{ff,2} = QS{2}{f};
-                                obj.FaceBasisValues{ff,2} = QS{3}{f};
-                                obj.FaceBasisGrads{ff,2}  = QS{4}{f};
-                            end
+%                             if obj.MMSBool || obj.Dimension == 1
+%                                 obj.FaceQuadNodes{ff,2}   = QS{1}{f};
+%                                 obj.FaceQuadWeights{ff,2} = QS{2}{f};
+%                                 obj.FaceBasisValues{ff,2} = QS{3}{f};
+%                                 obj.FaceBasisGrads{ff,2}  = QS{4}{f};
+%                             end
                         end
                     end
                     % Assign Cell Quadrature
@@ -264,7 +264,7 @@ classdef FEHandler < handle
                         obj.CellQuadNodes{c}   = QV{1};
                         obj.CellQuadWeights{c} = QV{2};
                         obj.CellBasisValues{c} = QV{3};
-                        obj.CellBasisGrads{c}  = QV{4};
+%                         obj.CellBasisGrads{c}  = QV{4};
                     end
                     % Form Additional LD Matrices from Original PWLD Matrices
                     % ----------------------------------------------------------

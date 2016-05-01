@@ -41,7 +41,7 @@ data.Neutronics.Transport.PolarLevels = dat_in.PolarLevels;
 data.Neutronics.Transport.QuadAngles  = dat_in.QuadAngles;  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = dat_in.QuadWeights; % Weights for manual set
 % Sweep Operations
-data.Neutronics.Transport.performSweeps = 1;
+data.Neutronics.Transport.performSweeps = 0;
 data.Neutronics.Transport.visualizeSweeping = 0;
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Neutronics.Transport.transportType = 'upwind';
