@@ -37,16 +37,16 @@ ncont = 80;
 % Basis function information
 % --------------------------
 p = 1;
-% BF1
+% % BF1
 BF(p).Name = 'PWLD';
 BF(p).Degree = 1;
 BF(p).BasisFunction = @PWLD_basis_functions;
 p = p + 1;
-% BF2
-BF(p).Name = 'PWLD';
-BF(p).Degree = 2;
-BF(p).BasisFunction = @PWLD_basis_functions;
-p = p + 1;
+% % BF2
+% BF(p).Name = 'PWLD';
+% BF(p).Degree = 2;
+% BF(p).BasisFunction = @PWLD_basis_functions;
+% p = p + 1;
 % BF3
 % BF(p).Name = 'WACHSPRESS';
 % BF(p).Degree = 1;
@@ -57,25 +57,25 @@ p = p + 1;
 % BF(p).Degree = 2;
 % BF(p).BasisFunction = @wachspress_basis_functions;
 % p = p + 1;
-% BF5
-BF(p).Name = 'MV';
-BF(p).Degree = 1;
-BF(p).BasisFunction = @mean_value_basis_functions;
-p = p + 1;
-% BF6 
-BF(p).Name = 'MV';
-BF(p).Degree = 2;
-BF(p).BasisFunction = @mean_value_basis_functions;
-p = p + 1;
-% BF7
-BF(p).Name = 'MAXENT';
-BF(p).Degree = 1;
-BF(p).BasisFunction = @max_entropy_basis_functions;
-p = p + 1;
-% BF8
-BF(p).Name = 'MAXENT';
-BF(p).Degree = 2;
-BF(p).BasisFunction = @max_entropy_basis_functions;
+% % BF5
+% BF(p).Name = 'MV';
+% BF(p).Degree = 1;
+% BF(p).BasisFunction = @mean_value_basis_functions;
+% p = p + 1;
+% % % BF6 
+% BF(p).Name = 'MV';
+% BF(p).Degree = 2;
+% BF(p).BasisFunction = @mean_value_basis_functions;
+% p = p + 1;
+% % BF7
+% BF(p).Name = 'MAXENT';
+% BF(p).Degree = 1;
+% BF(p).BasisFunction = @max_entropy_basis_functions;
+% p = p + 1;
+% % BF8
+% BF(p).Name = 'MAXENT';
+% BF(p).Degree = 2;
+% BF(p).BasisFunction = @max_entropy_basis_functions;
 % p = p + 1;
 % % BF9
 % BF(p).Name = 'LAGRANGE';
