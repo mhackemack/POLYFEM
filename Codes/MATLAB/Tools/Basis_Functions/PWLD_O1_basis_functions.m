@@ -51,8 +51,7 @@ end
 % Retrieve 2D Values and Gradients
 % ------------------------------------------------------------------------------
 if dim == 2
-    rcenter = [1/3,1/3];
-%     rcenter = mean(verts);
+    rcenter = mean(verts);
     q_nums = (1:nqx)';
     if grad_bool, refgrad = get_ref_grads(dim);  end
     % Loop through faces
