@@ -13,12 +13,13 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Main_Diffusion_Limit_Convergence(out_dir)
+function Main_Diffusion_Limit_Convergence()
 close all; clc; format long e;
+out_dir = 'outputs/Diffusion_Limit';
 % linear_BFs = {'WACHSPRESS'};
 % quadratic_BFs = {'WACHSPRESS'};
-% geom_types = {'quad'};
-% ep_log_vals = [0];
+% geom_types = {'Sq_poly'};
+% ep_log_vals = [-3];
 linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 geom_types = {'quad','Sq_poly'};
@@ -116,7 +117,7 @@ function geometry = get_geometry(gtype)
 global glob
 if strcmpi(gtype, 'quad')
 %     geometry = CartesianGeometry(2,linspace(0,1,11),linspace(0,1,11));
-    geometry = CartesianGeometry(2,linspace(0,1,41),linspace(0,1,41));
+    geometry = CartesianGeometry(2,linspace(0,1,21),linspace(0,1,21));
 elseif strcmpi(gtype, 'tri')
     tx = linspace(0,1,11);
     [x,y]=meshgrid(tx,tx);
@@ -127,7 +128,7 @@ elseif strcmpi(gtype, 'smooth_poly')
     gname = 'smooth_poly_mesh_L1_n8_a0.15';
     load(strcat(glob.geom_path,gname,'.mat'));
 elseif strcmpi(gtype, 'Sq_poly')
-    gname = 'PolyMesh_SqDomain_L1_n1024';
+    gname = 'PolyMesh_SqDomain_L1_n256';
     load(strcat(glob.geom_path,gname,'.mat'));
 elseif strcmpi(gtype, 'z-poly')
     gname = 'z_mesh_poly_L1_n9_a0.05';
