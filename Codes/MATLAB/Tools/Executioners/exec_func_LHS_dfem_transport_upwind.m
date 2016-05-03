@@ -46,11 +46,11 @@ for c=1:mesh.TotalCells
         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        for qq=1:na
-            sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
-            ccc = cnodes + q_offset(qq);
-            L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
-        end
+%         for qq=1:na
+%             sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
+%             ccc = cnodes + q_offset(qq);
+%             L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
+%         end
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
         % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
     end
