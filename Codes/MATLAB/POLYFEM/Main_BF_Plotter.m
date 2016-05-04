@@ -38,15 +38,15 @@ ncont = 80;
 % --------------------------
 p = 1;
 % % BF1
-BF(p).Name = 'PWLD';
-BF(p).Degree = 1;
-BF(p).BasisFunction = @PWLD_basis_functions;
-p = p + 1;
-% % BF2
 % BF(p).Name = 'PWLD';
-% BF(p).Degree = 2;
+% BF(p).Degree = 1;
 % BF(p).BasisFunction = @PWLD_basis_functions;
 % p = p + 1;
+% % BF2
+BF(p).Name = 'PWLD';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @PWLD_basis_functions;
+p = p + 1;
 % BF3
 % BF(p).Name = 'WACHSPRESS';
 % BF(p).Degree = 1;
@@ -63,19 +63,19 @@ p = p + 1;
 % BF(p).BasisFunction = @mean_value_basis_functions;
 % p = p + 1;
 % % % BF6 
-% BF(p).Name = 'MV';
-% BF(p).Degree = 2;
-% BF(p).BasisFunction = @mean_value_basis_functions;
-% p = p + 1;
+BF(p).Name = 'MV';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @mean_value_basis_functions;
+p = p + 1;
 % % BF7
 % BF(p).Name = 'MAXENT';
 % BF(p).Degree = 1;
 % BF(p).BasisFunction = @max_entropy_basis_functions;
 % p = p + 1;
 % % BF8
-% BF(p).Name = 'MAXENT';
-% BF(p).Degree = 2;
-% BF(p).BasisFunction = @max_entropy_basis_functions;
+BF(p).Name = 'MAXENT';
+BF(p).Degree = 2;
+BF(p).BasisFunction = @max_entropy_basis_functions;
 % p = p + 1;
 % % BF9
 % BF(p).Name = 'LAGRANGE';
@@ -86,7 +86,6 @@ p = p + 1;
 % BF(p).Name = 'LAGRANGE';
 % BF(p).Degree = 2;
 % BF(p).BasisFunction = get_lagrange_function('vals',2,2);
-% p = p + 1;
 % Geometric cell information
 % --------------------------
 % Square quadrature
@@ -104,21 +103,21 @@ p = 1;
 % Geometry(p).QuadPerDim = ns;
 % p = p + 1;
 % % Geometry2
-% Geometry(p).Name = 'deg_square';
-% Geometry(p).Vertices = [0,0;1,0;1,1;.5,1;0,1];
-% Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,1]};
+Geometry(p).Name = 'deg_square';
+Geometry(p).Vertices = [0,0;1,0;1,1;.5,1;0,1];
+Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,1]};
+Geometry(p).Quad = qxs;
+Geometry(p).QuadGrid = {xs, ys};
+Geometry(p).QuadPerDim = ns;
+% p = p + 1;
+% Geometry3
+% Geometry(p).Name = 'L-domain';
+% Geometry(p).Vertices = [0,0;1,0;1,0.5;0.5,0.5;0.5,1;0,1];
+% Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]};
 % Geometry(p).Quad = qxs;
 % Geometry(p).QuadGrid = {xs, ys};
 % Geometry(p).QuadPerDim = ns;
 % p = p + 1;
-% Geometry3
-Geometry(p).Name = 'L-domain';
-Geometry(p).Vertices = [0,0;1,0;1,0.5;0.5,0.5;0.5,1;0,1];
-Geometry(p).Faces = {[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]};
-Geometry(p).Quad = qxs;
-Geometry(p).QuadGrid = {xs, ys};
-Geometry(p).QuadPerDim = ns;
-p = p + 1;
 % Geometry4
 % Geometry(p).Name = 'triangle';
 % Geometry(p).Vertices = [0,0;1,0;0,1];
@@ -169,7 +168,7 @@ for g=1:ng
             % Save contour plot
             saveas(gcf, [out_dir,out_name,'_contour_b',num2str(i)], 'fig');
             print(gcf,'-dpng',[out_dir,out_name,'_contour_b',num2str(i)]);
-            print(gcf,'-depsc',[out_dir,out_name,'_contour_b',num2str(i)]);
+%             print(gcf,'-depsc',[out_dir,out_name,'_contour_b',num2str(i)]);
             % Generate surf plot
 %             clf; hold on; ax = gca;
 %             surf(qg{1}, qg{2}, bbr,'linestyle','none');
