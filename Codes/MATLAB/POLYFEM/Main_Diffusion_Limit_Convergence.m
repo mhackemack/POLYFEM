@@ -19,11 +19,11 @@ out_dir = 'outputs/Diffusion_Limit';
 % linear_BFs = {'WACHSPRESS'};
 % quadratic_BFs = {'WACHSPRESS'};
 % geom_types = {'Sq_poly'};
-% ep_log_vals = [-3];
+ep_log_vals = [-4,-5,-6];
 linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 geom_types = {'quad','Sq_poly'};
-ep_log_vals = [0,-1,-2,-3];
+% ep_log_vals = [0,-1,-2,-3];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
 glob = get_globals('Office');
@@ -36,6 +36,8 @@ diffdata = load_user_input();
 % Allocate memory space
 lin_sol_err  = zeros(length(ep_log_vals), length(linear_BFs), length(geom_types));
 quad_sol_err = zeros(length(ep_log_vals), length(quadratic_BFs), length(geom_types));
+lin_sol_err_wbound  = zeros(length(ep_log_vals), length(linear_BFs), length(geom_types));
+quad_sol_err_wbound = zeros(length(ep_log_vals), length(quadratic_BFs), length(geom_types));
 % Loop through all geometry types
 for g=1:length(geom_types)
     geometry = get_geometry(geom_types{g});
@@ -58,11 +60,14 @@ for g=1:length(geom_types)
             tdata = cleanup_neutronics_input_data(tdata, geometry);
             [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
             lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
+            lin_sol_err_wbound(j,i,g) = calc_diff_trans_error_bound(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
     % Print Linear Cases
-    fname = sprintf('%s/Convergence/DL_Linear_Convergence_%s.dat',out_dir,geom_types{g});
+    fname  = sprintf('%s/Convergence/DL_Linear_Convergence_%s.dat',out_dir,geom_types{g});
+    bfname = sprintf('%s/Convergence/DL_Linear_Convergence_wBound_%s.dat',out_dir,geom_types{g});
     dlmwrite(fname,lin_sol_err(:,:,g));
+    dlmwrite(bfname,lin_sol_err_wbound(:,:,g));
     % Run Quadratic Cases
     tdata = transdata; tdata.Neutronics.FEMDegree = 2;
     ddata = diffdata; ddata.Neutronics.FEMDegree = 2;
@@ -82,11 +87,14 @@ for g=1:length(geom_types)
             tdata = cleanup_neutronics_input_data(tdata, geometry);
             [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
             quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
+            quad_sol_err_wbound(j,i,g) = calc_diff_trans_error_bound(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
     % Print Quadratic Cases
     fname = sprintf('%s/Convergence/DL_Quadratic_Convergence_%s.dat',out_dir,geom_types{g});
+    bfname = sprintf('%s/Convergence/DL_Quadratic_Convergence_wBound_%s.dat',out_dir,geom_types{g});
     dlmwrite(fname,quad_sol_err(:,:,g));
+    dlmwrite(bfname,quad_sol_err_wbound(:,:,g));
 end
 return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,6 +168,18 @@ for c=1:mesh.TotalCells
         tval = tsol(cdofs);
         out = out + (M*(dval-tval))'*(dval-tval);
     end
+end
+out = sqrt(out);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = calc_diff_trans_error_bound(mesh,DoF,FE,dsol,tsol)
+out = 0;
+% Loop through cells
+for c=1:mesh.TotalCells
+    cdofs = DoF.ConnectivityArray{c};
+    M = FE.CellMassMatrix{c};
+    dval = dsol(cdofs);
+    tval = tsol(cdofs);
+    out = out + (M*(dval-tval))'*(dval-tval);
 end
 out = sqrt(out);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -26,8 +26,11 @@ ng = data.Energy.NumberEngeryGroups;
 tol = 1e-8;
 maxiters = 1e5;
 % ------------------------------------------------------------------------------
+nm = data.NumberMaterialsToAnalyze;
+JNDD_err = cell(nm, 1);
+JND_err  = cell(nm, 1);
 % Loop through materials to analyze and perform analysis
-for m=1:data.NumberMaterialsToAnalyze
+for m=1:nm
     % Generate unit source and allocate memory
     Q = rand(ng,1);
     % Get energy bounds from first component in material
@@ -61,7 +64,8 @@ for m=1:data.NumberMaterialsToAnalyze
     phi(fg,1) = fphi; phi0 = phi;
     err = [];
     % Calculate energy-collapsed XS values
-    F = T(tg,tg)\S0(tg,tg);
+%     F = T(tg,tg)\S0(tg,tg);
+    F = T(tg,tg)\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
     [V,D] = eig(F); D=(diag(D));
     [~,ind] = max(abs(D));
     V = V(:,ind) / sum(V(:,ind));
@@ -79,9 +83,9 @@ for m=1:data.NumberMaterialsToAnalyze
             phi(g) = phi(g) + siga(g)\(S0(g,g)*(phi(g) - phi0(g)));
         end
         % Perform EC DSA step
-        dphi = ave_siga\sum(tril(S0(tg,tg),-1)*(phi(tg) - phi0(tg)))...
-             + ave_siga\sum(triu(S0(tg,tg), 1)*(phi(tg) - phi0(tg)));
-%         dphi = ave_siga\sum(S0(tg,tg)*(phi(tg) - phi0(tg)));
+        dp = phi(tg) - phi0(tg);
+        rhs = sum(tril(S0(tg,tg),-1)*(dp)) + sum(triu(S0(tg,tg), 1)*(dp));
+        dphi = ave_siga\rhs;
         phi(tg) = phi(tg) + V*dphi;
         % Perform convergence testing and update fluxes
         err = [err;max(abs(phi-phi0)./abs(phi))];
@@ -90,6 +94,38 @@ for m=1:data.NumberMaterialsToAnalyze
         end
         phi0 = phi;
     end
+    JNDD_err{m} = err;
+    % Jacobi + NO WGC (1G DSA)
+    % --------------------------------------------------------------------------
+    phi = zeros(ng,1);
+    phi(fg,1) = fphi; phi0 = phi;
+    err = [];
+    % Calculate energy-collapsed XS values
+    F = T(tg,tg)\S0(tg,tg);
+    [V,D] = eig(F); D=(diag(D));
+    [~,ind] = max(abs(D));
+    V = V(:,ind) / sum(V(:,ind));
+    ave_siga = sum((T(tg,tg)-S0(tg,tg))*V);
+    % Calculate diffusion xs values
+    D = 1./(3*diag(T));
+    siga = diag(T) - diag(S0);
+    % Loop through iterations
+    for i=1:maxiters
+        % Sweep
+        phi(tg) = T(tg,tg)\(fsrc + Q(tg) + S0(tg,tg)*phi(tg));
+        tphi = phi;
+        % Perform EC DSA step
+        rhs = sum(S0(tg,tg)*(phi(tg) - phi0(tg)));
+        dphi = ave_siga\rhs;
+        phi(tg) = phi(tg) + V*dphi;
+        % Perform convergence testing and update fluxes
+        err = [err;max(abs(phi-phi0)./abs(phi))];
+        if err(end) < tol
+            break;
+        end
+        phi0 = phi;
+    end
+    JND_err{m} = err;
     % GS + WGC (TG)
     % --------------------------------------------------------------------------
 %     phi = zeros(ng,1);

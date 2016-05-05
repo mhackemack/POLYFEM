@@ -34,7 +34,6 @@ S0 = input.ScatteringMatrix;
 P = input.ProjectionMatrix;
 I = speye(ndofs*ng);
 % Build full matrix based on acceleration type
-% P = T + (A\B)*(T - I);
 if input.data.AccelType == glob.Accel_WGS_DSA
     % Build Scattering matrix
     S = zeros(ng*ndofs);
@@ -64,6 +63,33 @@ if input.data.AccelType == glob.Accel_WGS_DSA
         end
         E = T + P*(A\MDSA);
     end
+elseif input.data.AccelType == glob.Accel_WGS_INNER_DSA
+    Sl = zeros(ng*ndofs);
+    Sd = zeros(ng*ndofs);
+    Su = zeros(ng*ndofs);
+    for g=1:ng
+        gdofs = zdofs + g_offset(g);
+        for gg=1:ng
+            ggdofs = zdofs + g_offset(gg);
+            tS0 = S0(:,:,g,gg)*PM;
+            if gg < g
+                Sl(gdofs,ggdofs) = tS0;
+            elseif gg==g
+                Sd(gdofs,ggdofs) = tS0;
+            elseif gg > g
+                Su(gdofs,ggdofs) = tS0;
+            end
+        end
+    end
+    Sl = sparse(Sl); Sd = sparse(Sd); Su = sparse(Su); S = Sl + Sd + Su;
+    % Build tranpsort matrices
+    T = zeros(ndofs*ng);
+    for q=1:input.Quadrature.NumberAngularDirections
+        T = T + d2m(1,q)*( L{q}\( m2d(1,q)*S ));
+    end
+    TT = T - I;
+    MDSA = zeros(ndofs,ng*ndofs); SS = (Sl+Su)*TT;
+    
 elseif input.data.AccelType == glob.Accel_AGS_TG
     % Build scattering matrices
     Sd = zeros(ng*ndofs);

@@ -50,7 +50,8 @@ out.Accel_AGS_TG  = 3;
 out.Accel_AGS_MTG  = 4;
 out.Accel_AGS_TTG = 5;
 out.Accel_AGS_MTTG = 6;
-out.Accel_Fission_DSA = 7;
+out.Accel_WGS_INNER_DSA = 7;
+out.Accel_Fission_DSA = 8;
 % Acceleration Discretizations
 % ----------------------------
 out.Accel_DSA_MIP = 1;

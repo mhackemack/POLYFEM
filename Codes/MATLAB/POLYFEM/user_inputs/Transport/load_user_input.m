@@ -26,14 +26,14 @@ data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMLumping = false;
-data.Neutronics.FEMDegree = 1;
+data.Neutronics.FEMDegree = 3;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -75,7 +75,7 @@ data.Neutronics.Transport.BCVals  = {0.0;2.0};
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = 'pcg';
+data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'eisenstat';
 data.Neutronics.Transport.DSATolerance = 1e-4;
 data.Neutronics.Transport.DSAMaxIterations = 1e3;
@@ -117,10 +117,10 @@ L = 1; ncells = 4;
 % tri = delaunayTriangulation(x,y,z);
 % geometry = GeneralGeometry(3, 'Delaunay', tri);
 
-x=linspace(0,L,ncells+1);
+% x=linspace(0,L,ncells+1);
 % y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
+% geometry = CartesianGeometry(1,x);
 % geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
@@ -129,7 +129,7 @@ geometry = CartesianGeometry(1,x);
 % geometry.extrude_mesh_2D_to_3D(linspace(0,L,ncells+1));
 % geometry.extrude_mesh_2D_to_3D([0,1/3,2/3,1]);
 
-geometry.set_face_flag_on_surface(2,0.0);
+% geometry.set_face_flag_on_surface(2,0.0);
 % geometry.set_face_flag_on_surface(2,[0,.2*L;0,.4*L]);
 % geometry.set_face_flag_on_surface(2,[0,0;0,L]);
 % geometry.set_face_flag_on_surface(3,[0,L;L,L]);
@@ -143,7 +143,7 @@ geometry.set_face_flag_on_surface(2,0.0);
 % [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
-% [data, geometry] = get_Reed_1D( data, 4 );
+[data, geometry] = get_Reed_1D( data, 20 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EIR-2 Benchmark Overwrite
