@@ -18,7 +18,7 @@ clear; clc; close all; format long e
 % ------------------------------------------------------------------------------
 fpath = get_path(); addpath(fpath);
 global glob; glob = get_globals('Home');
-inp = 'InfMedium_GraphiteONLY';
+inp = 'InfMedium_AllComponents';
 addpath(['inputs/',inp]); % This one must be last to properly switch input files
 % ------------------------------------------------------------------------------
 data = load_user_input();
@@ -27,10 +27,11 @@ tol = 1e-8;
 maxiters = 1e5;
 % ------------------------------------------------------------------------------
 nm = data.NumberMaterialsToAnalyze;
-JNDD_err = cell(nm, 1);
-JND_err  = cell(nm, 1);
+JNDD_err = cell(nm, 1); JNDD_NSR = zeros(nm, 1);
+JND_err  = cell(nm, 1); JND_NSR  = zeros(nm, 1);
 % Loop through materials to analyze and perform analysis
 for m=1:nm
+    fprintf('Calculating material %d of %d.\n',m,nm)
     % Generate unit source and allocate memory
     Q = rand(ng,1);
     % Get energy bounds from first component in material
@@ -65,6 +66,7 @@ for m=1:nm
     err = [];
     % Calculate energy-collapsed XS values
 %     F = T(tg,tg)\S0(tg,tg);
+%     F = (T(tg,tg) - diag(diag(S0(tg,tg))))\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
     F = T(tg,tg)\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
     [V,D] = eig(F); D=(diag(D));
     [~,ind] = max(abs(D));
@@ -95,6 +97,7 @@ for m=1:nm
         phi0 = phi;
     end
     JNDD_err{m} = err;
+    JNDD_NSR(m) = JNDD_err{m}(end)/JNDD_err{m}(end-1);
     % Jacobi + NO WGC (1G DSA)
     % --------------------------------------------------------------------------
     phi = zeros(ng,1);
@@ -126,6 +129,7 @@ for m=1:nm
         phi0 = phi;
     end
     JND_err{m} = err;
+    JND_NSR(m) = JND_err{m}(end)/JND_err{m}(end-1);
     % GS + WGC (TG)
     % --------------------------------------------------------------------------
 %     phi = zeros(ng,1);
