@@ -26,8 +26,8 @@ print_heading(now, date);
 [data, ~] = load_user_input();
 % Begin User Input Section
 % ------------------------------------------------------------------------------
-BF_names = {'PWLD','WACHSPRESS','MV'};
-% BF_names = {'MAXENT'};
+% BF_names = {'PWLD','WACHSPRESS','MV'};
+BF_names = {'WACHSPRESS'};
 BF_orders = [1];
 
 data.problem.saveVTKSolution = 1;
@@ -71,20 +71,20 @@ data.problem.Dimension = 2;
 % end
 % Shestakov Quad Meshes
 % ------------------------------------------------------------------------------
-% gname = 'shestakov_quad_L1_nc7_emb3_a0.2';
-% load(strcat(glob.geom_path,gname,'.mat'));
-% for b=1:length(BF_names)
-%     now_name = BF_names{b};
-%     data.Neutronics.SpatialMethod = BF_names{b};
-%     for o=1:length(BF_orders)
-%         data.Neutronics.FEMDegree = BF_orders(o);
-%         if BF_orders(o) > 1 && ~strcmpi(now_name,'MAXENT'), continue; end
-%         data.problem.Name = sprintf('shes_quad_%s_k%d',now_name,BF_orders(o));
-%         [data, geometry] = process_input_data(data, geometry);
-%         data = cleanup_neutronics_input_data(data, geometry);
-%         [~, ~, ~, ~, ~] = execute_problem(data, geometry);
-%     end
-% end
+gname = 'shestakov_quad_L1_nc4_a0.25';
+load(strcat(glob.geom_path,gname,'.mat'));
+for b=1:length(BF_names)
+    now_name = BF_names{b};
+    data.Neutronics.SpatialMethod = BF_names{b};
+    for o=1:length(BF_orders)
+        data.Neutronics.FEMDegree = BF_orders(o);
+        if BF_orders(o) > 1 && ~strcmpi(now_name,'MAXENT'), continue; end
+        data.problem.Name = sprintf('shes_quad_%s_k%d',now_name,BF_orders(o));
+        [data, geometry] = process_input_data(data, geometry);
+        data = cleanup_neutronics_input_data(data, geometry);
+        [~, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+    end
+end
 % Shestakov Poly Meshes
 % ------------------------------------------------------------------------------
 % gname = 'shestakov_poly_mesh_L1_nc3_a0.15';
@@ -119,20 +119,20 @@ data.problem.Dimension = 2;
 % end
 % Z-Quad Meshes
 % ------------------------------------------------------------------------------
-gname = 'z_mesh_quad_L1_n20_a0.2';
-load(strcat(glob.geom_path,gname,'.mat'));
-for b=1:length(BF_names)
-    now_name = BF_names{b};
-    data.Neutronics.SpatialMethod = BF_names{b};
-    for o=1:length(BF_orders)
-        data.Neutronics.FEMDegree = BF_orders(o);
-        if BF_orders(o) > 1 && ~strcmpi(now_name,'MAXENT'), continue; end
-        data.problem.Name = sprintf('z_quad_%s_k%d',now_name,BF_orders(o));
-        [data, geometry] = process_input_data(data, geometry);
-        data = cleanup_neutronics_input_data(data, geometry);
-        [~, ~, ~, ~, ~] = execute_problem(data, geometry);
-    end
-end
+% gname = 'z_mesh_quad_L1_n20_a0.2';
+% load(strcat(glob.geom_path,gname,'.mat'));
+% for b=1:length(BF_names)
+%     now_name = BF_names{b};
+%     data.Neutronics.SpatialMethod = BF_names{b};
+%     for o=1:length(BF_orders)
+%         data.Neutronics.FEMDegree = BF_orders(o);
+%         if BF_orders(o) > 1 && ~strcmpi(now_name,'MAXENT'), continue; end
+%         data.problem.Name = sprintf('z_quad_%s_k%d',now_name,BF_orders(o));
+%         [data, geometry] = process_input_data(data, geometry);
+%         data = cleanup_neutronics_input_data(data, geometry);
+%         [~, ~, ~, ~, ~] = execute_problem(data, geometry);
+%     end
+% end
 % Z-Poly Meshes
 % ------------------------------------------------------------------------------
 % gname = 'z_mesh_poly_L1_n9_a0.05';
@@ -149,3 +149,19 @@ end
 %         [~, ~, ~, ~, ~] = execute_problem(data, geometry);
 %     end
 % end
+% Square Poly Meshes
+% ------------------------------------------------------------------------------
+gname = 'shestakov_quad_L1_nc4_a0.25';
+load(strcat(glob.geom_path,gname,'.mat'));
+for b=1:length(BF_names)
+    now_name = BF_names{b};
+    data.Neutronics.SpatialMethod = BF_names{b};
+    for o=1:length(BF_orders)
+        data.Neutronics.FEMDegree = BF_orders(o);
+        if BF_orders(o) > 1 && ~strcmpi(now_name,'MAXENT'), continue; end
+        data.problem.Name = sprintf('shes_quad_%s_k%d',now_name,BF_orders(o));
+        [data, geometry] = process_input_data(data, geometry);
+        data = cleanup_neutronics_input_data(data, geometry);
+        [~, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+    end
+end
