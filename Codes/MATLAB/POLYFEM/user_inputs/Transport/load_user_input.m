@@ -26,7 +26,7 @@ data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMLumping = false;
-data.Neutronics.FEMDegree = 3;
+data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
 
 % Transport Properties
@@ -143,7 +143,7 @@ L = 1; ncells = 4;
 % [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
-[data, geometry] = get_Reed_1D( data, 20 );
+[data, geometry] = get_Reed_1D( data, 1 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EIR-2 Benchmark Overwrite

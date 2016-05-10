@@ -163,26 +163,26 @@ for f=1:mesh.TotalFaces
         % THIS WORKS FOR LINEARS!!!
 %         if data.FEMDegree == 1
 %             % ( [[b]] , [[u]] )
-%             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
-%             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
-%             % ( [[b]] , {{Du}} )
-%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
-%             A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
-%             % ( {{Db}} , [[u]] )
-%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
-%             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
-
-
-            % WORKING ON TRIANLGES HERE!!!
-            % ( [[b]] , [[u]] )
             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
             % ( [[b]] , {{Du}} )
             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) + D(2)/2*G1'*PMc2;
+            A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
             % ( {{Db}} , [[u]] )
             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
+
+
+            % WORKING ON TRIANLGES HERE!!!
+            % ( [[b]] , [[u]] )
+%             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
+%             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
+%             % ( [[b]] , {{Du}} )
+%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
+%             A(cn1,cn2) = A(cn1,cn2) + D(2)/2*G1'*PMc2;
+%             % ( {{Db}} , [[u]] )
+%             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;
+%             A(cn1,cn2) = A(cn1,cn2) + D(1)/2*G2*PMc2;
             
 %             % ( [[b]] , [[u]] )
 %             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
@@ -196,13 +196,13 @@ for f=1:mesh.TotalFaces
             
             
 %         else
-%             % ( [[b]] , [[u]] )
+            % ( [[b]] , [[u]] )
 %             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
 %             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
-%             % ( {{Du}} , [[b]] )
+            % ( {{Du}} , [[b]] )
 %             A(fn1,cn1) = A(fn1,cn1) - D(1)/2*Gf1t*PMc1;
 %             A(fn1,cn2) = A(fn1,cn2) - D(2)/2*Gf1t*PMc2;
-%             % ( [[u]] , {{Db}} )
+            % ( [[u]] , {{Db}} )
 %             A(cn1,fn1) = A(cn1,fn1) - D(1)/2*Gf1*PMf1;
 %             A(cn1,fn2) = A(cn1,fn2) + D(1)/2*Gf2*PMf2;
 %         end
