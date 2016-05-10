@@ -27,8 +27,10 @@ tol = 1e-8;
 maxiters = 1e5;
 % ------------------------------------------------------------------------------
 nm = data.NumberMaterialsToAnalyze;
+JN_err = cell(nm, 1); JN_NSR = zeros(nm, 1);
 JNDD_err = cell(nm, 1); JNDD_NSR = zeros(nm, 1);
 JND_err  = cell(nm, 1); JND_NSR  = zeros(nm, 1);
+JNDNOEC_err  = cell(nm, 1); JNDNOEC_NSR  = zeros(nm, 1);
 % Loop through materials to analyze and perform analysis
 for m=1:nm
     fprintf('Calculating material %d of %d.\n',m,nm)
@@ -59,6 +61,24 @@ for m=1:nm
     ntg = length(tg);
     fphi = (T(fg,fg)-S0(fg,fg))\Q(fg,1);
     fsrc = tril(S0(tg,fg)*fphi);
+    % Jacobi + NO WGC (NO ACCEL)
+    % --------------------------------------------------------------------------
+    phi = zeros(ng,1);
+    phi(fg,1) = fphi; phi0 = phi;
+    err = [];
+    % Loop through iterations
+    for i=1:maxiters
+        % Sweep
+        phi(tg) = T(tg,tg)\(fsrc + Q(tg) + S0(tg,tg)*phi(tg));
+        % Perform convergence testing and update fluxes
+        err = [err;max(abs(phi-phi0)./abs(phi))];
+        if err(end) < tol
+            break;
+        end
+        phi0 = phi;
+    end
+    JN_err{m} = err;
+    JN_NSR(m) = JN_err{m}(end)/JN_err{m}(end-1);
     % Jacobi + NO WGC (DSA + 1G DSA)
     % --------------------------------------------------------------------------
     phi = zeros(ng,1);
@@ -109,9 +129,6 @@ for m=1:nm
     [~,ind] = max(abs(D));
     V = V(:,ind) / sum(V(:,ind));
     ave_siga = sum((T(tg,tg)-S0(tg,tg))*V);
-    % Calculate diffusion xs values
-    D = 1./(3*diag(T));
-    siga = diag(T) - diag(S0);
     % Loop through iterations
     for i=1:maxiters
         % Sweep
@@ -130,6 +147,31 @@ for m=1:nm
     end
     JND_err{m} = err;
     JND_NSR(m) = JND_err{m}(end)/JND_err{m}(end-1);
+    % Jacobi + NO WGC (All thermal groups DSA)
+    % --------------------------------------------------------------------------
+    phi = zeros(ng,1);
+    phi(fg,1) = fphi; phi0 = phi;
+    err = [];
+    % Calculate diffusion xs values
+    D = 1./(3*diag(T));
+    siga = diag(T) - diag(S0);
+    % Loop through iterations
+    for i=1:maxiters
+        % Sweep
+        phi(tg) = T(tg,tg)\(fsrc + Q(tg) + S0(tg,tg)*phi(tg));
+        % Loop through thermal groups - perform group-by-group DSA step
+        for g=tg(1):tg(end)
+            phi(g) = phi(g) + siga(g)\(S0(g,g)*(phi(g) - phi0(g)));
+        end
+        % Perform convergence testing and update fluxes
+        err = [err;max(abs(phi-phi0)./abs(phi))];
+        if err(end) < tol
+            break;
+        end
+        phi0 = phi;
+    end
+    JNDNOEC_err{m} = err;
+    JNDNOEC_NSR(m) = JNDNOEC_err{m}(end)/JNDNOEC_err{m}(end-1);
     % GS + WGC (TG)
     % --------------------------------------------------------------------------
 %     phi = zeros(ng,1);
