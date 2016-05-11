@@ -37,5 +37,5 @@
 *.gz
 .DS_Store
 Plots
-Codes\MATLAB\Extensive_Tools\AGMG_3.2.3-aca
+Codes/MATLAB/Extensive_Tools/AGMG_3.2.3-aca/*
 *.pdf
