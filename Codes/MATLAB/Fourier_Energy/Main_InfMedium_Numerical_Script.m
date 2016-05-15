@@ -24,7 +24,7 @@ addpath(['inputs/',inp]); % This one must be last to properly switch input files
 data = load_user_input();
 ng = data.Energy.NumberEngeryGroups;
 tol = 1e-8;
-maxiters = 1e5;
+maxiters = 1e4;
 % ------------------------------------------------------------------------------
 nm = data.NumberMaterialsToAnalyze;
 JN_err = cell(nm, 1); JN_NSR = zeros(nm, 1);
@@ -85,12 +85,12 @@ for m=1:nm
     phi(fg,1) = fphi; phi0 = phi;
     err = [];
     % Calculate energy-collapsed XS values
-%     F = T(tg,tg)\S0(tg,tg);
-%     F = (T(tg,tg) - diag(diag(S0(tg,tg))))\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
-    F = T(tg,tg)\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
+    F = (T(tg,tg) - diag(diag(S0(tg,tg))))\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
+%     F = T(tg,tg)\(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1));
     [V,D] = eig(F); D=(diag(D));
     [~,ind] = max(abs(D));
     V = V(:,ind) / sum(V(:,ind));
+%     ave_siga = sum((T(tg,tg)-(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1)))*V);
     ave_siga = sum((T(tg,tg)-S0(tg,tg))*V);
     % Calculate diffusion xs values
     D = 1./(3*diag(T));
