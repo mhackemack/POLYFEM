@@ -33,7 +33,7 @@ inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-n = 2;
+n = 101;
 data.NumberPhasePerDim = n;
 % pmin = 0; pmax = 1/10;
 pmin = 0; pmax = 2*pi;

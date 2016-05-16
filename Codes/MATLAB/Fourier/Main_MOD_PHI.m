@@ -31,11 +31,11 @@ glob.print_info = false;
 % ------------------------------------------------------------------------------
 inp = '2D_MOD_PHI'; addpath([glob.input_path,inp]);
 % Problem inputs
-sigt = 10000;
-c = 0.9999;
-% sigt = [10,100,1000,10000];
-% c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
-ncells = 10;
+% sigt = [10000,100000,1000000];
+% c = 0.9999;
+sigt = [10];
+c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
+ncells = 2;
 L = 1;
 ngrid = 101;
 data = load_user_input(ncells,L);
@@ -86,34 +86,34 @@ for t=1:length(sigt)
             dlmwrite([outdir,fulloutname,'_Eigenvalues.dat'],[D,real(D),imag(D)]);
             dlmwrite([outdir,fulloutname,'_Eigenvectors.dat'],V);
         end
-        % Run the Grid problems
-        data.Type = 'Grid';
-        data.NumberPhasePerDim = ngrid;
-        pmin = 0; pmax = 2*pi;
-        data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
-        data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
-        inputs = build_phase_transformation_matrix(data, inputs);
-        outputs = calculate_eigenspectrums(data, inputs);
-        % Process Grid outputs
-        for q=1:length(data.Neutronics.Transport.SnLevels)
-            qlvl = data.Neutronics.Transport.SnLevels(q);
-            % Make contour plot
-            x = inputs.phase{1}.WN{1}; x = x./max(max(x))*2*pi;
-            y = inputs.phase{1}.WN{2}; y = y./max(max(y))*2*pi;
-            z = outputs{q,1}.Eigen.Grid;
-            contourf(x,y,z,20); colorbar;
-            xlabel('\lambda_x');
-            ylabel('\lambda_y');
-            set(gca,'FontSize',11);
-%             tightfig(gcf); colorbar;
-            % Save contour plot and Grid data
-            fulloutname = sprintf('%s_%s%d_sigt=%d_c=%g',outname,data.Neutronics.Transport.QuadType,qlvl,sigt(t),c(cc));
-            dlmwrite([outdir,fulloutname,'_GridData',num2str(data.NumberPhasePerDim),'.dat'],z);
-            savefig(gcf,[outdir,fulloutname,'_contour.fig']);
-            print(gcf,'-dpng',[outdir,fulloutname,'_contour.png']);
-%             print(gcf,'-depsc',[outdir,fulloutname,'_contour.eps']);
-            close(gcf);
-        end
+%         % Run the Grid problems
+%         data.Type = 'Grid';
+%         data.NumberPhasePerDim = ngrid;
+%         pmin = 0; pmax = 2*pi;
+%         data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
+%         data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
+%         inputs = build_phase_transformation_matrix(data, inputs);
+%         outputs = calculate_eigenspectrums(data, inputs);
+%         % Process Grid outputs
+%         for q=1:length(data.Neutronics.Transport.SnLevels)
+%             qlvl = data.Neutronics.Transport.SnLevels(q);
+%             % Make contour plot
+%             x = inputs.phase{1}.WN{1}; x = x./max(max(x))*2*pi;
+%             y = inputs.phase{1}.WN{2}; y = y./max(max(y))*2*pi;
+%             z = outputs{q,1}.Eigen.Grid;
+%             contourf(x,y,z,20); colorbar;
+%             xlabel('\lambda_x');
+%             ylabel('\lambda_y');
+%             set(gca,'FontSize',11);
+% %             tightfig(gcf); colorbar;
+%             % Save contour plot and Grid data
+%             fulloutname = sprintf('%s_%s%d_sigt=%d_c=%g',outname,data.Neutronics.Transport.QuadType,qlvl,sigt(t),c(cc));
+%             dlmwrite([outdir,fulloutname,'_GridData',num2str(data.NumberPhasePerDim),'.dat'],z);
+%             savefig(gcf,[outdir,fulloutname,'_contour.fig']);
+%             print(gcf,'-dpng',[outdir,fulloutname,'_contour.png']);
+% %             print(gcf,'-depsc',[outdir,fulloutname,'_contour.eps']);
+%             close(gcf);
+%         end
     end
 end
 % Save off grid information
