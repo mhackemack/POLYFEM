@@ -31,6 +31,8 @@ JN_err = cell(nm, 1); JN_NSR = zeros(nm, 1);
 JNDD_err = cell(nm, 1); JNDD_NSR = zeros(nm, 1);
 JND_err  = cell(nm, 1); JND_NSR  = zeros(nm, 1);
 JNDNOEC_err  = cell(nm, 1); JNDNOEC_NSR  = zeros(nm, 1);
+JNDD_ESpec = zeros(length(data.Energy.ThermalGroups), nm);
+JND_ESpec  = zeros(length(data.Energy.ThermalGroups), nm);
 % Loop through materials to analyze and perform analysis
 for m=1:nm
     fprintf('Calculating material %d of %d.\n',m,nm)
@@ -90,6 +92,7 @@ for m=1:nm
     [V,D] = eig(F); D=(diag(D));
     [~,ind] = max(abs(D));
     V = V(:,ind) / sum(V(:,ind));
+    JNDD_ESpec(:,m) = V;
 %     ave_siga = sum((T(tg,tg)-(tril(S0(tg,tg),-1) + triu(S0(tg,tg), 1)))*V);
     ave_siga = sum((T(tg,tg)-S0(tg,tg))*V);
     % Calculate diffusion xs values
@@ -128,6 +131,7 @@ for m=1:nm
     [V,D] = eig(F); D=(diag(D));
     [~,ind] = max(abs(D));
     V = V(:,ind) / sum(V(:,ind));
+    JND_ESpec(:,m) = V;
     ave_siga = sum((T(tg,tg)-S0(tg,tg))*V);
     % Loop through iterations
     for i=1:maxiters
