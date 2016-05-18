@@ -149,8 +149,12 @@ for f=1:mesh.TotalFaces
         M     = fe.FaceMassMatrix{f,1};
         fpnorm= mesh.FaceNormal(op_f,:);
         G1    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{f,1});
-        G2    = cell_dot(dim,fpnorm,fe.FaceGradientMatrix{op_f,1});
-%         G2    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{op_f,1});
+        
+        
+%         G2    = cell_dot(dim,fpnorm,fe.FaceGradientMatrix{op_f,1});
+        G2    = cell_dot(dim,fnorm,fe.FaceGradientMatrix{op_f,1});   % ORIGINAL
+        
+        
 %         CG1   = cell_dot(dim,fnorm,fe.FaceCouplingGradientMatrix{f,1});
 %         CG2   = cell_dot(dim,fnorm,fe.FaceCouplingGradientMatrix{f,2});
         t_off = zeros(1,dim); t_off(1,off(f,1)) = off(f,2);
@@ -167,7 +171,7 @@ for f=1:mesh.TotalFaces
             A(fn1,fn1) = A(fn1,fn1) + k*M*PMf1;
             A(fn1,fn2) = A(fn1,fn2) - k*M*PMf2;
             % ( [[b]] , {{Du}} )
-            A(cn1,cn1) = A(cn1,cn1) + D(1)/2*G1'*PMc1;
+            A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1'*PMc1;
             A(cn1,cn2) = A(cn1,cn2) - D(2)/2*G1'*PMc2;
             % ( {{Db}} , [[u]] )
             A(cn1,cn1) = A(cn1,cn1) - D(1)/2*G1*PMc1;

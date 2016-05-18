@@ -36,13 +36,13 @@ data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
-data.Neutronics.PerformAcceleration = false;
+data.Neutronics.PerformAcceleration = true;
 data.Neutronics.DSAType = 'MIP';
 data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4,8,16];
+data.Neutronics.Transport.SnLevels = [8,16];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;

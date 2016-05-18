@@ -31,12 +31,12 @@ glob.print_info = false;
 % ------------------------------------------------------------------------------
 inp = '2D_MOD_PHI'; addpath([glob.input_path,inp]);
 % Problem inputs
-% sigt = [10000,100000,1000000];
+sigt = [10000,100000,1000000];
 % c = 0.9999;
-sigt = [10];
+% sigt = [1000];
 c    = [0.9,0.99,0.999,0.9999,0.99999,0.999999];
 ncells = 2;
-L = 1;
+L = 2;
 ngrid = 101;
 data = load_user_input(ncells,L);
 % end user input section
@@ -68,7 +68,8 @@ for t=1:length(sigt)
         % Run the Search problems
         data.Type = 'Search';
         data.NumberPhasePerDim = 5;
-        pmin = sqrt(eps); pmax = 2*pi - sqrt(eps);
+        pmin = 0; pmax = 2*pi;
+%         pmin = sqrt(eps); pmax = 2*pi - sqrt(eps);
         data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
         data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
         inputs = build_phase_transformation_matrix(data, inputs);
