@@ -19,11 +19,12 @@ out_dir = 'outputs/Diffusion_Limit';
 % linear_BFs = {'WACHSPRESS'};
 % quadratic_BFs = {'WACHSPRESS'};
 % geom_types = {'Sq_poly'};
-ep_log_vals = [-4,-5,-6];
+% ep_log_vals = [-3];
+% ep_log_vals = [0,-1,-2,-3,-4,];
 linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 geom_types = {'quad','Sq_poly'};
-% ep_log_vals = [0,-1,-2,-3];
+ep_log_vals = [0,-1,-2,-3,-4,-5,-6];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
 glob = get_globals('Office');
@@ -52,15 +53,15 @@ for g=1:length(geom_types)
         ddata = modify_diffusion_data(ddata, 1, tBF);
         [ddata, geometry] = process_input_data(ddata, geometry);
         ddata = cleanup_neutronics_input_data(ddata, geometry);
-        [ddata, dsol, ~, DoF, FE] = execute_problem(ddata, geometry);
+        [ddata, dsol, ~, dDoF, FE] = execute_problem(ddata, geometry);
         % Transport problems
         for j=1:length(ep_log_vals)
             tdata = modify_transport_data(tdata, 10^(ep_log_vals(j)), tBF);
             [tdata, geometry] = process_input_data(tdata, geometry);
             tdata = cleanup_neutronics_input_data(tdata, geometry);
-            [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
-            lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
-            lin_sol_err_wbound(j,i,g) = calc_diff_trans_error_bound(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
+            [tdata, tsol, ~, tDoF, ~] = execute_problem(tdata, geometry);
+            lin_sol_err(j,i,g) = calc_diff_trans_error(geometry,dDoF,tDoF,FE,dsol.flux{1},tsol.flux{1});
+            lin_sol_err_wbound(j,i,g) = calc_diff_trans_error_bound(geometry,dDoF,tDoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
     % Print Linear Cases
@@ -79,15 +80,15 @@ for g=1:length(geom_types)
         ddata = modify_diffusion_data(ddata, 1, tBF);
         [ddata, geometry] = process_input_data(ddata, geometry);
         ddata = cleanup_neutronics_input_data(ddata, geometry);
-        [ddata, dsol, ~, DoF, FE] = execute_problem(ddata, geometry);
+        [ddata, dsol, ~, dDoF, FE] = execute_problem(ddata, geometry);
         % Transport problems
         for j=1:length(ep_log_vals)
             tdata = modify_transport_data(tdata, 10^(ep_log_vals(j)), tBF);
             [tdata, geometry] = process_input_data(tdata, geometry);
             tdata = cleanup_neutronics_input_data(tdata, geometry);
-            [tdata, tsol, ~, ~, ~] = execute_problem(tdata, geometry);
-            quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
-            quad_sol_err_wbound(j,i,g) = calc_diff_trans_error_bound(geometry,DoF,FE,dsol.flux{1},tsol.flux{1});
+            [tdata, tsol, ~, tDoF, ~] = execute_problem(tdata, geometry);
+            quad_sol_err(j,i,g) = calc_diff_trans_error(geometry,dDoF,tDoF,FE,dsol.flux{1},tsol.flux{1});
+            quad_sol_err_wbound(j,i,g) = calc_diff_trans_error_bound(geometry,dDoF,tDoF,FE,dsol.flux{1},tsol.flux{1});
         end
     end
     % Print Quadratic Cases
@@ -124,8 +125,8 @@ data.Neutronics.Diffusion.ExtSource = 1;
 function geometry = get_geometry(gtype)
 global glob
 if strcmpi(gtype, 'quad')
-%     geometry = CartesianGeometry(2,linspace(0,1,11),linspace(0,1,11));
-    geometry = CartesianGeometry(2,linspace(0,1,21),linspace(0,1,21));
+    geometry = CartesianGeometry(2,linspace(0,1,17),linspace(0,1,17));
+%     geometry = CartesianGeometry(2,linspace(0,1,21),linspace(0,1,21));
 elseif strcmpi(gtype, 'tri')
     tx = linspace(0,1,11);
     [x,y]=meshgrid(tx,tx);
@@ -155,30 +156,32 @@ else
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = calc_diff_trans_error(mesh,DoF,FE,dsol,tsol)
+function out = calc_diff_trans_error(mesh,dDoF,tDoF,FE,dsol,tsol)
 out = 0;
 % Loop through cells
 for c=1:mesh.TotalCells
     cf = mesh.CellFaces{c};
     cfflags = mesh.FaceID(cf); cfflags = cfflags(cfflags~=0);
     if isempty(cfflags)
-        cdofs = DoF.ConnectivityArray{c};
+        ddofs = dDoF.ConnectivityArray{c};
+        tdofs = tDoF.ConnectivityArray{c};
         M = FE.CellMassMatrix{c};
-        dval = dsol(cdofs);
-        tval = tsol(cdofs);
+        dval = dsol(ddofs);
+        tval = tsol(tdofs);
         out = out + (M*(dval-tval))'*(dval-tval);
     end
 end
 out = sqrt(out);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = calc_diff_trans_error_bound(mesh,DoF,FE,dsol,tsol)
+function out = calc_diff_trans_error_bound(mesh,dDoF,tDoF,FE,dsol,tsol)
 out = 0;
 % Loop through cells
 for c=1:mesh.TotalCells
-    cdofs = DoF.ConnectivityArray{c};
+    ddofs = dDoF.ConnectivityArray{c};
+    tdofs = tDoF.ConnectivityArray{c};
     M = FE.CellMassMatrix{c};
-    dval = dsol(cdofs);
-    tval = tsol(cdofs);
+    dval = dsol(ddofs);
+    tval = tsol(tdofs);
     out = out + (M*(dval-tval))'*(dval-tval);
 end
 out = sqrt(out);

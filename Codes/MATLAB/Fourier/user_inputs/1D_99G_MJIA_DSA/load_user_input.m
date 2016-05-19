@@ -7,7 +7,7 @@ data.Output.file_bool = false;
 data.problem.Dimension = 1;
 data.geometry.type = 'cart';
 data.geometry.x = [1e0];
-% data.geometry.x = [1e0,1e-1,1e-2,1e-3,1e-4];
+% data.geometry.x = [1e0,1e-1,1e-2,1e-3];
 % log_xmin = -4; log_xmax = 0; xnum = 5;
 % data.geometry.x = logspace(log_xmin, log_xmax, xnum);
 data.geometry.dyz = [1];
@@ -16,10 +16,8 @@ data.geometry.ncelly = 1;
 data.geometry.ncellz = 1;
 % mat regions
 data.problem.NumberMaterials = 1;
-% data.geometry.mats(1).ID = 2;
+% data.geometry.mats(1).ID = 1;
 % data.geometry.mats(1).Region = [0.5;1];
-% data.geometry.mats(2).ID = 2;
-% data.geometry.mats(2).Region = [.5,.5;1,.5;1,1;.5,1];
 data.geometry.mats = [];
 % fem
 data.problem.refineMesh = false;
@@ -32,11 +30,11 @@ data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
 data.Neutronics.PerformAcceleration = 0;
 data.Neutronics.DSAType = 'MIP';
-data.Neutronics.AccelType = glob.Accel_AGS_MTG;
+data.Neutronics.AccelType = glob.Accel_WGS_MJIA_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2];
+data.Neutronics.Transport.SnLevels = [8];
 data.Neutronics.Transport.PnOrder = 0;
 data.Transport.PnOrder = 0;
 % groups
@@ -97,7 +95,7 @@ data.Neutronics.TotalXS = data.XS.TotalXS;
 data.Neutronics.AbsorbXS = data.XS.AbsorbXS;
 data.Neutronics.ScatteringXS = data.XS.ScatteringXS;
 % Collapse energy groups
-data = collapse_mtg_xs(data,1,2,1);
+data = collapse_mjia_xs(data,1,2,1);
 % Average cross sections
 data.Neutronics.AveTotalXS = [];
 data.Neutronics.AveScatteringXS = [];
@@ -112,17 +110,31 @@ function data = get_analytical_solutions(data)
 nm = data.problem.NumberMaterials;
 ng = data.Neutronics.numberEnergyGroups;
 for m=1:nm
+    % Unaccelerated 
     T = diag(data.Neutronics.TotalXS(m,:));
     S = squeeze(data.Neutronics.ScatteringXS(m,:,:));
-    Sd = tril(S,-1); Su = triu(S,0);
-    F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
+    SL = tril(S,-1);
+    SD = diag(diag(S));
+    SU = triu(S,1);
+    F = T\S; I = eye(ng); FF = S*(F - I);
     [V,D] = eig(F); D=(diag(D));
     data.AnalyticalUnacceleratedEigenvalue(m,:) = D;
     data.AnalyticalUnacceleratedEigenvector{m} = V;
     [data.AnalyticalMaxUnacceleratedEigenvalue(m),ind] = max(abs(D));
     data.AnalyticalMaxUnacceleratedEigenvector(m,:) = V(:,ind);
+    % G diffusion solves
+    B = (T-SD);
+    PB = B\(SD*(F - I));
+    [V,D] = eig(F+PB); D=(diag(D));
+    data.AnalyticalHalfAccelEval(m,:) = D;
+    data.AnalyticalHalfAccelEvec{m} = V;
+    [data.AnalyticalMaxHalfAccelEval(m),ind] = max(abs(D));
+    data.AnalyticalMaxHalfAccelEvec(m,:) = V(:,ind);
+    % Energy-Collapsed solve
     V = data.Neutronics.ErrorShape(m,:)';
-    L = F + V*(sum((T-Sd-Su)*V))^(-1)*sum(FF,1);
+    sigave = sum((T-S)*V);
+    R = (F-I) + PB;
+    L = (F + PB) + V*(sigave\sum((SL+SU)*R,1));
     [V,D] = eig(L); D=(diag(D));
     data.AnalyticalAcceleratedEigenvalue(m,:) = D;
     data.AnalyticalAcceleratedEigenvector{m} = V;

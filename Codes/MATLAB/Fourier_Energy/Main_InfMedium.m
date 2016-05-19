@@ -18,7 +18,7 @@ clear; clc; close all; format long e
 % ------------------------------------------------------------------------------
 fpath = get_path(); addpath(fpath);
 global glob; glob = get_globals('Home');
-inp = 'InfMedium_AllComponents';
+inp = 'InfMedium_GraphiteONLY';
 addpath(['inputs/',inp]); % This one must be last to properly switch input files
 % ------------------------------------------------------------------------------
 data = load_user_input();

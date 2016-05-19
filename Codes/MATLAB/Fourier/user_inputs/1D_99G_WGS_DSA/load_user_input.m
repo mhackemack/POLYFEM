@@ -34,7 +34,7 @@ data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [8];
+data.Neutronics.Transport.SnLevels = [2];
 data.Neutronics.Transport.PnOrder = 0;
 data.Transport.PnOrder = 0;
 % groups
@@ -50,7 +50,7 @@ data.Groups.NumberEnergyGroups = 99;
 data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
 data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
 % graphite
-% data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
+data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 % HDPE
 % data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
@@ -73,10 +73,10 @@ data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
 % data = add_xs_component_contribution(data, 1, 1, 'Be9_99G', 1.9077E-1);
 % data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 2.3298E-3);
 % Steel
-data = add_xs_component_contribution(data, 1, 1, 'Cr52_99G', 1.7428E-2);
-data = add_xs_component_contribution(data, 1, 1, 'Mn55_99G', 1.7363E-3);
-data = add_xs_component_contribution(data, 1, 1, 'Fe56_99G', 5.9358E-2);
-data = add_xs_component_contribution(data, 1, 1, 'Ni58_99G', 7.7199E-3);
+% data = add_xs_component_contribution(data, 1, 1, 'Cr52_99G', 1.7428E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'Mn55_99G', 1.7363E-3);
+% data = add_xs_component_contribution(data, 1, 1, 'Fe56_99G', 5.9358E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'Ni58_99G', 7.7199E-3);
 % Boral
 % data = add_xs_component_contribution(data, 1, 1, 'Al_99G', 3.8193E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'B10_99G', 7.1036E-3);
