@@ -28,7 +28,6 @@ data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
-
 % Transport Properties
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
