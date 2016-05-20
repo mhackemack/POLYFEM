@@ -20,7 +20,7 @@ data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = 
 % Neutronics Data
 % ------------------------------------------------------------------------------
 data.Neutronics.PowerLevel = 1.0;
-data.Neutronics.StartingSolution = 'zero';
+data.Neutronics.StartingSolution = 'function';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
@@ -32,7 +32,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'all';
+data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -40,7 +40,7 @@ data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
-data.Neutronics.Transport.performSweeps = 0;
+data.Neutronics.Transport.performSweeps = 1;
 data.Neutronics.Transport.visualizeSweeping = 0;
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Neutronics.Transport.transportType = 'upwind';
@@ -84,7 +84,7 @@ data.Neutronics.IP_Constant = 4;
 % ------------------------------------------------------------------------------
 data.solver.absoluteTolerance = 1e-8;
 data.solver.relativeTolerance = 1e-8;
-data.solver.maxIterations = 1;
+data.solver.maxIterations = 1e6;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
 
@@ -96,10 +96,10 @@ data.problem.Dimension = 2;
 function out = asymptotic_limit_func(x)
 dim = size(x,2);
 if dim == 1
-    out = 0.2*cos(pi*x(:,1));
+    out = 0.18*cos(pi*x(:,1));
 elseif dim == 2
-    out = 0.2*cos(pi*x(:,1)).*cos(pi*x(:,2));
+    out = 0.18*cos(pi*x(:,1)).*cos(pi*x(:,2));
 elseif dim == 3
-    out = 0.2*cos(pi*x(:,1)).*cos(pi*x(:,2)).*cos(pi*x(:,3));
+    out = 0.18*cos(pi*x(:,1)).*cos(pi*x(:,2)).*cos(pi*x(:,3));
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
