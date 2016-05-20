@@ -19,12 +19,12 @@ out_dir = 'outputs/Diffusion_Limit';
 % linear_BFs = {'WACHSPRESS'};
 % quadratic_BFs = {'WACHSPRESS'};
 % geom_types = {'Sq_poly'};
-% ep_log_vals = [-3];
+ep_log_vals = [-9];
 % ep_log_vals = [0,-1,-2,-3,-4,];
 linear_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 quadratic_BFs = {'WACHSPRESS','PWLD','MV','MAXENT'};
 geom_types = {'quad','Sq_poly'};
-ep_log_vals = [0,-1,-2,-3,-4,-5,-6,-7,-8];
+% ep_log_vals = [0,-1,-2,-3,-4,-5,-6,-7,-8];
 % Get Globals, Set Path, and Initialize Domain Space
 global glob
 glob = get_globals('Office');
