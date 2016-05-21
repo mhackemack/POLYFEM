@@ -86,10 +86,10 @@ p = 1;
 % data.Materials{p}.ComponentDensities = 1.0;
 % % ------------------------------------------------------------------------------
 % p = p + 1;
-% data.Materials{p}.MaterialName = 'graphite_99G';
-% data.Materials{p}.NumberComponents = 1;
-% data.Materials{p}.ComponentNames = {'graphite_99G'};
-% data.Materials{p}.ComponentDensities = 1.0;
+data.Materials{p}.MaterialName = 'graphite_99G';
+data.Materials{p}.NumberComponents = 1;
+data.Materials{p}.ComponentNames = {'graphite_99G'};
+data.Materials{p}.ComponentDensities = 1.0;
 % % ------------------------------------------------------------------------------
 % p = p + 1;
 % data.Materials{p}.MaterialName = 'H2O_99G';
@@ -158,10 +158,10 @@ p = 1;
 % data.Materials{p}.ComponentDensities = [5.0859E-2,2.5429E-2,6.6256E-3,2.6669E-2];
 % % ------------------------------------------------------------------------------
 % p = p + 1;
-data.Materials{p}.MaterialName = 'IM1_HDPE';
-data.Materials{p}.NumberComponents = 2;
-data.Materials{p}.ComponentNames = {'PolyH1_99G','FG_CNat_99G'};
-data.Materials{p}.ComponentDensities = [8.1570E-2,4.0787E-2];
+% data.Materials{p}.MaterialName = 'IM1_HDPE';
+% data.Materials{p}.NumberComponents = 2;
+% data.Materials{p}.ComponentNames = {'PolyH1_99G','FG_CNat_99G'};
+% data.Materials{p}.ComponentDensities = [8.1570E-2,4.0787E-2];
 % % ------------------------------------------------------------------------------
 % p = p + 1;
 % data.Materials{p}.MaterialName = 'IM1_AmBe';

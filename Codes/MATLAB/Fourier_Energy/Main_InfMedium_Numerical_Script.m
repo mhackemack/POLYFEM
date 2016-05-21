@@ -101,6 +101,7 @@ for m=1:nm
     % Loop through iterations
     for i=1:maxiters
         % Sweep
+%         phi(tg) = (T(tg,tg) - diag(diag(S0(tg,tg))))\(fsrc + Q(tg) + tril(S0(tg,tg),-1)*phi(tg) + triu(S0(tg,tg),1)*phi(tg));
         phi(tg) = T(tg,tg)\(fsrc + Q(tg) + S0(tg,tg)*phi(tg));
         tphi = phi;
         % Loop through thermal groups - perform group-by-group DSA step
