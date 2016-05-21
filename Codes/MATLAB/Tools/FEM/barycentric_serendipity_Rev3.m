@@ -37,7 +37,7 @@ nqx = size(qx, 1);
 if dim ~= 2, error('Should only be 2D.'); end
 % Allocate Matrix Memory
 % ------------------------------------------------------------------------------
-bout = zeros(nqx, ntot); gout = zeros(ntot,dim,nqx);
+bout = zeros(nqx, ntot); gout = zeros(ntot,dim,nqx); tgout = zeros(ntot,dim,nqx);
 % Get Problem Preliminaries
 % ------------------------------------------------------------------------------
 if nout > 1, grad_bool = true; end
@@ -77,6 +77,7 @@ if grad_bool
     gfact = [ones(1,nverts),2*ones(1,nverts)];
     % Loop through points and calculate gradient values
     for q=1:nqx
+        % Serendipity Space
         for i=1:ntot
             tt = [0,0];
             t1 = quad_pairs(i,1); t2 = quad_pairs(i,2);
@@ -88,8 +89,19 @@ if grad_bool
                 tt = tt + aa*blin(q,t1)*glin(t2,:,q);
                 tt = tt + aa*blin(q,t2)*glin(t1,:,q);
             end
-            gout(i,:,q) = gfact(i)*tt;
+            tgout(i,:,q) = gfact(i)*tt;
         end
+        % Lagrange Space
+        for i=1:nverts
+            gout(i,:,q) = tgout(i,:,q);
+            for j=(nverts+1):ntot
+                gout(i,:,q) = gout(i,:,q) + B(i,j)*tgout(j,:,q)/2;
+            end
+        end
+        for i=(nverts+1):ntot
+            gout(i,:,q) = 2*tgout(i,:,q);
+        end
+        % Scale to global space
         gout(:,:,q) = gout(:,:,q)*h0;
     end
 end
@@ -234,7 +246,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function B = get_ser_pairing_transformation(n)
 BB = get_upperright_Bmat(n);
-B = [eye(n),BB;zeros(n),4*eye(n)];
+B = [eye(n),BB;zeros(n),2*eye(n)];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_upperright_Bmat(n)
 out = diag(-1*ones(n,1)) - diag(ones((n-1),1),-1);

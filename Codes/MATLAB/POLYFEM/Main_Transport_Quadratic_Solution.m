@@ -26,7 +26,7 @@ print_heading(now, date);
 [data, ~] = load_user_input();
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BF_names = {'PWLD'};
+BF_names = {'MV'};
 % BF_names = {'PWLD','WACHSPRESS','MV','MAXENT'};
 data.problem.Dimension = 2;
 print_err_bool = true;
@@ -82,24 +82,24 @@ data.problem.saveVTKSolution = 0;
 % clear geometry;
 % % Shestakov Quad Meshes
 % % ------------------------------------------------------------------------------
-gname = 'shestakov_quad_L1_nc7_emb3_a0.2';
-load(strcat(glob.geom_path,gname,'.mat'));
-for b=1:length(BF_names)
-    now_name = BF_names{b};
-    data.Neutronics.SpatialMethod = BF_names{b};
-    data.problem.Name = sprintf('SOLUTION_shes_quad_%s_k2',now_name);
-    [data, geometry] = process_input_data(data, geometry);
-    data = cleanup_neutronics_input_data(data, geometry);
-    [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-    % Print difference in solution
-    if print_err_bool
-        data.problem.Name = sprintf('shes_quad_%s_k2',now_name);
-        outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
-        ye = ExactSol_QuadSolution(DoF.NodeLocations);
-        df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
-        write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
-    end
-end
+% gname = 'shestakov_quad_L1_nc7_emb3_a0.2';
+% load(strcat(glob.geom_path,gname,'.mat'));
+% for b=1:length(BF_names)
+%     now_name = BF_names{b};
+%     data.Neutronics.SpatialMethod = BF_names{b};
+%     data.problem.Name = sprintf('SOLUTION_shes_quad_%s_k2',now_name);
+%     [data, geometry] = process_input_data(data, geometry);
+%     data = cleanup_neutronics_input_data(data, geometry);
+%     [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+%     % Print difference in solution
+%     if print_err_bool
+%         data.problem.Name = sprintf('shes_quad_%s_k2',now_name);
+%         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
+%         ye = ExactSol_QuadSolution(DoF.NodeLocations);
+%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
+%     end
+% end
 % clear geometry;
 % % Shestakov Poly Meshes
 % % ------------------------------------------------------------------------------
@@ -124,24 +124,24 @@ end
 % clear geometry;
 % % Smooth Poly Meshes
 % % ------------------------------------------------------------------------------
-% gname = 'smooth_poly_mesh_L1_n8_a0.15';
-% load(strcat(glob.geom_path,gname,'.mat'));
-% for b=1:length(BF_names)
-%     now_name = BF_names{b};
-%     data.Neutronics.SpatialMethod = BF_names{b};
-%     data.problem.Name = sprintf('SOLUTION_smooth_poly_%s_k2',now_name);
-%     [data, geometry] = process_input_data(data, geometry);
-%     data = cleanup_neutronics_input_data(data, geometry);
-%     [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-%     % Print difference in solution
-%     if print_err_bool
-%         data.problem.Name = sprintf('smooth_poly_%s_k2',now_name);
-%         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
-%         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
-%         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
-%     end
-% end
+gname = 'smooth_poly_mesh_L1_n8_a0.15';
+load(strcat(glob.geom_path,gname,'.mat'));
+for b=1:length(BF_names)
+    now_name = BF_names{b};
+    data.Neutronics.SpatialMethod = BF_names{b};
+    data.problem.Name = sprintf('SOLUTION_smooth_poly_%s_k2',now_name);
+    [data, geometry] = process_input_data(data, geometry);
+    data = cleanup_neutronics_input_data(data, geometry);
+    [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+    % Print difference in solution
+    if print_err_bool
+        data.problem.Name = sprintf('smooth_poly_%s_k2',now_name);
+        outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
+        ye = ExactSol_QuadSolution(DoF.NodeLocations);
+        df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+        write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
+    end
+end
 % clear geometry;
 % % Z-Quad Meshes
 % % ------------------------------------------------------------------------------
