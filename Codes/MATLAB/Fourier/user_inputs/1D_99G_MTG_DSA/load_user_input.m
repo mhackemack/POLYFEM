@@ -52,7 +52,7 @@ data.Groups.NumberEnergyGroups = 99;
 data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
 data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
 % graphite
-data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 % HDPE
 % data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
@@ -67,9 +67,9 @@ data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
 % data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
 % Wood
-% data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0376E-2);
+data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
+data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);
+data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0376E-2);
 % AmBe
 % data = add_xs_component_contribution(data, 1, 1, 'Am241_99G', 1.1649E-3);
 % data = add_xs_component_contribution(data, 1, 1, 'Be9_99G', 1.9077E-1);
@@ -115,7 +115,10 @@ for m=1:nm
     T = diag(data.Neutronics.TotalXS(m,:));
     S = squeeze(data.Neutronics.ScatteringXS(m,:,:));
     Sd = tril(S,-1); Su = triu(S,0);
-    F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
+    I = eye(ng);
+    F = (I-(T\Sd))\(T\Su);
+    FF = Su*(F - I);
+%     F = (T-Sd)\Su; I = eye(ng); FF = Su*(F - I);
     [V,D] = eig(F); D=(diag(D));
     data.AnalyticalUnacceleratedEigenvalue(m,:) = D;
     data.AnalyticalUnacceleratedEigenvector{m} = V;

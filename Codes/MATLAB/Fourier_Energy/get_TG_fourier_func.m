@@ -13,7 +13,7 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = get_2G_fourier_func(ftype, Pn)
+function out = get_TG_fourier_func(ftype, Pn)
 
 if Pn == 0
     if strcmpi(ftype, 'unaccelerated')
@@ -68,7 +68,9 @@ ng = size(T,1); I = eye(ng);
 Sd0 = tril(S(:,:,1)); Su0 = triu(S(:,:,1),1);
 Sd1 = tril(S(:,:,2)); Su1 = triu(S(:,:,2),1);
 if abs(val) < 1e-10
-    error('Cannot limit my way out of this one...');
+    val = 1e-10;
+    Tmat = diag(atan(val./diag(T)))/val;
+    TTmat = T*diag(atan(val./diag(T)))/val;
 else
     Tmat = diag(atan(val./diag(T)))/val;
     TTmat = T*diag(atan(val./diag(T)))/val;
@@ -85,7 +87,9 @@ Sd0 = tril(S(:,:,1)); Su0 = triu(S(:,:,1),1);
 Sd1 = tril(S(:,:,2)); Su1 = triu(S(:,:,2),1);
 D = diag(D);
 if abs(val) < 1e-10
-    error('Cannot limit my way out of this one...');
+    val = 1e-10;
+    Tmat = diag(atan(val./diag(T)))/val;
+    TTmat = T*diag(atan(val./diag(T)))/val;
 else
     Tmat = diag(atan(val./diag(T)))/val;
     TTmat = T*diag(atan(val./diag(T)))/val;

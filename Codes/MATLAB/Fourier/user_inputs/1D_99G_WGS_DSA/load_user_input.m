@@ -50,7 +50,7 @@ data.Groups.NumberEnergyGroups = 99;
 data.Acceleration.Info.Groups = 1:data.Neutronics.numberEnergyGroups;
 data.Acceleration.Info.AccelerationType = data.Neutronics.AccelType;
 % graphite
-data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
+% data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 % HDPE
 % data = add_xs_component_contribution(data, 1, 1, 'PolyH1_99G', 8.1570E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 4.0787E-2);
@@ -65,9 +65,9 @@ data = add_xs_component_contribution(data, 1, 1, 'graphite_99G', 8.5238E-2);
 % data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0511E-5);
 % data = add_xs_component_contribution(data, 1, 1, 'Ar40_99G', 2.3297E-7);
 % Wood
-% data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);
-% data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0376E-2);
+data = add_xs_component_contribution(data, 1, 1, 'FG_H1_99G', 2.0752E-2);
+data = add_xs_component_contribution(data, 1, 1, 'FG_CNat_99G', 1.4520E-2);
+data = add_xs_component_contribution(data, 1, 1, 'O16_99G', 1.0376E-2);
 % AmBe
 % data = add_xs_component_contribution(data, 1, 1, 'Am241_99G', 1.1649E-3);
 % data = add_xs_component_contribution(data, 1, 1, 'Be9_99G', 1.9077E-1);
