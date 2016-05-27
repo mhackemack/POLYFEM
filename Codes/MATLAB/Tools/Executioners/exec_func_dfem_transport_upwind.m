@@ -85,7 +85,7 @@ if nout > 2, varargout{3} = A; end
 if nout > 3, varargout{4} = DSA_iterations; end
 if nout > 4, varargout{5} = DSA_time; end
 % Clear Command Line Text
-if glob.print_info, fprintf(rev_str); end
+if glob.print_info && ~ndat.Transport.HasOpposingReflectingBoundary, fprintf(rev_str); end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

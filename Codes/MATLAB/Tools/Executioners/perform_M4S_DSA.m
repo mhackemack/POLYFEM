@@ -155,7 +155,6 @@ for f=1:mesh.TotalFaces
         % Apply Interior Terms
         for g=1:ndat.numberEnergyGroups
             kp = 1/4;
-%             kp = get_penalty_coefficient(C_IP, DoF.Degree, D(g,:), h, fflag);
             gfnodes1 = fcnodes1 + (g-1)*ndg;
             gfnodes2 = fcnodes2 + (g-1)*ndg;
             gcnodes1 =  cnodes1 + (g-1)*ndg;
@@ -173,18 +172,25 @@ for f=1:mesh.TotalFaces
             % Gradient Terms
             % -------------------------------------------------------------
             % (+,+)
-            L(gcnodes2,gcnodes2) = L(gcnodes2,gcnodes2) + 0.5*D(2)*(G2 + G2');
+            L(gcnodes2,gcnodes2) = L(gcnodes2,gcnodes2) + 0.5*D(2)*G2';
             % (-,-)
-            L(gcnodes1,gcnodes1) = L(gcnodes1,gcnodes1) - 0.5*D(1)*(G1 + G1');
+            L(gcnodes1,gcnodes1) = L(gcnodes1,gcnodes1) - 0.5*D(1)*G1';
             % (+,-)
-            L(gcnodes2,gcnodes1) = L(gcnodes2,gcnodes1) + 0.5*(D(1)*CG1' - D(2)*CG2);
+            L(gcnodes2,gcnodes1) = L(gcnodes2,gcnodes1) + 0.5*D(1)*CG1';
             % (-,+)
-            L(gcnodes1,gcnodes2) = L(gcnodes1,gcnodes2) - 0.5*(D(2)*CG2' - D(1)*CG1);
+            L(gcnodes1,gcnodes2) = L(gcnodes1,gcnodes2) - 0.5*D(2)*CG2';
+%             % (+,+)
+%             L(gcnodes2,gcnodes2) = L(gcnodes2,gcnodes2) + 0.5*D(2)*(G2 + G2');
+%             % (-,-)
+%             L(gcnodes1,gcnodes1) = L(gcnodes1,gcnodes1) - 0.5*D(1)*(G1 + G1');
+%             % (+,-)
+%             L(gcnodes2,gcnodes1) = L(gcnodes2,gcnodes1) + 0.5*(D(1)*CG1' - D(2)*CG2);
+%             % (-,+)
+%             L(gcnodes1,gcnodes2) = L(gcnodes1,gcnodes2) - 0.5*(D(2)*CG2' - D(1)*CG1);
         end
     % Boundary Face
     else
         matids = mesh.MatID(fcells(1));
-        h = mesh.OrthogonalProjection(f,1);
         M = FE.FaceMassMatrix{f,1};
         G = FE.FaceGradientMatrix{f,1};
         G = cell_dot(dim,fnorm,G);
@@ -196,18 +202,13 @@ for f=1:mesh.TotalFaces
             gcnodes =  cnodes + (g-1)*ndg;
             D = ndat.Diffusion.DiffXS(matids,g);
             kp = 1/4;
-%             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
             if     (ndat.Transport.BCFlags(fflag) == glob.Vacuum || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
-%                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - D*(G + G');
-                L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
-            elseif  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
-                    ndat.Transport.BCFlags(fflag) == glob.Periodic
-                Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
-                rhs(gfnodes) = rhs(gfnodes) + M*Jin;
+                L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*G';
+%                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
             end
         end
     end
@@ -309,16 +310,28 @@ for f=1:mesh.TotalFaces
             % ------------------------------------------------------------------
             % (-,-)
             I = [I;crows11(:)]; J = [J;ccols11(:)];
-            tmat = -0.5*D(1)*(G{1} + G{1}'); TMAT = [TMAT;tmat(:)];
+            tmat = -0.5*D(1)*G{1}'; TMAT = [TMAT;tmat(:)];
             % (+,+)
             I = [I;crows22(:)]; J = [J;ccols22(:)];
-            tmat =  0.5*D(2)*(G{2} + G{2}'); TMAT = [TMAT;tmat(:)];
+            tmat =  0.5*D(2)*G{2}'; TMAT = [TMAT;tmat(:)];
             % (-,+)
             I = [I;crows21(:)]; J = [J;ccols12(:)];
-            tmat =  0.5*(D(1)*CG{1}' - D(2)*CG{2}); TMAT = [TMAT;tmat(:)];
+            tmat =  0.5*D(1)*CG{1}'; TMAT = [TMAT;tmat(:)];
             % (+,-)
             I = [I;crows12(:)]; J = [J;ccols21(:)];
-            tmat = -0.5*(D(2)*CG{2}' - D(1)*CG{1}); TMAT = [TMAT;tmat(:)];
+            tmat = -0.5*D(2)*CG{2}'; TMAT = [TMAT;tmat(:)];
+%             % (-,-)
+%             I = [I;crows11(:)]; J = [J;ccols11(:)];
+%             tmat = -0.5*D(1)*(G{1} + G{1}'); TMAT = [TMAT;tmat(:)];
+%             % (+,+)
+%             I = [I;crows22(:)]; J = [J;ccols22(:)];
+%             tmat =  0.5*D(2)*(G{2} + G{2}'); TMAT = [TMAT;tmat(:)];
+%             % (-,+)
+%             I = [I;crows21(:)]; J = [J;ccols12(:)];
+%             tmat =  0.5*(D(1)*CG{1}' - D(2)*CG{2}); TMAT = [TMAT;tmat(:)];
+%             % (+,-)
+%             I = [I;crows12(:)]; J = [J;ccols21(:)];
+%             tmat = -0.5*(D(2)*CG{2}' - D(1)*CG{1}); TMAT = [TMAT;tmat(:)];
         end
     % Boundary Face
     else
@@ -344,14 +357,10 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
-                tcmat = -0.5*D*(G + G'); tfmat = kp*M;
-%                 tcmat = -D*(G + G'); tfmat = kp*M;
+                tcmat = -0.5*D*G'; tfmat = kp*M;
+%                 tcmat = -0.5*D*(G + G'); tfmat = kp*M;
                 I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
                 I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tfmat(:)];
-            elseif  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
-                    ndat.Transport.BCFlags(fflag) == glob.Periodic
-                Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
-                rhs(gfnodes) = rhs(gfnodes) + M*Jin;
             end
         end
     end
@@ -360,7 +369,6 @@ L = sparse(I,J,TMAT,ndof,ndof);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function rhs = get_rhs(x, ndat, mesh, DoF, FE)
 global glob
-dim = mesh.Dimension;
 ndg = DoF.TotalDoFs;
 ng = ndat.numberEnergyGroups;
 ndof = ng*ndg;
@@ -386,120 +394,16 @@ for ff=1:mesh.TotalBoundaryFaces
         M = FE.FaceMassMatrix{f,1};
         fcnodes = DoF.FaceCellNodes{f,1};
         % Apply boundary terms
-        for g=1:ndat.numberEnergyGroups
-            gfnodes = fcnodes + (g-1)*ndg;
-            if  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
-                    ndat.Transport.BCFlags(fflag) == glob.Periodic
-                Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
-                rhs(gfnodes) = rhs(gfnodes) + M*Jin;
-            end
-        end
+%         for g=1:ndat.numberEnergyGroups
+%             gfnodes = fcnodes + (g-1)*ndg;
+%             if  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
+%                     ndat.Transport.BCFlags(fflag) == glob.Periodic
+%                 Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
+%                 rhs(gfnodes) = rhs(gfnodes) + M*Jin;
+%             end
+%         end
     end
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = get_Ax(x, ndat, mesh, DoF, FE)
-global glob
-dim = mesh.Dimension;
-ndg = DoF.TotalDoFs;
-ng = ndat.numberEnergyGroups;
-ndof = ng*ndg;
-% Allocate Memory
-out = zeros(ndof,1);
-% Loop through cells
-for tcell=1:mesh.TotalCells
-    cnodes = DoF.ConnectivityArray{tcell};
-    matID = mesh.MatID(tcell);
-    M = FE.CellMassMatrix{tcell};
-    K = FE.CellStiffnessMatrix{tcell};
-    % Loop through energy groups
-    for g=1:ndat.numberEnergyGroups
-        sg = cnodes + (g-1)*ndg;
-        out(sg) = out(sg) + (ndat.Diffusion.DiffXS(matID,g)*K + ndat.Diffusion.AbsorbXS(matID,g)*M)*x(sg);
-    end
-end
-% Loop through faces
-for f=1:mesh.TotalFaces
-    fflag = mesh.FaceID(f);
-    fcells = mesh.FaceCells(f,:);
-    fnorm = mesh.FaceNormal(f,:);
-    % Interior Face
-    if fflag == 0
-        matids = mesh.MatID(fcells);
-        D = ndat.Diffusion.DiffXS(matids,:)';
-        h = mesh.OrthogonalProjection(f,:);
-        fcnodes1 = DoF.FaceCellNodes{f,1}; fcnodes2 = DoF.FaceCellNodes{f,2};
-        cnodes1 = DoF.ConnectivityArray{fcells(1)}; cnodes2 = DoF.ConnectivityArray{fcells(2)};
-        M1 = FE.FaceMassMatrix{f,1}; M2 = FE.FaceMassMatrix{f,2};
-        MM1 = FE.FaceConformingMassMatrix{f,1}; MM2 = FE.FaceConformingMassMatrix{f,2};
-        G1 = FE.FaceGradientMatrix{f,1}; G1 = cell_dot(dim,fnorm,G1);
-        G2 = FE.FaceGradientMatrix{f,2}; G2 = cell_dot(dim,fnorm,G2);
-        CG1 = FE.FaceCouplingGradientMatrix{f,1}; CG1 = cell_dot(dim,fnorm,CG1);
-        CG2 = FE.FaceCouplingGradientMatrix{f,2}; CG2 = cell_dot(dim,fnorm,CG2);
-        % Apply Interior Terms
-        for g=1:ndat.numberEnergyGroups
-            kp = 1/4;
-%             kp = get_penalty_coefficient(C_IP, DoF.Degree, D(g,:), h, fflag);
-            gfnodes1 = fcnodes1 + (g-1)*ndg;
-            gfnodes2 = fcnodes2 + (g-1)*ndg;
-            gcnodes1 =  cnodes1 + (g-1)*ndg;
-            gcnodes2 =  cnodes2 + (g-1)*ndg;
-            % Mass Terms
-            % ------------------------------------------------------------------
-            % (-,-)
-            out(gfnodes1) = out(gfnodes1) + kp*M1*x(gfnodes1);
-            % (+,+)
-            out(gfnodes2) = out(gfnodes2) + kp*M2*x(gfnodes2);
-            % (+,-)
-            out(gfnodes2) = out(gfnodes2) - kp*MM2*x(gfnodes1);
-            % (-,+)
-            out(gfnodes1) = out(gfnodes1) - kp*MM1*x(gfnodes2);
-            % Gradient Terms
-            % ------------------------------------------------------------------
-            % (+,+)
-            out(gcnodes2) = out(gcnodes2) + 0.5*D(2)*(G2 + G2')*x(gcnodes2);
-            % (-,-)
-            out(gcnodes1) = out(gcnodes1) - 0.5*D(1)*(G1 + G1')*x(gcnodes1);
-            % (+,-)
-            out(gcnodes2) = out(gcnodes2) + 0.5*(D(1)*CG1' - D(2)*CG2)*x(gcnodes1);
-            % (-,+)
-            out(gcnodes1) = out(gcnodes1) - 0.5*(D(2)*CG2' - D(1)*CG1)*x(gcnodes2);
-        end
-    % Boundary Face
-    else
-        matids = mesh.get_cell_material_id(fcells(1));
-        h = mesh.OrthogonalProjection(f,1);
-        M = FE.FaceMassMatrix{f,1};
-        G = FE.FaceGradientMatrix{f,1};
-        G = cell_dot(dim,fnorm,G);
-        fcnodes = DoF.FaceCellNodes{f,1};
-        cnodes = DoF.ConnectivityArray{fcells(1)};
-        % Apply boundary terms
-        for g=1:ndat.numberEnergyGroups
-            gfnodes = fcnodes + (g-1)*ndg;
-            gcnodes =  cnodes + (g-1)*ndg;
-            D = ndat.Diffusion.DiffXS(matids,g);
-            kp = 1/4;
-%             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
-            if     (ndat.Transport.BCFlags(fflag) == glob.Vacuum || ...
-                    ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
-                    ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
-                    ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
-                out(gfnodes) = out(gfnodes) + kp*M*x(gfnodes);
-%                 out(gcnodes) = out(gcnodes) - D*(G + G')*x(gcnodes);
-                out(gcnodes) = out(gcnodes) - 0.5*D*(G + G')*x(gcnodes);
-            end
-        end
-    end
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = get_penalty_coefficient(C,p,D,h,eflag)
-c = C*(1+p)*p;
-if eflag == 0
-    out = c/2*(D(1)/h(1) + D(2)/h(2));
-else
-    out = c*D/h;
-end
-out = max(out, 0.25);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = cell_dot(dim,vec1, vec2)
 if dim == 1

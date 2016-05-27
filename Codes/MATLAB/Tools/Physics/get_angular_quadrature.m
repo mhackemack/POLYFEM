@@ -29,7 +29,11 @@ else
         elseif strcmp(AQName, 'GLC')
             [x,w] = get_GLC_quad(dim, data.SnLevels);
         elseif strcmp(AQName, 'PGLC')
-            [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels);
+            if isfield(data, 'PolarDimension')
+                [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels, data.PolarDimension);
+            else
+                [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels, 3);
+            end
         elseif strcmp(AQName, 'LS')
             [x,w] = get_LS_quad(dim, data.SnLevels);
         elseif strcmp(AQName, 'TriGLC')
@@ -140,7 +144,7 @@ for i=0:level/2-1
 end
 return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs,wts] = get_PGLC_quad(dim, npolar, nazimuth)
+function [angs,wts] = get_PGLC_quad(dim, npolar, nazimuth, pdim)
 % Quick Error Checks
 % ------------------
 if npolar < 1, error('PGLC polar count must be >= 1.'); end
@@ -154,6 +158,8 @@ nRoots = 2*npolar;
 % Allocate output memory
 angs = zeros(numAngles,3);
 wts = zeros(numAngles,1);
+azdims = 1:3; azdims(pdim) = [];
+alldims = [azdims,pdim];
 % Get other local variables
 delta_phi = pi/(4*nazimuth);
 azim_weight = 2*delta_phi;
@@ -164,7 +170,8 @@ for i=0:nazimuth-1
         costheta = x(jj);
         sintheta = sqrt(1-costheta^2);
         iord = jj + (i-1)*npolar;
-        angs(iord,:) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
+        angs(iord,alldims) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
+%         angs(iord,:) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
         wts(iord) = azim_weight*w(jj);
     end
     azim_angle = azim_angle + 2*delta_phi;

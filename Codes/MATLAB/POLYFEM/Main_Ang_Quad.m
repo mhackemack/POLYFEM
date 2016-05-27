@@ -23,9 +23,10 @@ end
 clc; close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 
-alvls = [24];
-plvls = [1,2];
+alvls = [1];
+plvls = [12];
 snlvl = [2,4,8,16];
+pdim  = 1;
 
 dim = 2;
 data.Neutronics.Transport.PnOrder = 0;
@@ -38,6 +39,7 @@ if strcmp(data.Neutronics.Transport.QuadType, 'PGLC')
         data.Neutronics.Transport.PolarLevels = plvls(i);
         for j=1:length(alvls)
             data.Neutronics.Transport.AzimuthalLevels = alvls(j);
+            data.Neutronics.Transport.PolarDimension = pdim;
             data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport, dim);
             draw_quadrature(data);
             ffname = [out_dir,fname,num2str(alvls(j)),'_',num2str(plvls(i)),'_',num2str(dim),'D'];
