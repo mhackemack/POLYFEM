@@ -13,7 +13,7 @@
 %   Note(s):        
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [A,B] = func_mat_M4S(lam, input)
+function A = func_mat_M4S(lam, input)
 global glob
 % Copy Input Space
 % ----------------
@@ -32,7 +32,7 @@ PV = exp(1i*node_locs*lam);
 PM = diag(PV);
 % Allocate Matrix Arrays
 % ----------------------
-A = zeros(ndofs); B = zeros(ndofs);
+A = zeros(ndofs); %B = zeros(ndofs);
 % Loop through Cells and Build Matrices
 % -------------------------------------
 for c=1:mesh.TotalCells
@@ -43,11 +43,11 @@ for c=1:mesh.TotalCells
     sxs = data.ScatteringXS(mat);
     axs = data.AbsorbXS(mat);
     D   = data.DiffusionXS(mat);
-    B(cn,cn) = B(cn,cn) + sxs*M;
+%     B(cn,cn) = B(cn,cn) + sxs*M;
     A(cn,cn) = A(cn,cn) + axs*M + D*K;
 end
 % Apply Volumetric Phase Shift
-B = B * PM;
+% B = B * PM;
 A = A * PM;
 % Loop through Faces and Build Matrices
 % -------------------------------------

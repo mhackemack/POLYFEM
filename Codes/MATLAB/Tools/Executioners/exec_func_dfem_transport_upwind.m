@@ -21,7 +21,7 @@ groups = 1:ndat.numberEnergyGroups;
 ang_sets = ndat.Transport.AngleSets; nas = length(ang_sets);
 rev_str = [];
 % NO Opposing Reflecting Boundaries
-if ~ndat.Transport.HasOpposingReflectingBoundary
+% if ~ndat.Transport.HasOpposingReflectingBoundary
     for m=1:nas
         % Print Angle Set Iteration
         if glob.print_info
@@ -39,32 +39,32 @@ if ~ndat.Transport.HasOpposingReflectingBoundary
         ndat = add_reflecting_angular_fluxes(y, ndat, mesh, DoF, ang_sets{m}, groups);
     end
 % Contains at least 1 opposing reflecting boundary
-else
-    it_abs_bool = false; it_rel_bool = false; it_count = 0;
-    flux0 = flux_out;
-    while ~it_abs_bool && ~it_rel_bool
-        [~, tflux] = setup_solution_space(ndat, mesh, DoF);
-        for m=1:nas
-            % Collect Matrix and RHS and compute angular fluxes
-            L = exec_func_LHS_dfem_transport_upwind(ndat, mesh, DoF, FE, ang_sets{m}, groups);
-            rhs = exec_func_RHS_dfem_transport(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
-            y = L\rhs;
-            % Postprocess angular flux solutions
-            tflux = add_to_flux(y, ndat, DoF, ang_sets{m}, groups, tflux);
-            ndat = compute_partial_boundary_currents(y, ndat, mesh, DoF, ang_sets{m}, groups);
-            ndat = add_reflecting_angular_fluxes(y, ndat, mesh, DoF, ang_sets{m}, groups);
-        end
-        flux_out = tflux;
-        % Compute Errors
-        [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,flux_out,flux0,groups,1,2);
-        [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,flux_out,flux0,groups,1,inf);
-        flux0 = flux_out;
-        % Check convergence
-        if err_L2 / norm_L2 < 1e-15, it_rel_bool = true; else it_rel_bool = false; end
-        if err_inf < 1e-15, it_abs_bool = true; else it_abs_bool = false; end
-        it_count = it_count + 1;
-    end
-end
+% else
+%     it_abs_bool = false; it_rel_bool = false; it_count = 0;
+%     flux0 = flux_out;
+%     while ~it_abs_bool && ~it_rel_bool
+%         [~, tflux] = setup_solution_space(ndat, mesh, DoF);
+%         for m=1:nas
+%             % Collect Matrix and RHS and compute angular fluxes
+%             L = exec_func_LHS_dfem_transport_upwind(ndat, mesh, DoF, FE, ang_sets{m}, groups);
+%             rhs = exec_func_RHS_dfem_transport(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
+%             y = L\rhs;
+%             % Postprocess angular flux solutions
+%             tflux = add_to_flux(y, ndat, DoF, ang_sets{m}, groups, tflux);
+%             ndat = compute_partial_boundary_currents(y, ndat, mesh, DoF, ang_sets{m}, groups);
+%             ndat = add_reflecting_angular_fluxes(y, ndat, mesh, DoF, ang_sets{m}, groups);
+%         end
+%         flux_out = tflux;
+%         % Compute Errors
+%         [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,flux_out,flux0,groups,1,2);
+%         [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,flux_out,flux0,groups,1,inf);
+%         flux0 = flux_out;
+%         % Check convergence
+%         if err_L2 / norm_L2 < 1e-15, it_rel_bool = true; else it_rel_bool = false; end
+%         if err_inf < 1e-15, it_abs_bool = true; else it_abs_bool = false; end
+%         it_count = it_count + 1;
+%     end
+% end
 % Perform DSA Update
 % ------------------------------------------------------------------------------
 if ndat.Transport.performDSA
@@ -85,8 +85,8 @@ if nout > 2, varargout{3} = A; end
 if nout > 3, varargout{4} = DSA_iterations; end
 if nout > 4, varargout{5} = DSA_time; end
 % Clear Command Line Text
-if glob.print_info && ~ndat.Transport.HasOpposingReflectingBoundary, fprintf(rev_str); end
-
+if glob.print_info, fprintf(rev_str); end
+% if glob.print_info && ~ndat.Transport.HasOpposingReflectingBoundary, fprintf(rev_str); end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [ndat, flux_out] = setup_solution_space(ndat, mesh, DoF)

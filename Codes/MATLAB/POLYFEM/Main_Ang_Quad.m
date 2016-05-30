@@ -24,7 +24,7 @@ clc; close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 
 alvls = [1];
-plvls = [12];
+plvls = [32];
 snlvl = [2,4,8,16];
 pdim  = 1;
 
