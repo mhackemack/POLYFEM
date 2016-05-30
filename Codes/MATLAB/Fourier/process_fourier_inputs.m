@@ -54,13 +54,13 @@ elseif data.problem.Dimension == 2
                 xx=xx(:);yy=yy(:);
                 
                 % THIS IS A HACK!!!
-                tri = triangulation([4,1,3;1,4,2],xx,yy);
+%                 tri = triangulation([4,1,3;1,4,2],xx,yy);
 %                 tri = triangulation([3,4,1;2,1,4],xx,yy);
-                inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
-                
-                
-%                 tri = delaunayTriangulation(xx,yy);
 %                 inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
+                
+                
+                tri = delaunayTriangulation(xx,yy);
+                inputs.meshes{c} = GeneralGeometry(2, 'Delaunay', tri);
             end
             inputs.meshes{c}.set_periodic_flag(1, 'x');
             inputs.meshes{c}.set_periodic_flag(1, 'y');
