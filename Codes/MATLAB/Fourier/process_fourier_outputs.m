@@ -31,7 +31,7 @@ else
     lump = 'U';
 end
 % Adjust IP/MIP Name with IP coefficient
-if strcmp(dsa_type,'MIP') ||strcmp(dsa_type,'IP')
+if strcmp(dsa_type,'MIP') || strcmp(dsa_type,'IP')
     dsa_type = [dsa_type,'_C=',num2str(data.Neutronics.IP_Constant)];
 end
 f_name = [t_type,'_',dsa_type,'_'];

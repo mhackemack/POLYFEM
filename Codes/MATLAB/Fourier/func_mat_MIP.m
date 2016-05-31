@@ -209,19 +209,19 @@ for f=1:mesh.TotalFaces
         if sum(fnorm) > 0
             % ( [[b]] , {{Du}} )
             A(cn1,cn1) = A(cn1,cn1) - 0.5*D(1)*G1'*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) - 0.5*D(2)*G2'*PMc2;
+            A(cn1,cn2) = A(cn1,cn2) - 0.5*D(2)*G1'*PMc2;
             % ( {{Db}} , [[u]] )
             A(cn1,cn1) = A(cn1,cn1) - 0.5*D(1)*G1*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) + 0.5*D(1)*G1*PMc2;
+            A(cn1,cn2) = A(cn1,cn2) + 0.5*D(1)*G2*PMc2;
         % Build (+) side contributions
         % ----------------------------------------------------------------------
         else
             % ( [[b]] , {{Du}} )
             A(cn1,cn1) = A(cn1,cn1) + 0.5*D(1)*GG1'*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) + 0.5*D(2)*GG2'*PMc2;
+            A(cn1,cn2) = A(cn1,cn2) + 0.5*D(2)*GG1'*PMc2;
             % ( {{Db}} , [[u]] )
             A(cn1,cn1) = A(cn1,cn1) + 0.5*D(1)*GG1*PMc1;
-            A(cn1,cn2) = A(cn1,cn2) - 0.5*D(1)*GG1*PMc2;
+            A(cn1,cn2) = A(cn1,cn2) - 0.5*D(1)*GG2*PMc2;
         end
     end
 end
