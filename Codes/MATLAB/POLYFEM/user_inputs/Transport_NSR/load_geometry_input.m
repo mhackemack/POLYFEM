@@ -1,6 +1,8 @@
 function geometry = load_geometry_input(dim, m_type, dx, num)
 global glob
-if dim == 2 && strcmp(m_type, 'tri')
+if dim == 1
+    geometry = CartesianGeometry(1,dx);
+elseif dim == 2 && strcmp(m_type, 'tri')
     [x,y]=meshgrid(dx,dx);
     x=x(:);y=y(:);
     tri = delaunayTriangulation(x,y);

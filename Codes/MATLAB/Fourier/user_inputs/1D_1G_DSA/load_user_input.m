@@ -2,12 +2,13 @@ function data = load_user_input()
 global glob
 % outputs
 data.Output.plotting_bool = true;
-data.Output.file_bool = false;
+data.Output.file_bool = true;
 % geometry
 data.problem.Dimension = 1;
 data.geometry.type = 'cart';
-log_xmin = -2; log_xmax = 3; xnum = 101;
-data.geometry.x = logspace(log_xmin, log_xmax, xnum);
+% log_xmin = -2; log_xmax = 3; xnum = 101;
+% data.geometry.x = logspace(log_xmin, log_xmax, xnum);
+data.geometry.x = unique([logspace(-2,0,41),logspace(0,2,161),logspace(2,3,21)]);
 data.geometry.dyz = [1];
 data.geometry.ncellx = 1;
 data.geometry.ncelly = 1;
@@ -19,18 +20,18 @@ data.geometry.mats = [];
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.FEMLumping = false;
-data.Neutronics.SpatialMethod = 'MAXENT';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
 data.Neutronics.PerformAcceleration = 1;
-data.Neutronics.DSAType = 'MIP';
-data.Neutronics.AccelType = glob.Accel_DSA_MIP;
+data.Neutronics.DSAType = 'M4S';
+data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [16];
+data.Neutronics.Transport.SnLevels = [2,4];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;

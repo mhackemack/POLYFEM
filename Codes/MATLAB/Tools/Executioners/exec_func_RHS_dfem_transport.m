@@ -53,18 +53,18 @@ for c=1:mesh.TotalCells
             % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % Loop through energy groups again
-%             for gg=1:ng
-%                 ggrp = groups(gg);
-%                 % apply fission term
-%                 fxs = ndat.FissSpec(cmat,grp)/keff*ndat.FissionXS(cmat,ggrp)*ndat.NuBar(cmat,ggrp);
-%                 tvec = tvec + fxs*M*x{ggrp,1}(cnodes);
-%                 % Add scattering contribution
-%                 for m=1:ndat.TotalFluxMoments
-%                     k = ndat.MomentOrders(m,1) + 1;
-%                     sxs = ndat.ScatteringXS(cmat,ggrp,grp,k)*m2d(m,tq);
-%                     tvec = tvec + sxs*M*x{ggrp,m}(cnodes);
-%                 end
-%             end
+            for gg=1:ng
+                ggrp = groups(gg);
+                % apply fission term
+                fxs = ndat.FissSpec(cmat,grp)/keff*ndat.FissionXS(cmat,ggrp)*ndat.NuBar(cmat,ggrp);
+                tvec = tvec + fxs*M*x{ggrp,1}(cnodes);
+                % Add scattering contribution
+                for m=1:ndat.TotalFluxMoments
+                    k = ndat.MomentOrders(m,1) + 1;
+                    sxs = ndat.ScatteringXS(cmat,ggrp,grp,k)*m2d(m,tq);
+                    tvec = tvec + sxs*M*x{ggrp,m}(cnodes);
+                end
+            end
             % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % Apply local matrix contribution

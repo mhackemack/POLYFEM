@@ -2,9 +2,9 @@ function data = load_user_input()
 global glob
 % outputs
 data.Output.plotting_bool = true;
-data.Output.file_bool = false;
+data.Output.file_bool = true;
 % geometry
-data.problem.Dimension = 1;
+data.problem.Dimension = 2;
 data.geometry.type = 'cart';
 % data.geometry.x = [1e-1,1e0,1e1,1e2,1e3];
 % data.geometry.x = [1e3];
@@ -27,18 +27,18 @@ data.geometry.mats = [];
 data.problem.refineMesh = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.FEMLumping = false;
-data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.SpatialMethod = 'MAXENT';
 data.Neutronics.FEMType = 'DFEM';
 data.Neutronics.TransportMethod = 'SI';
 data.Neutronics.Transport.transportType = 'upwind';
 % acceleration
 data.Neutronics.PerformAcceleration = 1;
-data.Neutronics.DSAType = 'MIP';
+data.Neutronics.DSAType = 'M4S';
 data.Neutronics.AccelType = glob.Accel_WGS_DSA;
 data.Neutronics.IP_Constant = 4;
 % angular quadrature
 data.Neutronics.Transport.QuadType = 'LS';
-data.Neutronics.Transport.SnLevels = [2,4,8];
+data.Neutronics.Transport.SnLevels = [2,4];
 data.Neutronics.Transport.PnOrder = 0;
 % groups
 data.Neutronics.numberEnergyGroups = 1;
