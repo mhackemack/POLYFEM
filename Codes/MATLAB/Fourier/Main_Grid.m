@@ -33,7 +33,7 @@ inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Grid';
-n = 101;
+n = 201;
 data.NumberPhasePerDim = n;
 % pmin = 0; pmax = 1/10;
 pmin = 0; pmax = 2*pi;
@@ -58,7 +58,11 @@ end
 if ~data.Neutronics.PerformAcceleration % Unaccelerated
     outname = sprintf('%s_%s',data.Neutronics.TransportMethod,lump,data.Neutronics.SpatialMethod);
 elseif data.Neutronics.PerformAcceleration % Accelerated
-    outname = sprintf('%s_%s_C=%d_%s%s%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
+    if strcmpi(data.Neutronics.DSAType,'mip') || strcmpi(data.Neutronics.DSAType,'ip')
+        outname = sprintf('%s_%s_C=%d_%s%s%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,data.Neutronics.IP_Constant,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
+    else
+        outname = sprintf('%s_%s_%s%s%d',data.Neutronics.TransportMethod,data.Neutronics.DSAType,lump,data.Neutronics.SpatialMethod,data.Neutronics.FEMDegree);
+    end
 end
 if ~isequal(exist(outdir, 'dir'),7),mkdir(outdir); end
 % Retrieve all spectrum data and postprocess
