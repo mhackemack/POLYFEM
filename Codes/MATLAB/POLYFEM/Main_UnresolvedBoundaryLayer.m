@@ -23,8 +23,8 @@ inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'WACHSPRESS','PWLD','MV','MAXENT'};
-fedeg = [1,2];
+sdm = {'MAXENT'};
+fedeg = [2];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
@@ -37,7 +37,7 @@ geom_in.Dimension = 2;
 geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.ncellx = 20;
+geom_in.ncellx = 10;
 geom_in.ncelly = 1;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
@@ -54,7 +54,7 @@ dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 0.3;
 dat_in.projectSolution = 1;
 % ---
-sigt = [1,10,100];
+sigt = [500];
 dat_in.RHSFunc = {@ZeroTransportFunction};
 % Execute Problem Suite
 % ------------------------------------------------------------------------------
