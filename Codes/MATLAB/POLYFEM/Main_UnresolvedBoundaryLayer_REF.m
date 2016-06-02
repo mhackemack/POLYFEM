@@ -19,12 +19,14 @@
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
 global glob; glob = get_globals('Office');
-inp = 'Transport_UBL';
+inp = 'Transport_UBL_REF';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'WACHSPRESS','PWLD','MV','MAXENT'};
-fedeg = [1,2];
+sdm = {'PWLD'};
+fedeg = [1];
+% sdm = {'WACHSPRESS','PWLD','MV','MAXENT'};
+% fedeg = [1,2];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
@@ -37,8 +39,8 @@ geom_in.Dimension = 2;
 geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.ncellx = 20;
-geom_in.ncelly = 1;
+geom_in.x = unique([linspace(0,0.015,25),linspace(0.015,.1,25),linspace(.1,1,15)]);
+geom_in.y = [0,1];
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
 geom_in.ymin_bound_type = glob.Reflecting;
@@ -54,7 +56,7 @@ dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 0.3;
 dat_in.projectSolution = 1;
 % ---
-sigt = [1,10,100];
+sigt = [10];
 dat_in.RHSFunc = {@ZeroTransportFunction};
 % Execute Problem Suite
 % ------------------------------------------------------------------------------
@@ -69,8 +71,8 @@ for k=1:length(fedeg)
             dat_in.TotalXS = sigt(t);
             data = load_user_input(dat_in, geom_in);
             [data,geometry] = load_geometry_input(data, geom_in);
-            data.problem.Path = ['Transport/UnresolvedBoundaryLayer/',geom_in.GeometryType];
-            data.problem.Name = sprintf('PGLC%d_Lx%d_nx%d_sig%d_%s%d',dat_in.PolarLevels,geom_in.Lx,geom_in.ncellx,sigt(t),sdm{s},fedeg(k));
+            data.problem.Path = ['Transport/UnresolvedBoundaryLayer_REF/',geom_in.GeometryType];
+            data.problem.Name = sprintf('PGLC%d_sig%d_%s%d',dat_in.PolarLevels,sigt(t),sdm{s},fedeg(k));
             % Run problem iteration
             [data, geometry] = process_input_data(data, geometry);
             data = cleanup_neutronics_input_data(data, geometry);

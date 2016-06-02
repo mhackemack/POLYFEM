@@ -1,4 +1,4 @@
-function out = BoundaryFunc_UBL(xx,ang)
+function out = BoundaryFunc_UBL_PGLC24(xx,ang)
 n = size(xx,1);
 rang1 = [3.238017096286933e-02,7.067359919122612e-01];
 rang2 = [3.238017096286933e-02,-7.067359919122612e-01];
