@@ -38,6 +38,11 @@ elseif order == 2
     else
         [bout, gout] = max_entropy_O2_basis_functions(verts, qx, faces, order, nverts);
     end
+%     if ~grad_bool
+%         bout = barycentric_serendipity_Rev2(verts, qx, faces, @max_entropy_O1_basis_functions);
+%     else
+%         [bout, gout] = barycentric_serendipity_Rev2(verts, qx, faces, @max_entropy_O1_basis_functions);
+%     end
 end
 % Set Output Arguments
 % ------------------------------------------------------------------------------

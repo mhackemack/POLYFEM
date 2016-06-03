@@ -23,7 +23,7 @@ inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'MAXENT'};
+sdm = {'PWLD'};
 fedeg = [2];
 dat_in.FEMLumping = false;
 % ---
@@ -34,7 +34,7 @@ dat_in.PolarLevels = 24;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 2;
-geom_in.GeometryType = 'cart';
+geom_in.GeometryType = 'tri';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
 geom_in.ncellx = 10;

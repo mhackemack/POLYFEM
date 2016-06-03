@@ -72,11 +72,12 @@ h = get_max_diamter( verts );
 f_dofs = get_face_dofs(nv, faces, order);
 % Calculate quadrature points and basis function values
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
-if order == 1
-    [bmv, gmv] = max_entropy_O1_basis_functions(verts, qx_v, faces, order, nverts);
-elseif order == 2
-    [bmv, gmv] = max_entropy_O2_basis_functions(verts, qx_v, faces, order, nverts);
-end
+[bmv, gmv] = max_entropy_basis_functions(verts, qx_v, faces, order, nverts);
+% if order == 1
+%     [bmv, gmv] = max_entropy_O1_basis_functions(verts, qx_v, faces, order, nverts);
+% elseif order == 2
+%     [bmv, gmv] = max_entropy_O2_basis_functions(verts, qx_v, faces, order, nverts);
+% end
 % Calculate surface basis functions and gradients
 [qx_s, qw_s, bms, gms] = get_ME_surface_values(dim, verts, faces, order, q_ord, h, s_flags(2));
 % mass matrix
