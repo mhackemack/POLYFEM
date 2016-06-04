@@ -18,12 +18,12 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Office');
+global glob; glob = get_globals('Home');
 inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'PWLD'};
+sdm = {'LAGRANGE','PWLD'};
 fedeg = [2];
 dat_in.FEMLumping = false;
 % ---
