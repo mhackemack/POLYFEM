@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function rhs = exec_func_RHS_dfem_transport(x, data, mesh, DoF, FE, angs, groups)
+function rhs = exec_func_RHS_dfem_transport_monochromatic(x, data, mesh, DoF, FE, angs, groups)
 % Process Input Space
 % -------------------
 global glob
@@ -18,7 +18,7 @@ ndof = DoF.TotalDoFs;
 ng = length(groups);
 na = length(angs);
 ntot = ndof * ng * na;
-keff = data.keff;
+% keff = data.keff;
 m2d = ndat.moment_to_discrete;
 angdirs = ndat.AngularDirections';
 angNorm = ndat.AngQuadNorm;
@@ -31,7 +31,6 @@ g_offset = (1:ng)*ndof*na - ndof*na;
 for c=1:mesh.TotalCells
     cmat = mesh.MatID(c);
     cnodes = DoF.ConnectivityArray{c};
-    M = FE.CellMassMatrix{c};
     F = FE.CellFunctionMatrix{c};
     % Loop through angles
     for q=1:na
@@ -50,23 +49,6 @@ for c=1:mesh.TotalCells
             else
                 tvec = ndat.ExtSource(cmat,grp)*m2d(1,tq) * F;
             end
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-            % Loop through energy groups again
-            for gg=1:ng
-                ggrp = groups(gg);
-                % apply fission term
-                fxs = ndat.FissSpec(cmat,grp)/keff*ndat.FissionXS(cmat,ggrp)*ndat.NuBar(cmat,ggrp);
-                tvec = tvec + fxs*M*x{ggrp,1}(cnodes);
-                % Add scattering contribution
-                for m=1:ndat.TotalFluxMoments
-                    k = ndat.MomentOrders(m,1) + 1;
-                    sxs = ndat.ScatteringXS(cmat,ggrp,grp,k)*m2d(m,tq);
-                    tvec = tvec + sxs*M*x{ggrp,m}(cnodes);
-                end
-            end
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-            % COMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
             % Apply local matrix contribution
             rhs(cnqg) = rhs(cnqg) + tvec;
         end
@@ -91,10 +73,6 @@ for ff=1:mesh.TotalBoundaryFaces
             grp = groups(g);
             cnqg = fnodes + g_offset(g) + q_offset(q);
             switch(tflag)
-                case(glob.Reflecting)
-                    opp_dir = ndat.ReflectingBoundaryAngles{f}(tq);
-                    opp_af = ndat.ReflectingFluxes{f}{opp_dir}(:,grp);
-                    rhs(cnqg) = rhs(cnqg) - fdot * M * opp_af;
                 case(glob.Periodic)
                     per_af = ndat.PeriodicFluxesOld{f}{tq}(:,grp);
                     rhs(cnqg) = rhs(cnqg) - fdot * M * per_af;

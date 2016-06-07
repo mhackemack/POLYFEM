@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function L = exec_func_LHS_dfem_transport_upwind(data, mesh, DoF, FE, angs, groups)
+function L = exec_func_LHS_dfem_transport_monochromatic(data, mesh, DoF, FE, angs, groups)
 % Process Input Space
 % -------------------
 global glob
@@ -44,15 +44,12 @@ for c=1:mesh.TotalCells
             cnqg = cnodes + g_offset(g) + q_offset(q);
             L(cnqg,cnqg) = L(cnqg,cnqg) + ndat.TotalXS(cmat,groups(g))*M + GG;
         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-%         for qq=1:na
-%             sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
-%             ccc = cnodes + q_offset(qq);
-%             L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
-%         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        % Loop through angles again
+        for qq=1:na
+            sxs = ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(qq);
+            ccc = cnodes + q_offset(qq);
+            L(cnqg,ccc) = L(cnqg,ccc) - sxs*M*ndat.moment_to_discrete(tq);
+        end
     end
 end
 
@@ -87,6 +84,7 @@ for f=1:mesh.TotalFaces
         end
     % Perform Boundary Face operations
     else
+        tflag = ndat.BCFlags(fflag);
         fnorm = mesh.FaceNormal(f,:);
         fnodes = DoF.FaceCellNodes{f,1};
         M = FE.FaceMassMatrix{f,1};
@@ -94,11 +92,15 @@ for f=1:mesh.TotalFaces
         for q=1:na
             tq = angs(q);
             fdot = fnorm * angdirs(tq,:)';
-            if fdot < 0 && abs(fdot) > glob.small
-                % Loop through energy groups
-                for g=1:ng
-                    fnqg = fnodes + g_offset(g) + q_offset(q);
-                    L(fnqg,fnqg) = L(fnqg,fnqg) - M*fdot;
+            if fdot > 0, continue; end
+            % Loop through energy groups
+            for g=1:ng
+                fnqg = fnodes + g_offset(g) + q_offset(q);
+                L(fnqg,fnqg) = L(fnqg,fnqg) - M*fdot;
+                if tflag == glob.Reflecting
+                    rba = ndat.ReflectingBoundaryAngles{f}(q);
+                    fnqqg = fnodes + g_offset(g) + q_offset(rba);
+                    L(fnqg,fnqqg) = L(fnqg,fnqqg) + M*fdot;
                 end
             end
         end
@@ -149,19 +151,16 @@ for c=1:mesh.TotalCells
             J = [J;cols(:)];
             TMAT = [TMAT;tmat(:)];
         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-%         for qq=1:na
-%             tq = angs(qq);
-%             ccc = cnodes + q_offset(qq);
-%             cols2 = onesnodes*ccc;
-%             I = [I;rows(:)];
-%             J = [J;cols2(:)];
-%             tmat = -ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(tq)*M*ndat.moment_to_discrete(tq);
-%             TMAT = [TMAT;tmat(:)];
-%         end
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
-        % UNCOMMENT THIS FOR MONOCHROMATIC SCATTERING!!!
+        % Loop through angle again
+        for qq=1:na
+            tq = angs(qq);
+            ccc = cnodes + q_offset(qq);
+            cols2 = onesnodes*ccc;
+            I = [I;rows(:)];
+            J = [J;cols2(:)];
+            tmat = -ndat.ScatteringXS(cmat,1,1,1)*ndat.discrete_to_moment(tq)*M*ndat.moment_to_discrete(tq);
+            TMAT = [TMAT;tmat(:)];
+        end
     end
 end
 % Loop through faces
@@ -202,6 +201,7 @@ for f=1:mesh.TotalFaces
         end
     % Perform Boundary Face operations
     else
+        tflag = ndat.BCFlags(fflag);
         fnorm = mesh.FaceNormal(f,:);
         fnodes = DoF.FaceCellNodes{f,1};
         onesnodes = ones(length(fnodes),1);
@@ -210,11 +210,16 @@ for f=1:mesh.TotalFaces
         for q=1:na
             tq = angs(q);
             fdot = fnorm * angdirs(tq,:)';
-            if fdot < 0 && abs(fdot) > glob.small
-                % Loop through energy groups
-                for g=1:ng
-                    fnqg = fnodes + g_offset(g) + q_offset(q);
-                    cols = onesnodes*fnqg; rows = (onesnodes*fnqg)'; tmat = -fdot*M;
+            if fdot > 0, continue; end
+            % Loop through energy groups
+            for g=1:ng
+                fnqg = fnodes + g_offset(g) + q_offset(q);
+                cols = onesnodes*fnqg; rows = (onesnodes*fnqg)'; tmat = -fdot*M;
+                I = [I;rows(:)]; J = [J;cols(:)]; TMAT = [TMAT;tmat(:)];
+                if tflag == glob.Reflecting
+                    rba = ndat.ReflectingBoundaryAngles{f}(q);
+                    fnqqg = fnodes + g_offset(g) + q_offset(rba);
+                    cols = onesnodes*fnqqg; rows = (onesnodes*fnqg)'; tmat = fdot*M;
                     I = [I;rows(:)]; J = [J;cols(:)]; TMAT = [TMAT;tmat(:)];
                 end
             end

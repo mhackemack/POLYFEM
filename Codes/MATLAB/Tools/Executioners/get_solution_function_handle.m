@@ -31,6 +31,8 @@ elseif strcmpi(ttype, 'transport')
             else
                 out = @exec_func_dfem_transport_upwind;
             end
+        elseif strcmpi(tt, 'monochromatic')
+            out = @exec_func_dfem_transport_monochromatic;
         elseif strcmpi(tt, 'hybrid')
             out = @exec_func_dfem_transport_hybrid;
         end

@@ -18,13 +18,13 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Home');
+global glob; glob = get_globals('Office');
 inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
 sdm = {'LAGRANGE'};
-fedeg = [1,2];
+fedeg = [1];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
@@ -34,10 +34,10 @@ dat_in.PolarLevels = 24;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 2;
-geom_in.GeometryType = 'cart';
+geom_in.GeometryType = 'tri';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.ncellx = 10;
+geom_in.ncellx = 40;
 geom_in.ncelly = 1;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;

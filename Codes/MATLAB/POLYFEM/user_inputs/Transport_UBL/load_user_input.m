@@ -43,7 +43,7 @@ data.Neutronics.Transport.PolarDimension = dat_in.PolarDimension;
 data.Neutronics.Transport.performSweeps = 0;
 data.Neutronics.Transport.visualizeSweeping = 0;
 % Tranpsort Type Properties - most of this only applies to hybrid transport
-data.Neutronics.Transport.transportType = 'upwind';
+data.Neutronics.Transport.transportType = 'monochromatic';
 data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
