@@ -1,4 +1,4 @@
-function write_output_to_vtk_rev2 (filename, data, mesh, DoF, sol, sol_name)
+function write_output_to_vtk_rev3 (filename, data, mesh, DoF, FE, sol, sol_name)
 % Quick Error Checking
 % --------------------
 if nargin < 4, error('Bad input parameters.'); end
@@ -25,10 +25,10 @@ str_sol = sprintf('%s_solution.vtk',filename);
 % Switch function call based on problem dimensionality
 if dim == 1
     write_1D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol);
-elseif dim == 2 && DoF.Degree == 1
+elseif dim == 2 && FE.Degree == 1
     write_2D_output_to_vtk_linear(mesh,DoF,sol,sol_name,str_mesh,str_sol);
-elseif dim == 2 && DoF.Degree > 1
-    write_2D_output_to_vtk_higher(mesh,DoF,sol,sol_name,str_mesh,str_sol);
+elseif dim == 2 && FE.Degree == 2
+    write_2D_output_to_vtk_k2(mesh,DoF,FE,sol,sol_name,str_mesh,str_sol);
 elseif dim==3
     write_3D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol);
 end
@@ -36,7 +36,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxilliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function write_1D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
+function write_1D_output_to_vtk(~,~,~,~,~,~)
 warning('1D write to .vtk file not currently supported.')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function write_2D_output_to_vtk_linear(mesh,DoF,sol,sol_name,~,str_sol)
@@ -100,11 +100,13 @@ for s=1:length(sol_name)
 end
 fclose(fid2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function write_2D_output_to_vtk_higher(mesh,DoF,sol,sol_name,~,str_sol)
-% Open solution file
-fid = generate_solution_file(str_sol);
+function write_2D_output_to_vtk_k2(mesh,DoF,FE,sol,sol_name,str_mesh,str_sol)
+% Generate output files
+% ------------------------------------------------------------------------------
+fid1 = generate_mesh_file(str_mesh);
+fid2 = generate_solution_file(str_sol);
 % Error check solution and name spaces
-% ------------------------------------
+% ------------------------------------------------------------------------------
 if isempty(sol), return; end
 if ~iscell(sol_name)
     sol_name = {sol_name};
@@ -125,60 +127,51 @@ elseif length(sol_name) == 1
 else
     error('Solution structures are weird...')
 end
-% Determine total number of usable spatial DoFs
-% ---------------------------------------------
-tot_dofs = 0; dofs_used = []; cell_dofs_used = cell(mesh.TotalCells,1);
-for c=1:mesh.TotalCells
-    tdofs = DoF.ConnectivityArray{c};
-    nv = length(mesh.CellVerts{c});
-    tot_dofs = tot_dofs + nv;
-    td = tdofs(1:nv);
-%     tot_dofs = tot_dofs + DoF.Degree*nv;
-%     td = [];
-%     for i=1:nv
-%         fn = DoF.CellFaceNodes{c}{i};
-%         td = [td,tdofs(i),fn(3:end)];
-%     end
-    dofs_used = [dofs_used,td];
-    cell_dofs_used{c} = td;
-end
-% Print DoF Information
-% ---------------------
-fprintf(fid,'POINTS %d float \n',tot_dofs);
-fprintf(fid,'%f %f %f \n',[DoF.NodeLocations(dofs_used,:) zeros(tot_dofs,3-mesh.Dimension)]');
+% Write Mesh Output
+% ------------------------------------------------------------------------------
+% Print Points Information
+fprintf(fid1,'POINTS %d float \n',mesh.TotalVertices);
+fprintf(fid1,'%f %f %f \n',[mesh.Vertices zeros(mesh.TotalVertices,3-mesh.Dimension)]');
 % Print Cell Information
-% ----------------------
-fprintf(fid,'CELLS %d %d \n',DoF.TotalCells,DoF.TotalCells+tot_dofs);
-d_count = 0;
+fprintf(fid1,'CELLS %d %d \n',mesh.TotalCells,mesh.TotalCells+mesh.TotalVertices);
 for c=1:mesh.TotalCells
-    td = cell_dofs_used{c}; ntd = length(td);
-    fprintf(fid,' %d ',ntd);
-    for k=1:ntd
-        fprintf(fid,'%d ',d_count);
-        d_count = d_count + 1;
+    cv = mesh.CellVerts{c} - 1; ncv = length(cv);
+    fprintf(fid1,' %d ',ncv);
+    for i=1:ncv
+        fprintf(fid,'%d ',cv(i));
     end
-    fprintf(fid,' \n');
+    fprintf(fid1,' \n');
 end
-fprintf(fid,' \n');
-fprintf(fid,'CELL_TYPES %d\n',DoF.TotalCells);
-fprintf(fid,'%d\n',7*ones(DoF.TotalCells,1));
+fprintf(fid1,'CELL_TYPES %d\n',mesh.TotalCells);
+fprintf(fid1,'%d\n',7*ones(mesh.TotalCells,1));
 % print cell material ids
-fprintf(fid,'CELL_DATA %d\n',DoF.TotalCells);
-fprintf(fid,'FIELD FieldData 1\n');
-fprintf(fid,'material 1 %d int\n',DoF.TotalCells);
-fprintf(fid,'%d\n',mesh.MatID);
-% Print Solution Information
-% --------------------------
-fprintf(fid,'POINT_DATA %d %d \n',tot_dofs);
-for s=1:length(sol_name)
-    s_name = sol_name{s};
-    ssol = sol{s};
-    fprintf(fid,'SCALARS %s double \n',s_name);
-    fprintf(fid,'LOOKUP_TABLE   default \n');
-    fprintf(fid,'%1.8e\n',ssol(dofs_used));
-    fprintf(fid, ' \n');
+fprintf(fid1,'CELL_DATA %d\n',mesh.TotalCells);
+fprintf(fid1,'FIELD FieldData 1\n');
+fprintf(fid1,'material 1 %d int\n',mesh.TotalCells);
+fprintf(fid1,'%d\n',mesh.MatID);
+
+% Write Solution Output
+% ------------------------------------------------------------------------------
+sol_dofs = [];
+num_sol_cells = 0;
+for c=1:mesh.TotalCells
+    cdofs = DoF.ConnectivityArray{c};
+    cfaces = mesh.CellFaces{c};
+    cmean = my_centroid(DoF.NodeLocations(cdofs,:));
+    % Triangle
+    if cfaces == 3
+        
+    end
+    % Quadrilateral
+    if cfaces == 4
+        
+    end
+    % Polygon
+    if cfaces > 4
+        
+    end
 end
-fclose(fid);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function write_3D_output_to_vtk(mesh,DoF,sol,sol_name,str_mesh,str_sol)
 % Generate output files
