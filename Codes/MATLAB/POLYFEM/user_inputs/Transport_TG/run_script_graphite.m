@@ -122,7 +122,7 @@ sol_ana = A\b;
 %             sol0 = sol(g);
 %             b = q(g); A = txs(g);
 %             b = b + S(g,:,1)*sol;
-%             sol(g) = b/A;
+%             sol(g) = A\b;
 %             if abs(sol(g) - sol0) < wgstol
 %                 break;
 %             end
@@ -160,7 +160,7 @@ for m=1:agsitmax
             wgs_sol_old(g) = sol(g);
             b = q(g); A = txs(g);
             b = b + S(g,:,1)*sol;
-            sol(g) = b/A;
+            sol(g) = A\b;
             if abs(sol(g) - wgs_sol_old(g)) < wgstol
                 break;
             end
