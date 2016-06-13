@@ -25,8 +25,26 @@ function plot_1D_solution(mesh, DoF, FE, x)
 if iscell(x), x = x{1}; end
 hold on
 xlim([min(mesh.Vertices), max(mesh.Vertices)])
+% 
 if DoF.Degree == 0
     
+elseif DoF.DoFType == 0
+    for c=1:DoF.TotalCells
+        % Retrieve DoF information for cell
+        cn = DoF.ConnectivityArray{c};
+        nodes = DoF.NodeLocations(cn,:);
+        ccent = nodes(1);
+        cverts = mesh.CellVerts{c};
+        xx = mesh.Vertices(cverts);
+        dx = abs(xx(2) - xx(1));
+%         save = x(cn(1));
+%         sx = x(cn(2));
+        b = get_LD_basis(xx,ccent,dx);
+        % Plot Values
+%         y = save*ones(2,1) + sx*b(:,2);
+        y    = b*x(cn);
+        plot(xx, y, 'k');
+    end
 else
     for c=1:DoF.TotalCells
         % Retrieve DoF information for cell
@@ -46,4 +64,9 @@ else
     end
 end
 hold off
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function bout = get_LD_basis(x,xmean,dx)
+nx = size(x,1); onx = ones(nx,1);
+ddr = xmean./dx;
+bout = [onx, 2*x./(onx*dx) - 2*onx*ddr];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

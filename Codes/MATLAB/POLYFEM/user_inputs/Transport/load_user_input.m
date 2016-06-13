@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.SpatialMethod = 'LD';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -33,7 +33,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'single';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -50,7 +50,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e0; c = 0.5;
+txs = 1e0; c = 0.0;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;

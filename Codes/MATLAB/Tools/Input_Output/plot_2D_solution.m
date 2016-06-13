@@ -19,7 +19,11 @@ n_input = nargin;
 if iscell(x), x = x{1}; end
 % determine plotting type
 if n_input < 5
-    plot_general_solution(mesh, DoF, x);
+    if DoF.DoFType == 0
+        plot_LD_solution(mesh, DoF, x);
+    else
+        plot_general_solution(mesh, DoF, x);
+    end
 else
     basis_name = upper(basis_name);
     if strcmp(basis_name, 'PWLD')
@@ -31,6 +35,24 @@ else
     end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function plot_LD_solution(mesh,DoF,x)
+hold on
+for c=1:mesh.TotalCells
+    cv = mesh.CellVerts{c}; ncv = length(cv);
+    xx = mesh.Vertices(cv,:);
+    ccent = mesh.CellCenter(c,:);
+    dx = get_LD_widths(mesh.Dimension,xx);
+    b = get_LD_basis(xx,ccent,dx);
+    cn = DoF.ConnectivityArray{c};
+%     save = x(cn(1));
+%     sx   = x(cn(2));
+%     sy   = x(cn(3));
+%     y    = save*ones(ncv,1) + sx*b(:,2) + sy*b(:,3);
+    y    = b*x(cn);
+    patch(xx(:,1), xx(:,2), y, y, 'FaceColor', 'interp')
+end
+hold off
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function plot_general_solution(mesh,DoF,x)
 hold on
@@ -62,4 +84,23 @@ for c=1:mesh.TotalCells
     end
 end
 hold off
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [xmean,dx] = get_LD_widths(dim,verts)
+xmean = mean(verts);
+% xmean = compute_volume_centroid(dim, verts, faces);
+if dim == 1
+    dx = verts(2) - verts(1);
+elseif dim == 2
+    dx = [max(verts(:,1)) - min(verts(:,1)),...
+          max(verts(:,2)) - min(verts(:,2))];
+elseif dim == 3
+    dx = [max(verts(:,1)) - min(verts(:,1)),...
+          max(verts(:,2)) - min(verts(:,2)),...
+          max(verts(:,3)) - min(verts(:,3))];
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function bout = get_LD_basis(x,xmean,dx)
+nx = size(x,1); onx = ones(nx,1);
+ddr = xmean./dx;
+bout = [onx, 2*x./(onx*dx) - 2*onx*ddr];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
