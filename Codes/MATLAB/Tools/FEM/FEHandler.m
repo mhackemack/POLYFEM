@@ -195,34 +195,61 @@ classdef FEHandler < handle
                         fprintf([rev_str,msg]);
                         rev_str = repmat(sprintf('\b'), 1, length(msg));
                     end
-                    % Collect Face Vertex Information for Cell
+                    % LD FEM Generation
                     % ----------------------------------------------------------
-                    cv = varargin{2}.CellVertexNodes{c};
-                    verts = varargin{2}.NodeLocations(cv,:);
-                    nvverts = length(verts);
-                    cind = varargin{2}.ConnectivityArray{c};
-                    cfaces = varargin{1}.CellFaces{c}; nfaces = length(cfaces);
-                    fcnodes = cell(nfaces,1);
-                    for f=1:nfaces
-                        ff = cfaces(f);
-                        if varargin{1}.FaceCells(ff,1) == c
-                            cfn = varargin{2}.FaceVertexNodes{ff,1};
-                        else
-                            cfn = varargin{2}.FaceVertexNodes{ff,2};
-                        end
-                        tfn = zeros(1,length(cfn));
-                        for i=1:length(tfn)
-                            for j=1:length(cind)
-                                if cfn(i) == cind(j);
-                                    tfn(i) = j;
-                                    break
+                    if varargin{2}.DoFType == 0
+                        cind = varargin{1}.CellVerts{c}; nvverts = length(cind);
+                        verts = varargin{1}.Vertices(cind,:);
+                        cfaces = varargin{1}.CellFaces{c}; nfaces = length(cfaces);
+                        fcnodes = cell(nfaces,1);
+                        for f=1:nfaces
+                            ff = cfaces(f);
+                            cfn = varargin{1}.FaceVerts{ff,1};
+                            if varargin{1}.FaceCells(ff,2) == c
+                                cfn = fliplr(cfn);
+                            end
+                            tfn = zeros(1,length(cfn));
+                            for i=1:length(tfn)
+                                for j=1:length(cind)
+                                    if cfn(i) == cind(j);
+                                        tfn(i) = j;
+                                        break
+                                    end
                                 end
                             end
+                            fcnodes{f} = tfn;
                         end
-                        fcnodes{f} = tfn;
+                    end
+                    % All Other FEM Generation
+                    % ----------------------------------------------------------
+                    if varargin{2}.DoFType ~= 0
+                        % Collect Face Vertex Information for Cell
+                        cv = varargin{2}.CellVertexNodes{c};
+                        verts = varargin{2}.NodeLocations(cv,:);
+                        nvverts = length(verts);
+                        cind = varargin{2}.ConnectivityArray{c};
+                        cfaces = varargin{1}.CellFaces{c}; nfaces = length(cfaces);
+                        fcnodes = cell(nfaces,1);
+                        for f=1:nfaces
+                            ff = cfaces(f);
+                            if varargin{1}.FaceCells(ff,1) == c
+                                cfn = varargin{2}.FaceVertexNodes{ff,1};
+                            else
+                                cfn = varargin{2}.FaceVertexNodes{ff,2};
+                            end
+                            tfn = zeros(1,length(cfn));
+                            for i=1:length(tfn)
+                                for j=1:length(cind)
+                                    if cfn(i) == cind(j);
+                                        tfn(i) = j;
+                                        break
+                                    end
+                                end
+                            end
+                            fcnodes{f} = tfn;
+                        end
                     end
                     % Retrieve cell-wise matrices and quadrature
-                    % ----------------------------------------------------------
 %                     [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.FEMLumpBool,obj.volume_bools,obj.surface_bools,true,12);
                     [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.FEMLumpBool,obj.volume_bools,obj.surface_bools,obj.MMSBool,obj.GaussOrder);
                     % Assign volumetric matrices
@@ -267,46 +294,6 @@ classdef FEHandler < handle
                         obj.CellBasisValues{c} = QV{3};
 %                         obj.CellBasisGrads{c}  = QV{4};
                     end
-                    % Form Additional LD Matrices from Original PWLD Matrices
-                    % ----------------------------------------------------------
-%                     if obj.BasisType == 0
-%                         P = varargin{2}.LDCellProjection{c};
-%                         J = varargin{2}.LDCellInterpolation{c};
-%                         M = obj.CellMassMatrix{c};
-%                         G = obj.CellGradientMatrix{c};
-%                         K = obj.CellStiffnessMatrix{c};
-%                         % LD Cell Matrices
-%                         obj.LDCellRHSMassMatrix{c} = P*M;
-%                         obj.LDCellMassMatrix{c} = obj.LDCellRHSMassMatrix{c}*J;
-%                         obj.LDCellStiffnessMatrix{c} = P*K*J;
-%                         for d=1:obj.Dimension
-%                             obj.LDCellGradientMatrix{c}{d} = P*G{d}*J;
-%                         end
-%                         % LD Face Matrices
-%                         tvz = zeros(nvverts);
-%                         for f=1:nfaces
-%                             ff = cfaces(f);
-%                             fvn = fcnodes{f}; nfvn = length(fvn);
-%                             fcells = varargin{1}.FaceCells(ff,:);
-%                             if fcells(1) == c
-%                                 tc = 1;
-%                             elseif fcells(2) == c
-%                                 tc = 2;
-%                             end
-% %                             fP = varargin{2}.LDFaceProjection{ff,tc};
-% %                             fJ = varargin{2}.LDFaceInterpolation{ff,tc};
-%                             fM = obj.FaceMassMatrix{ff,tc};
-%                             fG = obj.FaceGradientMatrix{ff,tc};
-%                             tfM = tvz;
-%                             tfM(fvn,fvn) = fM;
-%                             obj.LDFaceMassMatrix{ff,tc} = P*tfM*J;
-%                             obj.LDFaceRHSMassMatrix{ff,tc} = P(:,fvn)*fM;
-%                             for d=1:obj.Dimension
-%                                 obj.LDFaceGradientMatrix{ff,tc}{d} = P*fG{d}*J;
-%                                 
-%                             end
-%                         end
-%                     end
                 end
                 % Generate Coupling Face Gradient Terms
                 % -------------------------------------

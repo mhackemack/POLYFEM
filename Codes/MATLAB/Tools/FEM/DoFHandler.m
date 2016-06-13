@@ -1006,7 +1006,19 @@ obj.NodeLocations = mesh.CellCenter;
 % Loop through cells and build DoF structures
 for c=1:ncells
     obj.ConnectivityArray{c} = c;
-    
+    obj.NodeLocations(c,:) = mesh.CellCenter(c,:);
+    cfaces = mesh.CellFaces{c}; nf = length(cfaces);
+    obj.CellFaceNodes{c} = cell(nf,1);
+    % Loop through cell faces and build structures
+    for f=1:nf
+        obj.CellFaceNodes{c}{f} = c;
+        cf = cfaces(f); fcells = DoF.FaceCells(cf,:);
+        if fcells(1) == c
+            obj.FaceCellNodes{f,1} = c;
+        elseif fcells(2) == c
+            obj.FaceCellNodes{f,2} = c;
+        end
+    end
 end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1019,25 +1031,47 @@ odofs = ones(obj.Dimension+1,1);
 % Allocate memory space
 obj.NodeLocations = zeros(obj.TotalDoFs,obj.Dimension);
 % Loop through cells and build DoF structures
+% ------------------------------------------------------------------------------
+if glob.print_info, disp('   -> Begin Cell and Face DoF Assignment.'); end
 counter = 1;
 for c=1:ncells
     cdofs = counter:(counter+obj.Dimension);
     obj.ConnectivityArray{c} = cdofs;
+    obj.CellVertexNodes{c} = cdofs;
     obj.NodeLocations(cdofs,:) = odofs*mesh.CellCenter(c,:);
     cfaces = mesh.CellFaces{c}; nf = length(cfaces);
     obj.CellFaceNodes{c} = cell(nf,1);
     % Loop through cell faces and build structures
     for f=1:nf
         obj.CellFaceNodes{c}{f} = cdofs;
-        cf = cfaces(f); fcells = DoF.FaceCells(cf,:);
+        cf = cfaces(f); fcells = obj.FaceCells(cf,:);
         if fcells(1) == c
-            obj.FaceCellNodes{f,1} = cdofs;
+            obj.FaceCellNodes{cf,1} = cdofs;
         elseif fcells(2) == c
-            obj.FaceCellNodes{f,2} = cdofs;
+            obj.FaceCellNodes{cf,2} = cdofs;
         end
     end
     % Update DoF counter
     counter = counter + (obj.Dimension+1);
+end
+% Perform Cleanup Operations
+% ------------------------------------------------------------------------------
+if glob.print_info, disp('   -> Begin Cell and Face DoF Cleanup Operations.'); end
+obj.ConformingFaceNodes = cell(mesh.TotalFaces,2);
+obj.ConformingFaceNodeNumbering = cell(mesh.TotalFaces,2);
+obj.ConformingFaceCellNodeNumbering = cell(mesh.TotalFaces,2);
+% Cleanup Face Node Numbering
+for f=1:obj.TotalFaces
+    fcells = mesh.FaceCells(f,:);
+    fflag = mesh.FaceID(f);
+    if fflag ~= 0, fcells(2) = []; end
+    for i=1:length(fcells)
+        cdofs = obj.ConnectivityArray{fcells(i)}; nc = length(cdofs);
+        obj.ConformingFaceNodes{f,i} = cdofs;
+        obj.ConformingFaceNodeNumbering{f,i} = 1:nc;
+        obj.ConformingFaceCellNodeNumbering{f,i} = 1:nc;
+        obj.FaceVertexNodes{f,i} = cdofs;
+    end
 end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

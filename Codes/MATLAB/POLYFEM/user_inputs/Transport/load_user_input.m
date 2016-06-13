@@ -50,7 +50,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e1; c = 0.9999;
+txs = 1e0; c = 0.5;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -73,7 +73,7 @@ data.Neutronics.Transport.BCVals  = {0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 1;
+data.Neutronics.Transport.performDSA = 0;
 data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'eisenstat';
@@ -92,7 +92,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 10; ncells = 10;
+L = 1; ncells = 10;
 % gname = 'PolyMesh_SqDomain_L1_n256';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
