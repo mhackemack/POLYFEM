@@ -28,7 +28,8 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
             data.Neutronics.FEMSurfaceBools = [1,0,0,0];
         elseif strcmp(data.Neutronics.FEMType, 'DFEM')
             if strcmp(data.Neutronics.Transport.DSAType,'MIP') || ...
-               strcmp(data.Neutronics.Transport.DSAType,'IP')
+               strcmp(data.Neutronics.Transport.DSAType,'IP')  || ...
+               strcmp(data.Neutronics.Transport.DSAType,'M4S')
                 data.Neutronics.FEMSurfaceBools = [1,1,0,0];
             else
                 data.Neutronics.FEMSurfaceBools = [1,1,1,1];
@@ -37,11 +38,7 @@ elseif strcmp(data.Neutronics.transportMethod, 'Transport')
     % Without DSA
     else
         data.Neutronics.FEMVolumeBools = [1,0,1];
-        if strcmp(data.Neutronics.FEMType, 'CFEM')
-            data.Neutronics.FEMSurfaceBools = [1,0,0,0];
-        elseif strcmp(data.Neutronics.FEMType, 'DFEM')
-            data.Neutronics.FEMSurfaceBools = [1,0,0,0];
-        end
+        data.Neutronics.FEMSurfaceBools = [1,0,0,0];
     end
 end
 % Determine DoF Type

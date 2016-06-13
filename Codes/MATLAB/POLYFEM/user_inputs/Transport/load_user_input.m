@@ -11,11 +11,11 @@ data.problem.saveSolution = 0;
 data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 0;
-data.problem.refinementLevels = 8;
-data.problem.refinementTolerance = 0.2;
+data.problem.refineMesh = 1;
+data.problem.refinementLevels = 4;
+data.problem.refinementTolerance = 1/3;
 data.problem.AMRIrregularity = 1;
-data.problem.projectSolution = 0;
+data.problem.projectSolution = 1;
 data.problem.refinementType = 0; % 0 = err(c)/maxerr < c, 1 = numc/totalCells = c
 % Neutronics Data
 % ------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'zero';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LD';
+data.Neutronics.SpatialMethod = 'PWLD';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -33,7 +33,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'single';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -50,7 +50,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e0; c = 0.0;
+txs = 1e2; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -73,10 +73,10 @@ data.Neutronics.Transport.BCVals  = {0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 0;
+data.Neutronics.Transport.performDSA = 1;
 data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = 'direct';
-data.Neutronics.Transport.DSAPreconditioner = 'eisenstat';
+data.Neutronics.Transport.DSASolveMethod = 'pcg';
+data.Neutronics.Transport.DSAPreconditioner = 'jacobi';
 data.Neutronics.Transport.DSATolerance = 1e-4;
 data.Neutronics.Transport.DSAMaxIterations = 1e3;
 data.Neutronics.IP_Constant = 4;
@@ -92,7 +92,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 1; ncells = 10;
+L = 1; ncells = 20;
 % gname = 'PolyMesh_SqDomain_L1_n256';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
@@ -140,7 +140,7 @@ geometry = CartesianGeometry(2,x,y);
 % [data, geometry] = get_IronWater( data, 4, 'cart' );
 % [data, geometry] = get_IronWaterII( data, 1, 'tri' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
-% [data, geometry] = get_Yaqi_2D( data, 4, 'cart' );
+[data, geometry] = get_Yaqi_2D( data, 1, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
 % [data, geometry] = get_Reed_1D( data, 1 );
