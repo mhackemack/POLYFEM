@@ -29,12 +29,12 @@ glob = get_globals('Office');
 glob.print_info = false;
 % Load all user inputs
 % ------------------------------------------------------------------------------
-inp = '2D_1G_DSA'; addpath([glob.input_path,inp]);
+inp = '3D_1G_DSA'; addpath([glob.input_path,inp]);
 data = load_user_input();
 % additional inputs
 data.Type = 'Search';
-data.NumberPhasePerDim = 3;
-% wn_norm = 2*pi; pmin = sqrt(eps),; pmax = wn_norm - sqrt(eps);
+data.NumberPhasePerDim = 4;
+% wn_norm = 2*pi; pmin = sqrt(eps); pmax = wn_norm - sqrt(eps);
 % data.PhaseXSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
 % data.PhaseYSpacing = linspace(pmin,pmax,data.NumberPhasePerDim);
 % end user input section
