@@ -65,6 +65,7 @@ obj.FaceID = zeros(obj.TotalFaces,1,'uint32');
 obj.CellVerts = cell(obj.TotalCells,1);
 obj.CellCenter = zeros(obj.TotalCells,dim);
 obj.CellVolume = zeros(obj.TotalCells,1);
+obj.CellFaceVerts = cell(obj.TotalCells,1);
 obj.CellSurfaceArea = zeros(obj.TotalCells,1);
 obj.CellFaces = cell(obj.TotalCells,1);
 obj.OrthogonalProjection = zeros(obj.TotalFaces, 2);
@@ -108,6 +109,7 @@ for c=1:obj.TotalCells
         J = zeros(dim+1);
         J(1:3,:) = vv; J(4,:) = 1;
         obj.CellVolume(c) = obj.CellVolume(c) + abs(det(J))/6;
+        
     end
 end
 

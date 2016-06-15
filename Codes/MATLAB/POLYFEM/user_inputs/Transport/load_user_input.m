@@ -11,7 +11,7 @@ data.problem.saveSolution = 0;
 data.problem.saveVTKSolution = 0;
 % AMR Input Parameters
 % ------------------------------------------------------------------------------
-data.problem.refineMesh = 1;
+data.problem.refineMesh = 0;
 data.problem.refinementLevels = 4;
 data.problem.refinementTolerance = 1/3;
 data.problem.AMRIrregularity = 1;
@@ -33,7 +33,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'all';
+data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -50,7 +50,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-2;
-txs = 1e2; c = 0.9999;
+txs = 16; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -74,8 +74,8 @@ data.Neutronics.Transport.BCVals  = {0.0};
 % DSA Properties
 % ------------------------------------------------------------------------------
 data.Neutronics.Transport.performDSA = 1;
-data.Neutronics.Transport.DSAType = 'MIP';
-data.Neutronics.Transport.DSASolveMethod = 'pcg';
+data.Neutronics.Transport.DSAType = 'M4S';
+data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'jacobi';
 data.Neutronics.Transport.DSATolerance = 1e-4;
 data.Neutronics.Transport.DSAMaxIterations = 1e3;
@@ -91,8 +91,8 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 2;
-L = 1; ncells = 20;
+data.problem.Dimension = 3;
+L = 1; ncells = 10;
 % gname = 'PolyMesh_SqDomain_L1_n256';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
@@ -111,17 +111,17 @@ L = 1; ncells = 20;
 % tri = delaunayTriangulation(x,y);
 % geometry = GeneralGeometry(2, 'Delaunay', tri);
 
-% tx = linspace(0,L,ncells+1);
-% [x,y,z]=meshgrid(tx,tx,tx);
-% x=x(:);y=y(:);z=z(:);
-% tri = delaunayTriangulation(x,y,z);
-% geometry = GeneralGeometry(3, 'Delaunay', tri);
+tx = linspace(0,L,ncells+1);
+[x,y,z]=meshgrid(2*tx,tx,8*tx);
+x=x(:);y=y(:);z=z(:);
+tri = delaunayTriangulation(x,y,z);
+geometry = GeneralGeometry(3, 'Delaunay', tri);
 
-x=linspace(0,L,ncells+1);
-y=linspace(0,L,ncells+1);
+% x=linspace(0,L,ncells+1);
+% y=linspace(0,L,ncells+1);
 % z=linspace(0,L,ncells+1);
 % geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);
@@ -140,7 +140,7 @@ geometry = CartesianGeometry(2,x,y);
 % [data, geometry] = get_IronWater( data, 4, 'cart' );
 % [data, geometry] = get_IronWaterII( data, 1, 'tri' );
 % [data, geometry] = get_BWRAssembly( data, 2, 'cart' );
-[data, geometry] = get_Yaqi_2D( data, 1, 'cart' );
+% [data, geometry] = get_Yaqi_2D( data, 1, 'cart' );
 % [data, geometry] = get_2D_SS_tophat( data, .9, 1, 'cart' );
 % [data, geometry] = get_3D_SS_tophat( data, 1, 1, 'cart' );
 % [data, geometry] = get_Reed_1D( data, 1 );

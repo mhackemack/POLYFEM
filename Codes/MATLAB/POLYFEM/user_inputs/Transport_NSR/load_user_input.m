@@ -36,7 +36,7 @@ end
 % DSA Properties
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 data.Neutronics.Transport.performDSA = 1;
-data.Neutronics.Transport.DSAType = 'MIP';
+data.Neutronics.Transport.DSAType = 'M4S';
 data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'Jacobi';
 data.Neutronics.Transport.DSATolerance = 1e-4;

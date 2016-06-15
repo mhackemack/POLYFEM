@@ -1,23 +1,23 @@
-function geometry = load_geometry_input(dim, m_type, dx, num)
+function geometry = load_geometry_input(dim, m_type, dx, ar, num)
 global glob
 if dim == 1
     geometry = CartesianGeometry(1,dx);
 elseif dim == 2 && strcmp(m_type, 'tri')
-    [x,y]=meshgrid(dx,dx);
+    [x,y]=meshgrid(dx,ar*dx);
     x=x(:);y=y(:);
     tri = delaunayTriangulation(x,y);
     geometry = GeneralGeometry(2, 'Delaunay', tri);
 elseif dim == 2 && strcmp(m_type, 'quad')
-    geometry = CartesianGeometry(2,dx,dx);
+    geometry = CartesianGeometry(2,dx,ar*dx);
 elseif dim == 3 && strcmp(m_type, 'hex')
-    geometry = CartesianGeometry(3,dx,dx,dx);
+    geometry = CartesianGeometry(3,dx,ar*dx,ar*dx);
 elseif dim == 3 && strcmp(m_type, 'tet')
-    [x,y,z]=meshgrid(dx,dx,dx);
+    [x,y,z]=meshgrid(dx,ar*dx,ar*dx);
     x=x(:);y=y(:);z=z(:);
     tri = delaunayTriangulation(x,y,z);
     geometry = GeneralGeometry(3, 'Delaunay', tri);
 elseif dim == 3 && strcmp(m_type, 'tri_prism')
-    [x,y]=meshgrid(dx,dx);
+    [x,y]=meshgrid(dx,ar*dx);
     x=x(:);y=y(:);
     tri = delaunayTriangulation(x,y);
     geometry = GeneralGeometry(2, 'Delaunay', tri);

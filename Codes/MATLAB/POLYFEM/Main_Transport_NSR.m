@@ -26,25 +26,26 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % ------------------------------------------------------------------------------
 global glob
 glob = get_globals('Office');
-glob.print_info = false;
+glob.print_info = true;
 addpath([glob.input_path,'Transport_NSR']);
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bf, quad, bc
 % bf_name = {'WACHSPRESS','MV'};
-bf_name = {'WACHSPRESS','MV','MAXENT'};
-% bf_name = {'PWLD'};
+% bf_name = {'WACHSPRESS','MV','MAXENT'};
+bf_name = {'PWLD'};
 fdeg = [1];
-q_type = 'LS'; sn_levels = [2,4,8];
+q_type = 'LS'; sn_levels = [2,4];
 bc_type = 'Vacuum';
 % geometry
-dim = 2; m_type = 'quad';
+dim = 3; m_type = 'tet';
 % dx_num_start = 2; L = 1;
 dx_num_start = 21; L = 1;
 dx_start = linspace(0,L,dx_num_start);
+ar = 10;
 % xs
 c = 0.9999;
-mfp_lower = 2; mfp_upper = 51;
+mfp_lower = 1; mfp_upper = 41;
 mfp_min = 0; mfp_max = 3;
 % mfp_lower = 0; mfp_upper = 41;
 % mfp_min = -1; mfp_max = 3;
@@ -56,7 +57,7 @@ diff_type = 'M4S'; C_IP = [4];
 
 % Load some initial data
 % ----------------------
-geom = load_geometry_input(dim, m_type, dx_start, 1);
+geom = load_geometry_input(dim, m_type, dx_start, ar, 1);
 
 % Loop through problem space and execute test suite
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -98,7 +99,7 @@ for f=1:length(fdeg)
                 data.Neutronics.IP_Constant = C_IP(i);
                 %         if dim == 3, data.Neutronics.IP_Constant = 1e-3*data.Neutronics.IP_Constant; end
                 dx_num = dx_num_start;
-                geom = load_geometry_input(dim, m_type, dx_start, 1);
+                geom = load_geometry_input(dim, m_type, dx_start, ar, 1);
                 tc = 0;
                 % First loop through upper mfp values in reverse order
                 for j=mfp_upper:-1:1
@@ -133,7 +134,7 @@ for f=1:length(fdeg)
                     
                     dx_num = (dx_num-1)*2+1;
                     dx = linspace(0,L,dx_num);
-                    geom = load_geometry_input(dim, m_type, dx, jj);
+                    geom = load_geometry_input(dim, m_type, dx, ar, jj);
                     mfp(j) = txs * (max(geom.CellVolume))^(1/dim);
                     [data, geom] = process_input_data(data, geom);
                     data = cleanup_neutronics_input_data(data, geom);
@@ -159,8 +160,11 @@ for f=1:length(fdeg)
                 % Save off information
                 if ~isequal(exist(dname, 'dir'),7), mkdir(dname); end
                 q = sn_levels(m); C = C_IP(i);
-                fname = sprintf('%s%d_%s%d_C=%d',bf_name{b},fdeg(f),q_type,q,C);
-%                 fname = [bf_name,'_',q_type,num2str(q),'_C=',num2str(C)];
+                if dim == 1
+                    fname = sprintf('%s%d_%s%d_C=%d',bf_name{b},fdeg(f),q_type,q,C);
+                else
+                    fname = sprintf('%s%d_%s%d_C=%d_AR=%d',bf_name{b},fdeg(f),q_type,q,C,ar);
+                end
                 mat_out = [mfp, squeeze(NSR_norm(m,i,:)), squeeze(NSR_err(m,i,:))];
                 dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
             end
@@ -193,7 +197,7 @@ for f=1:length(fdeg)
             disp(['    -> Quadrature Set: ',num2str(m),' of ', num2str(sn_num)])
             data = load_quad_input( data, q_type, sn_levels(m) );
             dx_num = dx_num_start;
-            geom = load_geometry_input(dim, m_type, dx_start, 1);
+            geom = load_geometry_input(dim, m_type, dx_start, ar, 1);
             tc = 0;
             mfp = zeros(mfp_tot, 1);
             % First loop through upper mfp values in reverse order
@@ -229,7 +233,7 @@ for f=1:length(fdeg)
                 
                 dx_num = (dx_num-1)*2+1;
                 dx = linspace(0,L,dx_num);
-                geom = load_geometry_input(dim, m_type, dx, jj);
+                geom = load_geometry_input(dim, m_type, dx, ar, jj);
                 mfp(j) = txs * (max(geom.CellVolume))^(1/dim);
                 [data, geom] = process_input_data(data, geom);
                 data = cleanup_neutronics_input_data(data, geom);
@@ -255,7 +259,11 @@ for f=1:length(fdeg)
             % Save off information
             if ~isequal(exist(dname, 'dir'),7), mkdir(dname); end
             q = sn_levels(m);
-            fname = sprintf('%s%d_%s%d',bf_name{b},fdeg(f),q_type,q);
+            if dim == 1
+                fname = sprintf('%s%d_%s%d',bf_name{b},fdeg(f),q_type,q);
+            else
+                fname = sprintf('%s%d_%s%d_AR=%d',bf_name{b},fdeg(f),q_type,q,ar);
+            end
             mat_out = [mfp, squeeze(NSR_norm(m,:))', squeeze(NSR_err(m,:))'];
             dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
         end

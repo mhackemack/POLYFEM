@@ -471,7 +471,7 @@ else
 end
 out = max(out, 0.25);
 % THIS IS A HACK FOR TESTING!!!
-% if out > 0.5, out = 0.5; end
+% out = 0.25;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = cell_dot(dim,vec1, vec2)
 if dim == 1
