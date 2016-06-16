@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Office');
+glob = get_globals('Home');
 glob.print_info = true;
 addpath([glob.input_path,'Transport_NSR']);
 % Begin user input section
@@ -35,7 +35,7 @@ addpath([glob.input_path,'Transport_NSR']);
 % bf_name = {'WACHSPRESS','MV','MAXENT'};
 bf_name = {'PWLD'};
 fdeg = [1];
-q_type = 'LS'; sn_levels = [2,4];
+q_type = 'LS'; sn_levels = [2,4,8];
 bc_type = 'Vacuum';
 % geometry
 dim = 3; m_type = 'tet';
