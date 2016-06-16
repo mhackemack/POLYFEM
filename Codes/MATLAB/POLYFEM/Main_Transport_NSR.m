@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = true;
 addpath([glob.input_path,'Transport_NSR']);
 % Begin user input section
@@ -35,17 +35,17 @@ addpath([glob.input_path,'Transport_NSR']);
 % bf_name = {'WACHSPRESS','MV','MAXENT'};
 bf_name = {'PWLD'};
 fdeg = [1];
-q_type = 'LS'; sn_levels = [2,4,8];
+q_type = 'LS'; sn_levels = [2,4];
 bc_type = 'Vacuum';
 % geometry
-dim = 3; m_type = 'tet';
+dim = 2; m_type = 'tri';
 % dx_num_start = 2; L = 1;
 dx_num_start = 21; L = 1;
 dx_start = linspace(0,L,dx_num_start);
-ar = 10;
+ar = 1;
 % xs
 c = 0.9999;
-mfp_lower = 1; mfp_upper = 41;
+mfp_lower = 2; mfp_upper = 31;
 mfp_min = 0; mfp_max = 3;
 % mfp_lower = 0; mfp_upper = 41;
 % mfp_min = -1; mfp_max = 3;
@@ -67,7 +67,8 @@ C_num = length(C_IP);
 txs = 0;
 t_max_dim = (max(geom.CellVolume))^(1/dim);
 dname = 'outputs/Transport_NSR/';
-dname = [dname, diff_type, '_', bc_type, '_', m_type, '/'];
+dname = [dname, diff_type, '_MOD_', bc_type, '_', m_type, '/'];
+% dname = [dname, diff_type, '_', bc_type, '_', m_type, '/'];
 data.Neutronics.Transport.DSAType = diff_type;
 % MIP and IP DSA schemes
 % ------------------------------------------------------------------------------

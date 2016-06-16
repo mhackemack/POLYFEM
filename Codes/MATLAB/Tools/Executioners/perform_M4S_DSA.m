@@ -113,6 +113,7 @@ dim = mesh.Dimension;
 ndg = DoF.TotalDoFs;
 ng = ndat.numberEnergyGroups;
 ndof = ng*ndg;
+C_IP = ndat.IP_Constant;
 % Allocate Memory
 if ndof > glob.maxMatrix
     [L, rhs] = get_sparse_matrices(x, ndat, mesh, DoF, FE);
@@ -154,7 +155,8 @@ for f=1:mesh.TotalFaces
         CG2 = FE.FaceCouplingGradientMatrix{f,2}; CG2 = cell_dot(dim,fnorm,CG2);
         % Apply Interior Terms
         for g=1:ndat.numberEnergyGroups
-            kp = 1/4;
+%             kp = 1/4;
+            kp = get_penalty_coefficient(C_IP, DoF.Degree, D(g,:), h, fflag);
             gfnodes1 = fcnodes1 + (g-1)*ndg;
             gfnodes2 = fcnodes2 + (g-1)*ndg;
             gcnodes1 =  cnodes1 + (g-1)*ndg;
@@ -191,6 +193,7 @@ for f=1:mesh.TotalFaces
     % Boundary Face
     else
         matids = mesh.MatID(fcells(1));
+        h = mesh.OrthogonalProjection(f,1);
         M = FE.FaceMassMatrix{f,1};
         G = FE.FaceGradientMatrix{f,1};
         G = cell_dot(dim,fnorm,G);
@@ -201,7 +204,8 @@ for f=1:mesh.TotalFaces
             gfnodes = fcnodes + (g-1)*ndg;
             gcnodes =  cnodes + (g-1)*ndg;
             D = ndat.Diffusion.DiffXS(matids,g);
-            kp = 1/4;
+%             kp = 1/4;
+            kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
             if     (ndat.Transport.BCFlags(fflag) == glob.Vacuum || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
@@ -221,6 +225,7 @@ dim = mesh.Dimension;
 ndg = DoF.TotalDoFs;
 ng = ndat.numberEnergyGroups;
 ndof = ng*ndg;
+C_IP = ndat.IP_Constant;
 % Allocate Memory
 rhs = zeros(ndof,1);
 I = [];
@@ -278,8 +283,8 @@ for f=1:mesh.TotalFaces
         fonesnodes = ones(length(fcnodes{1}),1);
         % Apply Interior Terms
         for g=1:ndat.numberEnergyGroups
-            kp = 1/4;
-%             kp = get_penalty_coefficient(C_IP, DoF.Degree, D(g,:), h, fflag);
+%             kp = 1/4;
+            kp = get_penalty_coefficient(C_IP, DoF.Degree, D(g,:), h, fflag);
             gfnodes1 = fcnodes{1} + (g-1)*ndg;
             gfnodes2 = fcnodes{2} + (g-1)*ndg;
             gcnodes1 =  cnodes{1} + (g-1)*ndg;
@@ -351,8 +356,8 @@ for f=1:mesh.TotalFaces
             crows = conesnodes*gcnodes; ccols = (conesnodes*gcnodes)';
             frows = fonesnodes*gfnodes; fcols = (fonesnodes*gfnodes)';
             D = ndat.Diffusion.DiffXS(matids,g);
-            kp = 1/4;
-%             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
+%             kp = 1/4;
+            kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
             if     (ndat.Transport.BCFlags(fflag) == glob.Vacuum || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
@@ -385,25 +390,18 @@ for tcell=1:mesh.TotalCells
         rhs(sg) = rhs(sg) + ndat.Diffusion.ScatteringXS(matID,g,g) * M * x(sg);
     end
 end
-% Loop through faces
-for ff=1:mesh.TotalBoundaryFaces
-    f = mesh.BoundaryFaces(ff);
-    fflag = mesh.FaceID(f);
-    % Boundary Face
-    if fflag ~= 0
-        M = FE.FaceMassMatrix{f,1};
-        fcnodes = DoF.FaceCellNodes{f,1};
-        % Apply boundary terms
-%         for g=1:ndat.numberEnergyGroups
-%             gfnodes = fcnodes + (g-1)*ndg;
-%             if  ndat.Transport.BCFlags(fflag) == glob.Reflecting || ...
-%                     ndat.Transport.BCFlags(fflag) == glob.Periodic
-%                 Jin = ndat.Transport.OutgoingCurrents{f}(:,g) - ndat.Transport.OutgoingCurrentsOld{f}(:,g);
-%                 rhs(gfnodes) = rhs(gfnodes) + M*Jin;
-%             end
-%         end
-    end
-end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_penalty_coefficient(C,p,D,h,eflag)
+% c = C*(1+p)*p;
+% if eflag == 0
+%     out = c/2*(D(1)/h(1) + D(2)/h(2));
+% else
+%     out = c*D/h;
+% end
+% out = max(out, 0.25);
+% THIS IS A HACK!!!
+out = 0.25;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = cell_dot(dim,vec1, vec2)
 if dim == 1
