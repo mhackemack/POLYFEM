@@ -24,8 +24,8 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % Being User Input Section
 % ------------------------------------------------------------------------------
 sdm = {'LAGRANGE'};
-fedeg = 1;
-dat_in.FEMLumping = false;
+fedeg = [4,5,6,7,8];
+dat_in.FEMLumping = 1;
 % ---
 dat_in.QuadType = 'PGLC';
 dat_in.SnLevels = 24;
@@ -37,7 +37,7 @@ geom_in.Dimension = 1;
 geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.ncellx = 100;
+geom_in.ncellx = 10;
 geom_in.ncelly = 1;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
@@ -70,7 +70,11 @@ for k=1:length(fedeg)
             data = load_user_input(dat_in, geom_in);
             [data,geometry] = load_geometry_input(data, geom_in);
             data.problem.Path = 'Transport/UnresolvedBoundaryLayer_1D';
-            data.problem.Name = sprintf('S%d_Lx%d_nx%d_sig%d_%s%d',dat_in.SnLevels,geom_in.Lx,geom_in.ncellx,sigt(t),sdm{s},fedeg(k));
+            if dat_in.FEMLumping
+                data.problem.Name = sprintf('S%d_Lx%d_nx%d_sig%d_L%s%d',dat_in.SnLevels,geom_in.Lx,geom_in.ncellx,sigt(t),sdm{s},fedeg(k));
+            else
+                data.problem.Name = sprintf('S%d_Lx%d_nx%d_sig%d_U%s%d',dat_in.SnLevels,geom_in.Lx,geom_in.ncellx,sigt(t),sdm{s},fedeg(k));
+            end
             % Run problem iteration
             [data, geometry] = process_input_data(data, geometry);
             data = cleanup_neutronics_input_data(data, geometry);

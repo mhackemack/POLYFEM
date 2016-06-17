@@ -61,6 +61,8 @@ bgrads_v = get_1D_gradients(ord, xx, qx);
 M = bvals_v'*(bvals_v.*(qw*zt));
 K = bgrads_v'*(bgrads_v.*(qw*zt));
 G{1} = (bgrads_v'*(bvals_v.*(qw*zt)))';
+% Apply Mass Matrix Lumping
+if lump_bool, M = diag(sum(M)); end
 
 % Construct Surface Matrix Space
 % ------------------------------------------------------------------------------
@@ -88,7 +90,9 @@ varargout{4} = {{verts(1),verts(2)},{1,1},{bvals_s(1,:),bvals_s(2,:)},{bgrads_s(
 %   Function List
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_1D_values(ord, v, x)
-if ord == 1
+if ord == 0
+    out = ones(length(x),1);
+elseif ord == 1
     out = [(v(2)-x), (x-v(1))]/(v(2) - v(1));
 elseif ord == 2
     out = [(x-v(2)).*(x-v(3))/(v(1)-v(2))/(v(1)-v(3)),...
@@ -110,7 +114,9 @@ else
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_1D_gradients(ord, v, x)
-if ord == 1
+if ord == 0
+    out = zeros(length(x),1);
+elseif ord == 1
     out = ones(length(x),1) * [-1, 1]/(v(2) - v(1));
 elseif ord == 2
     out = [  (x - v(2))/((v(1) - v(2))*(v(1) - v(3))) + (x - v(3))/((v(1) - v(2))*(v(1) - v(3))), ...

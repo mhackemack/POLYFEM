@@ -197,7 +197,7 @@ classdef FEHandler < handle
                     end
                     % LD FEM Generation
                     % ----------------------------------------------------------
-                    if varargin{2}.DoFType == 0
+                    if varargin{2}.DoFType == 0 || obj.Degree == 0
                         cind = varargin{1}.CellVerts{c}; nvverts = length(cind);
                         verts = varargin{1}.Vertices(cind,:);
                         cfaces = varargin{1}.CellFaces{c}; nfaces = length(cfaces);
@@ -219,10 +219,9 @@ classdef FEHandler < handle
                             end
                             fcnodes{f} = tfn;
                         end
-                    end
                     % All Other FEM Generation
                     % ----------------------------------------------------------
-                    if varargin{2}.DoFType ~= 0
+                    else
                         % Collect Face Vertex Information for Cell
                         cv = varargin{2}.CellVertexNodes{c};
                         verts = varargin{2}.NodeLocations(cv,:);

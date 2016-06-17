@@ -27,7 +27,13 @@ hold on
 xlim([min(mesh.Vertices), max(mesh.Vertices)])
 % 
 if DoF.Degree == 0
-    
+    for c=1:DoF.TotalCells
+        cn = DoF.ConnectivityArray{c};
+        cverts = mesh.CellVerts{c};
+        xx = mesh.Vertices(cverts);
+        y = x(cn);
+        plot(xx,y*ones(2,1),'k');
+    end
 elseif DoF.DoFType == 0
     for c=1:DoF.TotalCells
         % Retrieve DoF information for cell
@@ -37,11 +43,8 @@ elseif DoF.DoFType == 0
         cverts = mesh.CellVerts{c};
         xx = mesh.Vertices(cverts);
         dx = abs(xx(2) - xx(1));
-%         save = x(cn(1));
-%         sx = x(cn(2));
         b = get_LD_basis(xx,ccent,dx);
         % Plot Values
-%         y = save*ones(2,1) + sx*b(:,2);
         y    = b*x(cn);
         plot(xx, y, 'k');
     end

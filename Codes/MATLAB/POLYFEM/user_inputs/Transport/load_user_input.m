@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'random';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'PWLD';
+data.Neutronics.SpatialMethod = 'LAGRANGE';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -33,7 +33,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 8;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -49,8 +49,8 @@ data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
-% ep = 1e-2;
-txs = 1; c = 0.9999;
+% ep = 1e-5;
+txs = 10; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -62,7 +62,7 @@ data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
-data.Neutronics.Transport.ExtSource = [0.0];
+data.Neutronics.Transport.ExtSource = [1.0];
 % Boundary Conditions
 % data.Neutronics.Transport.BCFlags = [glob.Vacuum,glob.IncidentIsotropic];
 % data.Neutronics.Transport.BCVals  = {0.0;2.0};
@@ -91,8 +91,8 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 2;
-L = 1; ncells = 20;
+data.problem.Dimension = 1;
+L = 1; ncells = 50;
 % gname = 'PolyMesh_SqDomain_L1_n256';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
@@ -117,11 +117,11 @@ L = 1; ncells = 20;
 % tri = delaunayTriangulation(x,y,z);
 % geometry = GeneralGeometry(3, 'Delaunay', tri);
 
-x=linspace(0,100*L,ncells+1);
-y=linspace(0,1*L,ncells+1);
+x=linspace(0,1*L,ncells+1);
+% y=linspace(0,1*L,ncells+1);
 % z=linspace(0,L,ncells+1);
-% geometry = CartesianGeometry(1,x);
-geometry = CartesianGeometry(2,x,y);
+geometry = CartesianGeometry(1,x);
+% geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);

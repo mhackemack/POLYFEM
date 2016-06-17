@@ -69,20 +69,6 @@ f_dofs = get_face_dofs(nv, faces, order);
 % Calculate quadrature points and basis function values
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
 [bmv, gmv] = PWLD_O2_basis_functions(verts, qx_v, faces, order, nverts);
-% Build surface quadrature
-% qx_s = cell(nf,1); qw_s = cell(nf,1); qs_ind = cell(nf,1);
-% qxs_list = []; qws_list = []; counter = 0;
-% for f=1:nf
-%     [qx_s{f}, qw_s{f}] = get_general_surface_quadrature(verts, faces{f}, q_ord);
-%     qxs_list = [qxs_list; qx_s{f}]; qws_list = [qws_list; qw_s{f}];
-%     nx = length(qw_s{f}); tind = 1:nx; qs_ind{f} = counter + tind;
-%     counter = counter + nx;
-% end
-% if s_flags(2)
-%     [tbms, tgms] = PWLD_O2_basis_functions(verts, qxs_list, faces, order, nverts);
-% else
-%     tbms = PWLD_O2_basis_functions(verts, qxs_list, faces, order, nverts);
-% end
 % mass matrix
 for q=1:nqx
     bt = bmv(q,:);
