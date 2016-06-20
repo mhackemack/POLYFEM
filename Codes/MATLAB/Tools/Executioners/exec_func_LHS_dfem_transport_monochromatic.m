@@ -23,7 +23,7 @@ angdirs = ndat.AngularDirections;
 q_offset = (1:na)*ndof - ndof;
 g_offset = (1:ng)*ndof*na - ndof*na;
 % Allocate Memory Space
-% ---------------------
+% ------------------------------------------------------------------------------
 if ntot > glob.maxMatrix
     L = get_sparse_matrix(data, mesh, DoF, FE, angs, groups);
     return
@@ -52,8 +52,8 @@ for c=1:mesh.TotalCells
         end
     end
 end
-
 % Loop through faces
+% ------------------------------------------------------------------------------
 for f=1:mesh.TotalFaces
     fflag = mesh.FaceID(f);
     fnorm = mesh.FaceNormal(f,:);
@@ -110,7 +110,7 @@ if ~issparse(L), L = sparse(L); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function L = get_sparse_matrix(data, mesh, DoF, FE, angs, groups)
 % Process Input Space
-% -------------------
+% ------------------------------------------------------------------------------
 global glob
 dim = mesh.Dimension;
 ndat = data.Transport;
@@ -122,11 +122,12 @@ angdirs = ndat.AngularDirections;
 q_offset = (1:na)*ndof - ndof;
 g_offset = (1:ng)*ndof*na - ndof*na;
 % Allocate Memory Space
-% ---------------------
+% ------------------------------------------------------------------------------
 I = [];
 J = [];
 TMAT = [];
 % Loop through cells
+% ------------------------------------------------------------------------------
 for c=1:mesh.TotalCells
     cmat = mesh.MatID(c);
     cnodes = DoF.ConnectivityArray{c}; ncnodes = length(cnodes);
@@ -140,12 +141,12 @@ for c=1:mesh.TotalCells
         % Loop through energy groups
         for g=1:ng
             % Get Indexing Information
-            % ------------------------
+            % ------------------------------------------------------------------
             cnqg = cnodes + g_offset(g) + q_offset(q);
             rows = (onesnodes*cnqg)';
             cols = onesnodes*cnqg;
             % Apply Sparse Indexing
-            % ---------------------
+            % ------------------------------------------------------------------
             tmat = ndat.TotalXS(cmat,g)*M + GG;
             I = [I;rows(:)];
             J = [J;cols(:)];
@@ -164,6 +165,7 @@ for c=1:mesh.TotalCells
     end
 end
 % Loop through faces
+% ------------------------------------------------------------------------------
 for f=1:mesh.TotalFaces
     fflag = mesh.FaceID(f);
     fnorm = mesh.FaceNormal(f,:);

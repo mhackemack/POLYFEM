@@ -21,6 +21,8 @@ if iscell(x), x = x{1}; end
 if n_input < 5
     if DoF.DoFType == 0
         plot_LD_solution(mesh, DoF, x);
+    elseif DoF.Degree == 0
+        plot_k0_solution(mesh,DoF,x);
     else
         plot_general_solution(mesh, DoF, x);
     end
@@ -39,17 +41,24 @@ end
 function plot_LD_solution(mesh,DoF,x)
 hold on
 for c=1:mesh.TotalCells
-    cv = mesh.CellVerts{c}; ncv = length(cv);
+    cv = mesh.CellVerts{c};
     xx = mesh.Vertices(cv,:);
     ccent = mesh.CellCenter(c,:);
     dx = get_LD_widths(mesh.Dimension,xx);
     b = get_LD_basis(xx,ccent,dx);
     cn = DoF.ConnectivityArray{c};
-%     save = x(cn(1));
-%     sx   = x(cn(2));
-%     sy   = x(cn(3));
-%     y    = save*ones(ncv,1) + sx*b(:,2) + sy*b(:,3);
     y    = b*x(cn);
+    patch(xx(:,1), xx(:,2), y, y, 'FaceColor', 'interp')
+end
+hold off
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function plot_k0_solution(mesh,DoF,x)
+hold on
+for c=1:mesh.TotalCells
+    cv = mesh.CellVerts{c}; ncv = length(cv);
+    xx = mesh.Vertices(cv,:);
+    cn = DoF.ConnectivityArray{c};
+    y  = x(cn)*ones(ncv,1);
     patch(xx(:,1), xx(:,2), y, y, 'FaceColor', 'interp')
 end
 hold off

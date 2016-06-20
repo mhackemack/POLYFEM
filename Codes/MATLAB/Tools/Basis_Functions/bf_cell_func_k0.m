@@ -65,11 +65,12 @@ end
 % ------------------------------------------------------------------------------
 % Cell-Wise Values
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
+[bmv, gmv] = get_k0_volume_terms(dim, length(qw_v));
 % mass matrix
 M = sum(qw_v);
 % Face-Wise Values
 % ------------------------------------------------------------------------------
-[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, q_ord, q_ord);
+[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, q_ord);
 for f=1:nf
     MM{f} = sum(qw_s{f});
     if s_flags(2)
@@ -103,7 +104,7 @@ for i=1:nv
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord, q_ord)
+function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, q_ord)
 nf = length(faces);
 qx_s = cell(nf, 1);
 qw_s = cell(nf, 1);
@@ -111,10 +112,35 @@ bms  = cell(nf, 1);
 gms  = cell(nf, 1);
 % Change based on dimension type
 if dim == 1
-    
+    % Left Face
+    qw_s{1} = 1.0;
+    qx_s{1} = verts(1);
+    bms{1}  = 1.0;
+    gms{1}  = 0.0;
+    % Right Face
+    qw_s{2} = 1.0;
+    qx_s{2} = verts(2);
+    bms{2}  = 1.0;
+    gms{2}  = 0.0;
 elseif dim == 2
-    
+    [tqx, tqw] = get_legendre_gauss_quad(q_ord); ntqx = length(tqw);
+    fones = ones(ntqx,1); fzeros = zeros(1,dim,ntqx);
+    % Loop through faces
+    for f=1:nf
+        fv = faces{f};
+        v = verts(fv,:);
+        dx = v(2,:) - v(1,:);
+        len = norm(diff(v));
+        qw_s{f} = tqw*len;
+        qx_s{f} = fones*v(1,:) + tqx*dx;
+        bms{f} = fones;
+        gms{f} = fzeros;
+    end
 elseif dim == 3
     
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [bmv, gmv] = get_k0_volume_terms(dim, nqx)
+bmv = ones(nqx,1);
+gmv = zeros(1,dim,nqx);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

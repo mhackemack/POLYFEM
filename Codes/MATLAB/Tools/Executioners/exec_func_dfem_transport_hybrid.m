@@ -14,7 +14,7 @@ global glob
 % Setup Solution Space
 % ------------------------------------------------------------------------------
 [ndat, flux_out] = setup_solution_space(ndat, mesh, DoF);
-DSA_iterations = 0;
+DSA_iterations = 0; DSA_time = 0;
 % Loop through Angle Sets
 % ------------------------------------------------------------------------------
 groups = 1:ndat.numberEnergyGroups;
@@ -29,7 +29,8 @@ for m=1:nas
     end
     % Collect Matrix and RHS and compute angular fluxes
     L = exec_func_LHS_dfem_transport_hybrid(ndat, mesh, DoF, FE, ang_sets{m}, groups);
-    rhs = exec_func_RHS_dfem_transport(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
+    rhs = exec_func_RHS_dfem_transport_monochromatic(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
+%     rhs = exec_func_RHS_dfem_transport(x, ndat, mesh, DoF, FE, ang_sets{m}, groups);
     y = L\rhs;
     % Postprocess angular flux solutions
     flux_out = add_to_flux(y, ndat, DoF, ang_sets{m}, groups, flux_out);
