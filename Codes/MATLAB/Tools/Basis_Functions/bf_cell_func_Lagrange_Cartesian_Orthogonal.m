@@ -31,12 +31,13 @@ nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
 faces = varargin{3}; nf = length(faces);
 ord = varargin{4};
-v_flags = varargin{5};
-s_flags = varargin{6};
-q_bool = varargin{7};
+lump_bool = varargin{5};
+v_flags = varargin{6};
+s_flags = varargin{7};
+q_bool = varargin{8};
 q_ord = ord+2;
-if nargin > 7
-    if ~isempty(varargin{8}),q_ord = varargin{8};end
+if nargin > 8
+    if ~isempty(varargin{9}),q_ord = varargin{9};end
 end
 % Prepare Vertices and Dimensional Space
 % --------------------------------------
@@ -123,6 +124,7 @@ end
 % Volume Matrices
 [M,K,G] = get_volume_matrices(dim, ord, dx, dy);
 M = M(r_to_g,r_to_g);
+if lump_bool, M = diag(sum(M)); end
 K = K(r_to_g,r_to_g);
 for d=1:dim
     G{d} = G{d}(r_to_g,r_to_g);

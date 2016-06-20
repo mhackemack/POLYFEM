@@ -143,6 +143,7 @@ end
 % Build Matrices
 % --------------
 M = bvals_v'*(bvals_v.*(qw_V*zt));
+if lump_bool, M = diag(sum(M)); end
 K  = zeros(ntot);
 G  = cell(dim,1);
 for d=1:dim

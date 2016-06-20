@@ -1,14 +1,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Title:          Metric Main Generation Function
+%   Title:          k=0 Basis Function Generator
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2014
+%   Year:           2016
 %
 %   Description:    MATLAB script to produce the elementary volume and
 %                   surface matrices, along with the appropriate quadrature
-%                   set outputs for the Metric basis functions.
+%                   set outputs for the 0th-order basis functions.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -23,7 +23,7 @@
 %                   9) Quadrature Order (Optional)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function varargout = bf_cell_func_Metric( varargin )
+function varargout = bf_cell_func_k0( varargin )
 % Collect Input/Output Arguments
 % ------------------------------------------------------------------------------
 nout = nargout;
@@ -39,74 +39,42 @@ q_ord = ord+2;
 if nargin > 8
     if ~isempty(varargin{9}),q_ord = varargin{9};end
 end
+% Quick Error Checking
+% ------------------------------------------------------------------------------
+if ord ~= 0, error('Only 0th-order basis functions.'); end
 % Prepare Vertices and Dimensional Space
 % ------------------------------------------------------------------------------
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
-% Quick Error Checking
-% ------------------------------------------------------------------------------
-if order > 1 , error('Metric coordinates only defined for order 1.'); end
-if dim ~= 2, error('Metric coordinates only coded for 2D at this time.'); end
-% if ~isConvex(verts, faces), error('Can only apply Metric Coordinates to convex shapes.'); end
-% Compute and exit immediately if 1D
-% ------------------------------------------------------------------------------
-if dim == 1
-    [bf_V,bf_S,QV,QS] = bf_cell_func_1D(varargin{:});
-    varargout = {bf_V, bf_S, QV, QS};
-    return
-end
+h = get_max_diamter( verts );
 % ------------------------------------------------------------------------------
 % Allocate Matrix Space
-% ---------------------
-znv = zeros(nv);
-M = znv;
-K = znv;
+% ------------------------------------------------------------------------------
+M = 0;
+K = 0;
 G = cell(dim, 1);
-for d=1:dim, G{d} = znv; end
+for d=1:dim, G{d} = 0; end
 MM = cell(nf, 1);
 G2 = cell(nf, 1);
 for f=1:nf
-    MM{f} = zeros(length(faces{f}));
-    for d=1:dim, G2{f}{d} = znv; end
+    MM{f} = 0;
+    for d=1:dim, G2{f}{d} = 0; end
 end
 % Collect all Matrices and Quadratures
 % ------------------------------------------------------------------------------
 % Cell-Wise Values
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
-[bmv, gmv] = metric_basis_functions(verts, qx_v, faces, order, nverts);
 % mass matrix
-for q=1:nqx
-    bt = bmv(q,:);
-    M = M + qw_v(q) * (bt'*bt);
-end
-if lump_bool, M = diag(sum(M)); end
-% stiffness matrix
-if v_flags(2)
-    for q=1:nqx
-        bg = gmv(:,:,q);
-        K = K + qw_v(q) * (bg*bg');
-    end
-end
-% gradient matrix
-if v_flags(3)
-    for q=1:nqx
-        bt = bmv(q,:);
-        bg = gmv(:,:,q);
-        for d=1:dim
-            G{d} = G{d} + qw_v(q) * (bg(:,d)*bt)';
-        end
-    end
-end
+M = sum(qw_v);
 % Face-Wise Values
-[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, order);
+% ------------------------------------------------------------------------------
+[qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, q_ord, q_ord);
 for f=1:nf
-    nqx = length(qw_s{f});
-    for q=1:nqx
-        bt = bms{f}(q,:);
-        MM{f} = MM{f} + qw_s{f}(q) * (bt'*bt);
-        if s_flags(2)
-            
+    MM{f} = sum(qw_s{f});
+    if s_flags(2)
+        for d=1:dim
+            G2{f}{d} = 0;
         end
     end
 end
@@ -123,32 +91,30 @@ varargout{4} = {qx_s, qw_s, bms, gms};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Auxiallary Function Calls
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord)
+function out_max = get_max_diamter( verts )
+nv = size(verts,1);
+out_max = 0;
+for i=1:nv
+    vi = verts(i,:);
+    for j=1:nv
+        if i==j, continue; end
+        h = norm(verts(j,:) - vi);
+        if h > out_max, out_max = h; end
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [qx_s, qw_s, bms, gms] = get_surface_values(dim, verts, faces, ord, q_ord)
 nf = length(faces);
 qx_s = cell(nf, 1);
 qw_s = cell(nf, 1);
 bms  = cell(nf, 1);
 gms  = cell(nf, 1);
-if dim == 2
-    [tqx, tqw] = lgwt(ord+2,0,1); ntqx = length(tqw);
-    fones = ones(ntqx,1);
-    for f=1:nf
-        fv = faces{f};
-        v = verts(fv,:);
-        dv = v(2,:) - v(1,:);
-        len = norm(diff(v));
-        qw_s{f} = tqw*len;
-        qx_s{f} = fones*v(1,:) + tqx*dv;
-        if ord == 1
-            bms{f} = [1-tqx, tqx];
-        elseif ord == 2
-             bms{f} = [(1-tqx).^2, tqx.^2, 2*tqx.*(1-tqx)];
-        end
-    end
+% Change based on dimension type
+if dim == 1
+    
+elseif dim == 2
+    
 elseif dim == 3
-    for f=1:nf
-        fv = faces{f};
-        v = verts(fv,:);
-    end
+    
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

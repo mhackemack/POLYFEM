@@ -135,6 +135,7 @@ end
 if v_flags(1)
     M = bvals_v'*(bvals_v.*(qw_V*zt));
 end
+if lump_bool, M = diag(sum(M)); end
 % Stiffness Matrix
 if v_flags(2)
     for q=1:nq_V

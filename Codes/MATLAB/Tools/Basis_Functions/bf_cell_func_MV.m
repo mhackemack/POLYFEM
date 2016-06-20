@@ -81,6 +81,7 @@ for q=1:nqx
     bt = bmv(q,:);
     M = M + qw_v(q) * (bt'*bt);
 end
+if lump_bool, M = diag(sum(M)); end
 % stiffness matrix
 if v_flags(2)
     for q=1:nqx

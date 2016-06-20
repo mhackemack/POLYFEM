@@ -451,10 +451,16 @@ classdef FEHandler < handle
             if obj.Dimension == 1
                 obj.BasisType = 1;
                 obj.bf_cell_func = @bf_cell_func_1D;
-                obj.basis_eval_func = @LD_basis_functions;
+                return
             elseif strcmp(bbname, 'LD')
                 obj.BasisType = 0;
                 obj.bf_cell_func = @bf_cell_func_LD;
+                obj.basis_eval_func = @LD_basis_functions;
+                return
+            elseif obj.Degree == 0
+                obj.BasisType = 0;
+                obj.bf_cell_func = @bf_cell_func_k0;
+                return
             elseif strcmp(bbname, 'LAGRANGE')
                 obj.BasisType = 1;
                 if strcmp(obj.MeshType,'Triangle') || strcmp(obj.MeshType,'Tetrahedron')
@@ -469,6 +475,7 @@ classdef FEHandler < handle
                 else
                     error('Cannot recognize mesh type.');
                 end
+                return
             elseif strcmp(bbname, 'SERENDIPITY')
                 obj.BasisType = 2;
                 if strcmp(obj.MeshType,'Triangle') || strcmp(obj.MeshType,'Tetrahedron')
@@ -483,6 +490,7 @@ classdef FEHandler < handle
                 else
                     error('Cannot recognize mesh type.');
                 end
+                return
             elseif strcmp(bbname, 'PWLD')
                 obj.BasisType = 3;
                 if obj.Degree == 1
@@ -491,6 +499,7 @@ classdef FEHandler < handle
                     obj.bf_cell_func = @bf_cell_func_PWQ;
                 end
                 obj.basis_eval_func = @PWLD_basis_functions;
+                return
 %                 obj.volume_func = @PWLD_volume;
 %                 obj.surface_func = @PWLD_surface;
 %                 obj.quadrature_func = @PWLD_quad_gen;
@@ -498,9 +507,11 @@ classdef FEHandler < handle
                 obj.BasisType = 3;
                 obj.bf_cell_func = @bf_cell_func_PWQ;
                 obj.basis_eval_func = @PWLD_basis_functions;
+                return
             elseif strcmp(bbname, 'WACHSPRESS')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_Wachspress;
+                return
 %                 obj.volume_func = @wachspress_volume;
 %                 obj.surface_func = @wachspress_surface;
 %                 obj.quadrature_func = @eval_quad_gen;
@@ -509,6 +520,7 @@ classdef FEHandler < handle
             elseif strcmp(bbname, 'MV')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_MV;
+                return
 %                 obj.volume_func = @mean_value_volume;
 %                 obj.surface_func = @mean_value_surface;
 %                 obj.quadrature_func = @eval_quad_gen;
@@ -523,6 +535,7 @@ classdef FEHandler < handle
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_max_entropy;
                 obj.basis_eval_func = @max_entropy_basis_functions;
+                return
 %                 obj.volume_func = @max_entropy_volume;
 %                 obj.surface_func = @max_entropy_surface;
 %                 obj.quadrature_func = @eval_quad_gen;
@@ -531,6 +544,7 @@ classdef FEHandler < handle
             elseif strcmp(bbname, 'METRIC')
                 obj.BasisType = 4;
                 obj.bf_cell_func = @bf_cell_func_Metric;
+                return
 %                 obj.quadrature_func = @eval_quad_gen;
 %                 obj.eval_volume_func = @metric_basis_functions;
 %                 obj.eval_surface_func = @metric_basis_functions;
