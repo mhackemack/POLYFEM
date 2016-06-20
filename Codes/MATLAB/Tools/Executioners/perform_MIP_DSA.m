@@ -200,10 +200,10 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentIsotropic || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
-%                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
-%                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - D*(G + G');
                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
-                L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
+                L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - D*(G + G');
+%                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + 0.5*M;
+%                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
             end
         end
     end
@@ -471,7 +471,7 @@ else
 end
 out = max(out, 0.25);
 % THIS IS A HACK FOR TESTING!!!
-% out = 0.25;
+% out = 0.5;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = cell_dot(dim,vec1, vec2)
 if dim == 1

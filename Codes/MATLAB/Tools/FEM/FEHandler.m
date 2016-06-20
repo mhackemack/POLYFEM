@@ -448,7 +448,7 @@ classdef FEHandler < handle
         % Set basis function handles
         function set_basis_functions(obj)
             bbname = upper(obj.BasisName);
-            if obj.Dimension == 1
+            if obj.Dimension == 1 && ~strcmp(bbname, 'LD')
                 obj.BasisType = 1;
                 obj.bf_cell_func = @bf_cell_func_1D;
                 return
