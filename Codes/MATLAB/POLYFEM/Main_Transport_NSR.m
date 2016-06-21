@@ -25,7 +25,7 @@ if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 % Populate global space
 % ------------------------------------------------------------------------------
 global glob
-glob = get_globals('Home');
+glob = get_globals('Office');
 glob.print_info = true;
 addpath([glob.input_path,'Transport_NSR']);
 % Begin user input section
@@ -35,20 +35,20 @@ addpath([glob.input_path,'Transport_NSR']);
 % bf_name = {'WACHSPRESS','MV','MAXENT'};
 bf_name = {'LAGRANGE'};
 fdeg = [1];
-q_type = 'LS'; sn_levels = [4];
+q_type = 'LS'; sn_levels = [2,4];
 bc_type = 'Vacuum';
 % geometry
 dim = 2; m_type = 'quad';
 % dx_num_start = 2; L = 1;
-dx_num_start = 41; L = 1;
+dx_num_start = 21; L = 1;
 dx_start = linspace(0,L,dx_num_start);
-ar = 100;
+ar = 10;
 % xs
 c = 0.9999;
-mfp_lower = 0; mfp_upper = 1;
-mfp_min = -1; mfp_max = -1;
-% mfp_lower = 0; mfp_upper = 41;
-% mfp_min = -1; mfp_max = 3;
+mfp_lower = 2; mfp_upper = 31;
+mfp_min = 0; mfp_max = 3;
+% % mfp_lower = 0; mfp_upper = 41;
+% % mfp_min = -1; mfp_max = 3;
 mfp_vals = logspace(mfp_min, mfp_max, mfp_upper);
 % DSA
 diff_type = 'MIP'; C_IP = [4];
@@ -67,7 +67,7 @@ C_num = length(C_IP);
 txs = 0;
 t_max_dim = (max(geom.CellVolume))^(1/dim);
 dname = 'outputs/Transport_NSR/';
-dname = [dname, diff_type, '_MOD_', bc_type, '_', m_type, '/'];
+dname = [dname, diff_type, '_RobinMOD_', bc_type, '_', m_type, '/'];
 % dname = [dname, diff_type, '_', bc_type, '_', m_type, '/'];
 data.Neutronics.Transport.DSAType = diff_type;
 % MIP and IP DSA schemes
@@ -167,7 +167,7 @@ for f=1:length(fdeg)
                     fname = sprintf('%s%d_%s%d_C=%d_AR=%d',bf_name{b},fdeg(f),q_type,q,C,ar);
                 end
                 mat_out = [mfp, squeeze(NSR_norm(m,i,:)), squeeze(NSR_err(m,i,:))];
-%                 dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
+                dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
             end
         end
     end
@@ -266,7 +266,7 @@ for f=1:length(fdeg)
                 fname = sprintf('%s%d_%s%d_AR=%d',bf_name{b},fdeg(f),q_type,q,ar);
             end
             mat_out = [mfp, squeeze(NSR_norm(m,:))', squeeze(NSR_err(m,:))'];
-%             dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
+            dlmwrite([dname,fname,'.dat'],mat_out,'precision','%14.8e');
         end
     end
 end
