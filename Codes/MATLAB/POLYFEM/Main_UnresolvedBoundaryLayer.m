@@ -24,7 +24,7 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % Being User Input Section
 % ------------------------------------------------------------------------------
 sdm = {'LAGRANGE'};
-fedeg = [1];
+fedeg = [2];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
@@ -34,10 +34,10 @@ dat_in.PolarLevels = 24;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 2;
-geom_in.GeometryType = 'tri';
+geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.ncellx = 40;
+geom_in.ncellx = 10;
 geom_in.ncelly = 1;
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;

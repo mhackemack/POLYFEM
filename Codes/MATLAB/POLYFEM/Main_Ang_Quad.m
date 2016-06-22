@@ -24,7 +24,7 @@ clc; close all; format long e
 if ~pbool, fpath = get_path(); addpath(fpath); pbool = true; end
 
 alvls = [1];
-plvls = [32];
+plvls = [24];
 snlvl = [2,4,8,16];
 pdim  = 1;
 
@@ -43,10 +43,10 @@ if strcmp(data.Neutronics.Transport.QuadType, 'PGLC')
             data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport, dim);
             draw_quadrature(data);
             ffname = [out_dir,fname,num2str(alvls(j)),'_',num2str(plvls(i)),'_',num2str(dim),'D'];
-            saveas(gcf,ffname,'fig');
-            print(gcf,ffname,'-depsc');
-            print(gcf,ffname,'-dpng');
-            close all;
+%             saveas(gcf,ffname,'fig');
+%             print(gcf,ffname,'-depsc');
+%             print(gcf,ffname,'-dpng');
+%             close all;
         end
     end
 else
@@ -55,9 +55,9 @@ else
         data.Neutronics.Transport = get_angular_quadrature(data.Neutronics.Transport, dim);
         draw_quadrature(data);
         ffname = [out_dir,fname,num2str(snlvl(m)),'_',num2str(dim),'D'];
-        saveas(gcf,ffname,'fig');
-        print(gcf,ffname,'-depsc');
-        print(gcf,ffname,'-dpng');
-        close all;
+%         saveas(gcf,ffname,'fig');
+%         print(gcf,ffname,'-depsc');
+%         print(gcf,ffname,'-dpng');
+%         close all;
     end
 end

@@ -18,7 +18,7 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Home');
+global glob; glob = get_globals('Office');
 inp = 'Transport_UBL_1DREF';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
@@ -36,7 +36,7 @@ dat_in.PolarDimension = 1;
 geom_in.Dimension = 1;
 geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
-geom_in.x = unique([linspace(0,0.01,81),linspace(0.01,.1,81),linspace(.1,1,41)]);
+geom_in.x = unique([linspace(0,0.01,201),linspace(0.01,.1,201),linspace(.1,1,101)]);
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
 geom_in.ymin_bound_type = glob.Reflecting;

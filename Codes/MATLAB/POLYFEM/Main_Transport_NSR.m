@@ -33,7 +33,7 @@ addpath([glob.input_path,'Transport_NSR']);
 % bf, quad, bc
 % bf_name = {'WACHSPRESS','MV'};
 % bf_name = {'WACHSPRESS','MV','MAXENT'};
-bf_name = {'LAGRANGE'};
+bf_name = {'PWLD'};
 fdeg = [1];
 q_type = 'LS'; sn_levels = [2,4];
 bc_type = 'Vacuum';
@@ -42,7 +42,7 @@ dim = 2; m_type = 'quad';
 % dx_num_start = 2; L = 1;
 dx_num_start = 21; L = 1;
 dx_start = linspace(0,L,dx_num_start);
-ar = 10;
+ar = 100;
 % xs
 c = 0.9999;
 mfp_lower = 2; mfp_upper = 31;
@@ -98,7 +98,6 @@ for f=1:length(fdeg)
                 disp(['      -> IP Constant: ',num2str(i),' of ', num2str(C_num)])
                 mfp = zeros(mfp_tot, 1);
                 data.Neutronics.IP_Constant = C_IP(i);
-                %         if dim == 3, data.Neutronics.IP_Constant = 1e-3*data.Neutronics.IP_Constant; end
                 dx_num = dx_num_start;
                 geom = load_geometry_input(dim, m_type, dx_start, ar, 1);
                 tc = 0;

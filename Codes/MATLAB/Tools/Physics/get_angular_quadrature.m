@@ -23,21 +23,32 @@ else
     if dim == 1
         [x,w] = lgwt(data.SnLevels,-1,1);
         w = w*2;
+        adims = [1,2,3];
     else
-        if strcmp(AQName, 'LDFE')
-            [x,w] = get_LDFE_quad(dim, data.SnLevels);
-        elseif strcmp(AQName, 'GLC')
-            [x,w] = get_GLC_quad(dim, data.SnLevels);
-        elseif strcmp(AQName, 'PGLC')
-            if isfield(data, 'PolarDimension')
-                [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels, data.PolarDimension);
-            else
-                [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels, 3);
+        % Form angle directions based on polar angle - defaults to z
+        if isfield(data, 'PolarDimension')
+            pdim = data.PolarDimension;
+            if pdim == 1
+                adims = [2,3,1];
+            elseif pdim == 2
+                adims = [1,3,2];
+            elseif pdim == 3
+                adims = [1,2,3];
             end
+        else
+            adims = [1,2,3];
+        end
+        % Switch based on quadrature type
+        if strcmp(AQName, 'LDFE')
+            [x,w] = get_LDFE_quad(dim, data.SnLevels, adims);
+        elseif strcmp(AQName, 'GLC')
+            [x,w] = get_GLC_quad(dim, data.SnLevels, adims);
+        elseif strcmp(AQName, 'PGLC')
+            [x,w] = get_PGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels, adims);
         elseif strcmp(AQName, 'LS')
-            [x,w] = get_LS_quad(dim, data.SnLevels);
+            [x,w] = get_LS_quad(dim, data.SnLevels, adims);
         elseif strcmp(AQName, 'TriGLC')
-            [x,w] = get_TriGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels);
+            [x,w] = get_TriGLC_quad(dim, data.PolarLevels, data.AzimuthalLevels, adims);
         else
             error('Cannot determine angular quadrature type.')
         end
@@ -57,10 +68,10 @@ end
 if strcmpi(AQName, 'Manual')
     opp_ind = determine_opposite_angle(x);
 else
-    [x, w, opp_ind] = deploy_all_octants(dim,x,w);
+    [x, w, opp_ind] = deploy_all_octants(dim,x,w,adims);
 end
 w = (w /sum(w))*a_norm;
-[nMtot, Sn, Kn] = compute_harmonics(dim, x, data.PnOrder);
+[nMtot, Sn, Kn] = compute_harmonics(dim, x, data.PnOrder, adims);
 x = x(:,1:dim);
 d2m = compute_d2m(nMtot, w, Sn);
 m2d = compute_m2d(length(w), Sn, Kn, a_norm);
@@ -85,7 +96,7 @@ return
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs,wts] = get_LDFE_quad(dim, level)
+function [angs,wts] = get_LDFE_quad(dim, level, adims)
 % Quick Error Checks
 % ------------------
 if level < 0 || level > 7, error('LDFE level must be between 0 and 7.'); end
@@ -100,7 +111,7 @@ for i=0:level-1
     lineno = lineno + 4^(i+1);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs, wts] = get_GLC_quad(dim, level)
+function [angs, wts] = get_GLC_quad(dim, level, adims)
 % Quick Error Checks
 % ------------------
 
@@ -134,9 +145,12 @@ end
 pos = 1;offset = 0;
 for i=0:level/2-1
     for j=0:level/2-i-1
-        angs(pos,1) = sin_theta(i+1)*cos(az_nodes(j+1+offset));
-        angs(pos,2) = sin_theta(i+1)*sin(az_nodes(j+1+offset));
-        angs(pos,3) = cos_theta(i+1);
+        angs(pos,adims(1)) = sin_theta(i+1)*cos(az_nodes(j+1+offset));
+        angs(pos,adims(2)) = sin_theta(i+1)*sin(az_nodes(j+1+offset));
+        angs(pos,adims(3)) = cos_theta(i+1);
+%         angs(pos,1) = sin_theta(i+1)*cos(az_nodes(j+1+offset));
+%         angs(pos,2) = sin_theta(i+1)*sin(az_nodes(j+1+offset));
+%         angs(pos,3) = cos_theta(i+1);
         wts(pos) = pol_wt(i+1)*az_wt(j+1+offset);
         pos = pos + 1;
     end
@@ -144,7 +158,7 @@ for i=0:level/2-1
 end
 return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs,wts] = get_PGLC_quad(dim, npolar, nazimuth, pdim)
+function [angs,wts] = get_PGLC_quad(dim, npolar, nazimuth, adims)
 % Quick Error Checks
 % ------------------
 if npolar < 1, error('PGLC polar count must be >= 1.'); end
@@ -158,8 +172,6 @@ nRoots = 2*npolar;
 % Allocate output memory
 angs = zeros(numAngles,3);
 wts = zeros(numAngles,1);
-azdims = 1:3; azdims(pdim) = [];
-alldims = [azdims,pdim];
 % Get other local variables
 delta_phi = pi/(4*nazimuth);
 azim_weight = 2*delta_phi;
@@ -170,14 +182,13 @@ for i=0:nazimuth-1
         costheta = x(jj);
         sintheta = sqrt(1-costheta^2);
         iord = jj + (i-1)*npolar;
-        angs(iord,alldims) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
-%         angs(iord,:) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
+        angs(iord,adims) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
         wts(iord) = azim_weight*w(jj);
     end
     azim_angle = azim_angle + 2*delta_phi;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs,wts] = get_LS_quad(dim, level)
+function [angs,wts] = get_LS_quad(dim, level, adims)
 % Quick Error Checks
 % ------------------
 if level > 24
@@ -187,7 +198,7 @@ end
 % ----------------
 [angs,wts] = get_LS_local_quad(dim,level);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs,wts] = get_TriGLC_quad(dim, npolar, nazimuth)
+function [angs,wts] = get_TriGLC_quad(dim, npolar, nazimuth, adims)
 % Quick Error Checks
 % ------------------
 if npolar < 1, error('TriPGLC polar count must be >= 1.'); end
@@ -220,7 +231,8 @@ for j=0:npolar-1
     costheta = x(k);
     sintheta = sqrt(1-costheta^2);
     for i=0:nazimuth-1
-        angs(dir,:) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
+        angs(dir,adims) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
+%         angs(dir,:) = [cos(azim_angle)*sintheta,sin(azim_angle)*sintheta,costheta];
         wts(dir) = azim_weight*w(k);
         azim_angle = azim_angle + 2*delta_phi;
         dir = dir + 1;
@@ -228,7 +240,7 @@ for j=0:npolar-1
     nazimuth = nazimuth - 1;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [angs,wts,opp_ind] = deploy_all_octants(dim, angs, wts)
+function [angs,wts,opp_ind] = deploy_all_octants(dim, angs, wts, adims)
 numAngles = length(wts);
 octAngles = numAngles / 2^dim;
 opp_ind = zeros(numAngles,1);
@@ -265,7 +277,7 @@ if dim == 3
         angs(n+numAngles/2,1) =  angs(n,1);
         angs(n+numAngles/2,2) =  angs(n,2);
         angs(n+numAngles/2,3) = -angs(n,3);
-        wts(n+numAngles/2) = wts(n);
+        wts(n+numAngles/2)    =  wts(n);
     end
 end
 if dim == 2
@@ -273,7 +285,7 @@ if dim == 2
         nn = n + 1;
         opp_ind(nn) = nn+2*octAngles;
         opp_ind(nn+2*octAngles) = nn;
-        opp_ind(nn+octAngles) = nn+3*octAngles;
+        opp_ind(nn+octAngles)   = nn+3*octAngles;
         opp_ind(nn+3*octAngles) = nn+octAngles;
     end
 elseif dim == 3
@@ -281,7 +293,7 @@ elseif dim == 3
         nn = n + 1;
         opp_ind(nn) = nn+6*octAngles;
         opp_ind(nn+6*octAngles) = nn;
-        opp_ind(nn+octAngles) = nn+7*octAngles;
+        opp_ind(nn+octAngles)   = nn+7*octAngles;
         opp_ind(nn+7*octAngles) = nn+octAngles;
         opp_ind(nn+2*octAngles) = nn+4*octAngles;
         opp_ind(nn+4*octAngles) = nn+2*octAngles;
@@ -303,7 +315,7 @@ for m=1:na
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [nMtot, Sn, Kn] = compute_harmonics(dim, angs, fMom)
+function [nMtot, Sn, Kn] = compute_harmonics(dim, angs, fMom, adims)
 if dim == 1
     [nMtot, Sn, Kn] = compute_1D_harmonics(angs, fMom);
     return
@@ -330,12 +342,12 @@ nMtot = size(Kn,1);
 nA = size(angs,1);
 Sn = zeros(nMtot, nA);
 for a=1:nA
-    L = evaluate_legendre(angs(a,3),fMom);
+    L = evaluate_legendre(angs(a,adims(3)),fMom);
     for m=1:nMtot
         k = Kn(m,1); kk = k + 1;
         n = Kn(m,2); nn = n + 1;
-        phi = atan(angs(a,2) / angs(a,1));
-        if angs(a,1) < 0
+        phi = atan(angs(a,adims(2)) / angs(a,adims(1)));
+        if angs(a,adims(1)) < 0
             phi = phi + pi;
         end
         if n >= 0
