@@ -18,12 +18,12 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Office');
+global glob; glob = get_globals('Home');
 inp = 'Transport_UBL_REF';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-% sdm = {'PWLD'};
+% sdm = {'LAGRANGE'};
 fedeg = [1];
 sdm = {'WACHSPRESS','PWLD','MV','MAXENT'};
 % fedeg = [1,2];
@@ -32,14 +32,14 @@ dat_in.FEMLumping = false;
 dat_in.QuadType = 'PGLC';
 dat_in.SnLevels = 4;
 dat_in.AzimuthalLevels = 1;
-dat_in.PolarLevels = 24;
+dat_in.PolarLevels = 8;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 2;
 geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.x = unique([linspace(0,0.01,51),linspace(0.01,.1,51),linspace(.1,1,21)]);
+geom_in.x = unique([linspace(0,0.01,801),linspace(0.01,1,201)]);
 geom_in.y = [0,1];
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;

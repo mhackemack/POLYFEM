@@ -24,7 +24,7 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % Being User Input Section
 % ------------------------------------------------------------------------------
 sdm = {'LAGRANGE'};
-fedeg = [2];
+fedeg = 1:8;
 dat_in.FEMLumping = 0;
 % ---
 dat_in.QuadType = 'PGLC';

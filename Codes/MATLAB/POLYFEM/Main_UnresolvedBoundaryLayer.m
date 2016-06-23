@@ -23,14 +23,14 @@ inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'LAGRANGE'};
-fedeg = [2];
+sdm = {'WACHSPRESS','MV','PWLD','MAXENT'};
+fedeg = [1,2];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
 dat_in.SnLevels = 4;
 dat_in.AzimuthalLevels = 1;
-dat_in.PolarLevels = 24;
+dat_in.PolarLevels = 8;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 2;
