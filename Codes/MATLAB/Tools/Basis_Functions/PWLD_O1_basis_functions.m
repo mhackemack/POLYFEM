@@ -64,7 +64,8 @@ if dim == 2
         detJ = J(1,1)*J(2,2)-J(2,1)*J(1,2);
         invJ = [J(2,2),-J(1,2);-J(2,1),J(1,1)]/detJ;
         % Determine points inside triangle
-        qxbool = inpoly(qx, vv);
+        qxbool = inpolygon(qx(:,1),qx(:,2), vv(:,1), vv(:,2));
+%         qxbool = inpoly(qx, vv);
         tq_nums = q_nums(qxbool);
         xtemp = qx(tq_nums,:); nxt = size(xtemp,1);
         % Map to the reference triangle and get reference values
