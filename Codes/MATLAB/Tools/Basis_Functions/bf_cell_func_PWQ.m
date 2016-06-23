@@ -154,6 +154,7 @@ for f=1:nf
     if ord == 1
         bms{f} = [1-tqx, tqx];
     elseif ord == 2
+%         bms{f} = [2*(1-tqx).*(1/2-tqx),2*(tqx-1/2).*tqx,4*tqx.*(1-tqx)];
         bms{f} = [(1-tqx).^2, tqx.^2, 2*tqx.*(1-tqx)];
     end
 end

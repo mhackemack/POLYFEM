@@ -24,13 +24,13 @@ addpath([glob.input_path,inp]); % This one must be last to properly switch input
 % Being User Input Section
 % ------------------------------------------------------------------------------
 sdm = {'LAGRANGE'};
-fedeg = 1:8;
-dat_in.FEMLumping = 0;
+fedeg = 1:4;
+dat_in.FEMLumping = 1;
 % ---
 dat_in.QuadType = 'PGLC';
-dat_in.SnLevels = 24;
+dat_in.SnLevels = 16;
 dat_in.AzimuthalLevels = 1;
-dat_in.PolarLevels = 24;
+dat_in.PolarLevels = 16;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 1;
@@ -79,6 +79,7 @@ for k=1:length(fedeg)
             [data, geometry] = process_input_data(data, geometry);
             data = cleanup_neutronics_input_data(data, geometry);
             [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+            plot_solution(geometry,DoF,FE,sol.flux);
         end
     end
 end

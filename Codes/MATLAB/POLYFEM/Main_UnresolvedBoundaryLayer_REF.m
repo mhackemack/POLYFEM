@@ -18,14 +18,14 @@
 % ------------------------------------------------------------------------------
 clc; close all; format long e; clear;
 fpath = get_path(); addpath(fpath);
-global glob; glob = get_globals('Home');
+global glob; glob = get_globals('Office');
 inp = 'Transport_UBL_REF';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-% sdm = {'LAGRANGE'};
+sdm = {'LAGRANGE'};
 fedeg = [1];
-sdm = {'WACHSPRESS','PWLD','MV','MAXENT'};
+% sdm = {'WACHSPRESS','PWLD','MV','MAXENT'};
 % fedeg = [1,2];
 dat_in.FEMLumping = false;
 % ---
@@ -39,7 +39,7 @@ geom_in.Dimension = 2;
 geom_in.GeometryType = 'cart';
 geom_in.Lx = 1;
 geom_in.Ly = 1;
-geom_in.x = unique([linspace(0,0.01,801),linspace(0.01,1,201)]);
+geom_in.x = unique([linspace(0,0.01,1001),linspace(0.01,1,251)]);
 geom_in.y = [0,1];
 geom_in.xmin_bound_type = glob.Function;
 geom_in.xmax_bound_type = glob.Vacuum;
@@ -77,6 +77,7 @@ for k=1:length(fedeg)
             [data, geometry] = process_input_data(data, geometry);
             data = cleanup_neutronics_input_data(data, geometry);
             [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+            plot_solution(geometry,DoF,FE,sol.flux);
         end
     end
 end

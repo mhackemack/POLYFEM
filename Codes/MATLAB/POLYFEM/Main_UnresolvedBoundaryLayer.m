@@ -23,8 +23,9 @@ inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'WACHSPRESS','MV','PWLD','MAXENT'};
-fedeg = [1,2];
+sdm = {'PWLD'};
+% sdm = {'WACHSPRESS','MV','PWLD'};
+fedeg = [2];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
@@ -75,6 +76,7 @@ for k=1:length(fedeg)
             [data, geometry] = process_input_data(data, geometry);
             data = cleanup_neutronics_input_data(data, geometry);
             [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+            plot_solution(geometry,DoF,FE,sol.flux);
         end
     end
 end
