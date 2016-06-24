@@ -4,7 +4,7 @@ plot_linear = false;
 plot_quadratic = false;
 plot_tests = false;
 plot_serendipity = false;
-plot_serendipity_tests = false;
+plot_serendipity_tests = true;
 plot_fem_sol = true;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
