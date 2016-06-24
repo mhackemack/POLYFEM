@@ -76,8 +76,6 @@ end
 figure(200);
 plot_basis_function(test_unity,X,Y,sides);
 
-
-
 % test linearity
 test_linx = @(x,y,sides) 0*x+0*y;
 for i=1:4
@@ -100,5 +98,39 @@ for i=1:4
 end
 figure(400);
 plot_basis_function(test_liny,X,Y,sides);
+
+% test quadratic
+test_quad_xx = @(x,y,sides) 0*x+0*y;
+for i=1:4
+    for j=1:4
+        % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
+        xxcoef = (pt{i}(1)*pt{j}(1) + pt{j}(1)*pt{i}(1))/2;
+        test_quad_xx = @(x,y,sides) test_quad_xx(x,y,sides) + xxcoef*mu{i,j}(x,y,sides);
+    end
+end
+figure(500); plot_basis_function(test_quad_xx,X,Y,sides);
+
+% test quadratic
+test_quad_xy = @(x,y,sides) 0*x+0*y;
+for i=1:4
+    for j=1:4
+        % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
+        xycoef = (pt{i}(1)*pt{j}(2) + pt{j}(1)*pt{i}(2))/2;
+        test_quad_xy = @(x,y,sides) test_quad_xy(x,y,sides) + xycoef*mu{i,j}(x,y,sides);
+    end
+end
+figure(600); plot_basis_function(test_quad_xy,X,Y,sides);
+
+% test quadratic
+test_quad_yy = @(x,y,sides) 0*x+0*y;
+for i=1:4
+    for j=1:4
+        % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
+        yycoef = (pt{i}(2)*pt{j}(2) + pt{j}(2)*pt{i}(2))/2;
+        test_quad_yy = @(x,y,sides) test_quad_yy(x,y,sides) + yycoef*mu{i,j}(x,y,sides);
+    end
+end
+figure(700); plot_basis_function(test_quad_yy,X,Y,sides);
+
 
 
