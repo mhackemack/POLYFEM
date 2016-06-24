@@ -11,4 +11,5 @@ end
 surf(Y,X,Z');
 xlabel('X');
 ylabel('Y');
+colorbar;
 view(0,90)

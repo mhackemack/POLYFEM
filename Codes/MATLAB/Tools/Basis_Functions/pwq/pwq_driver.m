@@ -66,7 +66,8 @@ plot_basis_function(test_same,X,Y,sides);
 % end
 
 % test unity
-test_unity = @(x,y,sides) 0*x + 0*y;
+disp('Testing unity.')
+test_unity = @(x,y,sides) -1 + 0*x + 0*y;
 for i=1:4
     for j=1:4
         % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
@@ -77,7 +78,8 @@ figure(200);
 plot_basis_function(test_unity,X,Y,sides);
 
 % test linearity
-test_linx = @(x,y,sides) 0*x+0*y;
+disp('Testing x-linearity.')
+test_linx = @(x,y,sides) -1*x+0*y;
 for i=1:4
     for j=1:4
         % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
@@ -88,7 +90,8 @@ end
 figure(300);
 plot_basis_function(test_linx,X,Y,sides);
 
-test_liny = @(x,y,sides) 0*x+0*y;
+disp('Testing y-linearity.')
+test_liny = @(x,y,sides) 0*x-1*y;
 for i=1:4
     for j=1:4
         % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
@@ -100,7 +103,8 @@ figure(400);
 plot_basis_function(test_liny,X,Y,sides);
 
 % test quadratic
-test_quad_xx = @(x,y,sides) 0*x+0*y;
+disp('Testing xx-quadratic.')
+test_quad_xx = @(x,y,sides) -x.^2;
 for i=1:4
     for j=1:4
         % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
@@ -111,7 +115,8 @@ end
 figure(500); plot_basis_function(test_quad_xx,X,Y,sides);
 
 % test quadratic
-test_quad_xy = @(x,y,sides) 0*x+0*y;
+disp('Testing xy-quadratic.')
+test_quad_xy = @(x,y,sides) -x.*y;
 for i=1:4
     for j=1:4
         % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
@@ -122,7 +127,8 @@ end
 figure(600); plot_basis_function(test_quad_xy,X,Y,sides);
 
 % test quadratic
-test_quad_yy = @(x,y,sides) 0*x+0*y;
+disp('Testing yy-quadratic.')
+test_quad_yy = @(x,y,sides) -y.^2;
 for i=1:4
     for j=1:4
         % because j goes from 1 to 4 and not i to 4, the factor 2 is not needed
@@ -132,5 +138,19 @@ for i=1:4
 end
 figure(700); plot_basis_function(test_quad_yy,X,Y,sides);
 
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+%                     Serendipity Conversion and Testing
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Build A matrix
+% --------------
+Ap = [-1,0;0,-1;-1,0;0,-1;.5*ones(4,2)];
+A = [eye(8),Ap];
+% Build B matrix
+% --------------
+BB = diag(-1*ones(4,1)) - diag(ones((4-1),1),-1);
+BB(1,4) = -1;
+B = [eye(4),BB;zeros(4),2*eye(4)];
+% Build Serendipity Functions
+% ---------------------------
