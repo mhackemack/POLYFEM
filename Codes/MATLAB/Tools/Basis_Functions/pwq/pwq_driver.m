@@ -4,7 +4,8 @@ plot_linear = false;
 plot_quadratic = false;
 plot_tests = false;
 plot_serendipity = false;
-plot_fem_sol = true;
+plot_serendipity_tests = true;
+plot_fem_sol = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -270,6 +271,28 @@ if plot_serendipity
         plot_basis_function(xi{ixi},X,Y,sides);
     end
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%                     Testing serendipity
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% create plots
+if plot_serendipity_tests
+    % test unity
+    disp('Testing serendipity unity.')
+    test_unity = @(x,y,sides) -1 + 0*x + 0*y;
+    for ixi=1:8
+        fac=1;
+        if ixi>4
+            fac=2;
+        end
+            test_unity = @(x,y,sides) test_unity(x,y,sides) + fac*xi{ixi}(x,y,sides);
+    end
+    figure(950+ixi);
+    plot_basis_function(test_unity,X,Y,sides);
+end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
