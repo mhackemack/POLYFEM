@@ -4,8 +4,8 @@ plot_linear = false;
 plot_quadratic = false;
 plot_tests = false;
 plot_serendipity = false;
-plot_serendipity_tests = true;
-plot_fem_sol = false;
+plot_serendipity_tests = false;
+plot_fem_sol = true;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -190,7 +190,8 @@ end
 % E: (1,2), (2,3), (3,4), (4,1)
 % D: (1,3) then (2,4) for diagonal terms
 % ------------------------------------------------------------------------------
-Ap = [-1,0;0,-1;-1,0;0,-1;.5*ones(4,2)];
+% Ap = [-1,0;0,-1;-1,0;0,-1;ones(4,2)];
+Ap = [-1,0;0,-1;-1,0;0,-1;ones(4,2)];
 A = [eye(8),Ap];
 % Build B matrix
 % ------------------------------------------------------------------------------
@@ -251,8 +252,12 @@ for ixi=1:8
             k=k+1;
             % because j goes from i to 4 and not 1 to 4, the factor 2 is needed
             fac=1;
-            if i~=j
+            if abs(i-j) == 1
                 fac=2;
+            elseif i==1 && j==4
+                fac=2;
+            elseif abs(i-j) > 1
+                fac=1;
             end
             % only do [xi]=A[mu] when the entries in A are not zero
             if abs(coef(k)) > eps
@@ -264,7 +269,7 @@ end
 
 if plot_serendipity
     % test serendipity
-    disp('Testing serendipity.')
+    disp('Plotting serendipity.')
     for ixi=1:8
         fprintf('%d/8 \n',ixi);
         figure(800+ixi);
@@ -283,14 +288,75 @@ if plot_serendipity_tests
     disp('Testing serendipity unity.')
     test_unity = @(x,y,sides) -1 + 0*x + 0*y;
     for ixi=1:8
-        fac=1;
-        if ixi>4
-            fac=2;
-        end
-            test_unity = @(x,y,sides) test_unity(x,y,sides) + fac*xi{ixi}(x,y,sides);
+        test_unity = @(x,y,sides) test_unity(x,y,sides) + xi{ixi}(x,y,sides);
     end
-    figure(950+ixi);
+    figure(920);
     plot_basis_function(test_unity,X,Y,sides);
+    % test x-linearity
+    disp('Testing serendipity x-linearity.')
+    test_xlin = @(x,y,sides) -1*x + 0*y;
+    for ixi=1:8
+        if ixi <=4
+            xcoef = pt{ixi}(1);
+        else
+            xcoef = (pt{ixi-4}(1)+pt{mod(ixi-4,4)+1}(1))/2;
+        end
+        test_xlin = @(x,y,sides) test_xlin(x,y,sides) + xcoef*xi{ixi}(x,y,sides);
+    end
+    figure(921);
+    plot_basis_function(test_xlin,X,Y,sides);
+    % test y-linearity
+    disp('Testing serendipity y-linearity.')
+    test_ylin = @(x,y,sides) 0*x + -1*y;
+    for ixi=1:8
+        if ixi <=4
+            ycoef = pt{ixi}(2);
+        else
+            ycoef = (pt{ixi-4}(2)+pt{mod(ixi-4,4)+1}(2))/2;
+        end
+        test_ylin = @(x,y,sides) test_ylin(x,y,sides) + ycoef*xi{ixi}(x,y,sides);
+    end
+    figure(922);
+    plot_basis_function(test_ylin,X,Y,sides);
+    % test xy-quadratic
+    disp('Testing serendipity xy-quadratic.')
+    test_xy = @(x,y,sides) -1*x.*y;
+    for ixi=1:8
+        if ixi <=4
+            coef = pt{ixi}(1)*pt{ixi}(2);
+        else
+            coef = (pt{ixi-4}(1)+pt{mod(ixi-4,4)+1}(1))/2*(pt{ixi-4}(2)+pt{mod(ixi-4,4)+1}(2))/2;
+        end
+        test_xy = @(x,y,sides) test_xy(x,y,sides) + coef*xi{ixi}(x,y,sides);
+    end
+    figure(923);
+    plot_basis_function(test_xy,X,Y,sides);
+    % test xx-quadratic
+    disp('Testing serendipity xx-quadratic.')
+    test_xx = @(x,y,sides) -1*x.*x;
+    for ixi=1:8
+        if ixi <=4
+            coef = pt{ixi}(1)*pt{ixi}(1);
+        else
+            coef = pt{ixi-4}(1)*pt{mod(ixi-4,4)+1}(1);
+        end
+        test_xx = @(x,y,sides) test_xx(x,y,sides) + coef*xi{ixi}(x,y,sides);
+    end
+    figure(924);
+    plot_basis_function(test_xx,X,Y,sides);
+    % test yy-quadratic
+    disp('Testing serendipity yy-quadratic.')
+    test_yy = @(x,y,sides) -1*y.*y;
+    for ixi=1:8
+        if ixi <=4
+            coef = pt{ixi}(2)*pt{ixi}(2);
+        else
+            coef = pt{ixi-4}(2)*pt{mod(ixi-4,4)+1}(2);
+        end
+        test_yy = @(x,y,sides) test_yy(x,y,sides) + coef*xi{ixi}(x,y,sides);
+    end
+    figure(925);
+    plot_basis_function(test_yy,X,Y,sides);
 end
 
 
