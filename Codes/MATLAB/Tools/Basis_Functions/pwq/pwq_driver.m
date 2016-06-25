@@ -5,7 +5,7 @@ plot_quadratic = false;
 plot_tests = false;
 plot_serendipity = false;
 plot_serendipity_tests = true;
-plot_fem_sol = true;
+plot_fem_sol = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -190,8 +190,8 @@ end
 % E: (1,2), (2,3), (3,4), (4,1)
 % D: (1,3) then (2,4) for diagonal terms
 % ------------------------------------------------------------------------------
+Ap = [-1,0;0,-1;-1,0;0,-1;0.5*ones(4,2)];
 % Ap = [-1,0;0,-1;-1,0;0,-1;ones(4,2)];
-Ap = [-1,0;0,-1;-1,0;0,-1;ones(4,2)];
 A = [eye(8),Ap];
 % Build B matrix
 % ------------------------------------------------------------------------------
@@ -252,13 +252,20 @@ for ixi=1:8
             k=k+1;
             % because j goes from i to 4 and not 1 to 4, the factor 2 is needed
             fac=1;
-            if abs(i-j) == 1
+            if abs(i-j) == 1 % bottom, right, and top faces
                 fac=2;
-            elseif i==1 && j==4
+            elseif i==1 && j==4 % left face
                 fac=2;
             elseif abs(i-j) > 1
-                fac=1;
+                fac=2;
             end
+%             if abs(i-j) == 1 % bottom, right, and top faces
+%                 fac=2;
+%             elseif i==1 && j==4 % left face
+%                 fac=2;
+%             elseif abs(i-j) > 1
+%                 fac=1;
+%             end
             % only do [xi]=A[mu] when the entries in A are not zero
             if abs(coef(k)) > eps
                 xi{ixi}= @(x,y,sides) xi{ixi}(x,y,sides) + fac*coef(k)*mu{i,j}(x,y,sides);

@@ -249,7 +249,7 @@ classdef FEHandler < handle
                         end
                     end
                     % Retrieve cell-wise matrices and quadrature
-%                     [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.FEMLumpBool,obj.volume_bools,obj.surface_bools,true,12);
+%                    [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.FEMLumpBool,obj.volume_bools,obj.surface_bools,true,12);
                     [MV, MS, QV, QS] = obj.bf_cell_func(nvverts,verts,fcnodes,obj.Degree,obj.FEMLumpBool,obj.volume_bools,obj.surface_bools,obj.MMSBool,obj.GaussOrder);
                     % Assign volumetric matrices
                     obj.CellMassMatrix{c}      = MV{1};
