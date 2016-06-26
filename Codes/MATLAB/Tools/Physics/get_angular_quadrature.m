@@ -19,6 +19,7 @@ if strcmpi(AQName, 'Manual')
     x = data.QuadAngles; nx = size(x,1);
     x = [x,zeros(nx,3-dim)];
     w = data.QuadWeights;
+    adims = [1,2,3];
 else
     if dim == 1
         [x,w] = lgwt(data.SnLevels,-1,1);

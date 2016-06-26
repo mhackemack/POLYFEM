@@ -32,7 +32,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % MMS Properties
 data.Neutronics.Transport.MMS = true;
-data.Neutronics.Transport.QuadOrder = 16;
+data.Neutronics.Transport.QuadOrder = 6;
 data.Neutronics.Transport.ExtSource = cell(data.Neutronics.numberEnergyGroups,1);
 data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties

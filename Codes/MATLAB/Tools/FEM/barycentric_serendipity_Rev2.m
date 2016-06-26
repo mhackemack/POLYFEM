@@ -66,6 +66,7 @@ end
 % A = get_quad_pairing_transformation(nverts, scaled_verts, vind, diag_pairs);
 A = get_quad_pairing_transformation(ser_verts, ser_nodes, quad_pairs, diag_pairs, vind);
 q_vals = blin(:,quad_pairs(:,1)).*blin(:,quad_pairs(:,2));
+bout = (A*q_vals')';
 for q=1:nqx
     bout(q,:) = A*q_vals(q,:)';
 end

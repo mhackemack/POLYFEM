@@ -49,8 +49,8 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 data.Neutronics.Transport.TotalXS = dat_in.TotalXS;
-data.Neutronics.Transport.AbsorbXS = 0;
-data.Neutronics.Transport.ScatteringXS = dat_in.TotalXS;
+data.Neutronics.Transport.AbsorbXS = (1-dat_in.c)*dat_in.TotalXS;
+data.Neutronics.Transport.ScatteringXS = dat_in.c*dat_in.TotalXS;
 data.Neutronics.Transport.FissionXS = 0.0;
 data.Neutronics.Transport.NuBar = 0.0;
 data.Neutronics.Transport.FissSpec = 0.0;

@@ -29,10 +29,10 @@ geom_in.GeometryType = 'cart';
 geom_in.Lx = 1; geom_in.ncellx = 5;
 geom_in.Ly = 1; geom_in.ncelly = 5;
 % ---
-fedeg = [1];
-sdm = {'MAXENT'};
+fedeg = [2];
+sdm = {'PWLD'};
 % ---
-dat_in.lvls = 30;
+dat_in.lvls = 12;
 dat_in.irr = 1;
 dat_in.tol = 0.2;
 % Execute Problem Suite

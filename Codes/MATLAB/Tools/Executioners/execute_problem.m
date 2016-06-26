@@ -9,7 +9,7 @@
 %   Description:    
 %   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [data, sol, geometry, DoF, FE] = execute_problem(data, geometry)
+function [data, sol, geometry, DoF, FE] = execute_problem(data, geometry, varargin)
 global glob
 % Generate problem execution schedule
 % ------------------------------------------------------------------------------

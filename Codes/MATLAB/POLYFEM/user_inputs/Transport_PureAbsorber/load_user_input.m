@@ -33,7 +33,7 @@ data.Neutronics.Transport.QuadOrder = 4;
 % data.Neutronics.Transport.ExactSolution = cell(data.Neutronics.numberEnergyGroups,1);
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'single';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = dat_in.QuadType;
 data.Neutronics.Transport.SnLevels = dat_in.SnLevels;
 data.Neutronics.Transport.AzimuthalLevels = dat_in.AzimuthalLevels;
@@ -45,7 +45,7 @@ data.Neutronics.Transport.QuadWeights = dat_in.QuadWeights; % Weights for manual
 data.Neutronics.Transport.performSweeps = 0;
 data.Neutronics.Transport.visualizeSweeping = 0;
 % Tranpsort Type Properties - most of this only applies to hybrid transport
-data.Neutronics.Transport.transportType = 'upwind';
+data.Neutronics.Transport.transportType = 'monochromatic';
 data.Neutronics.Transport.StabilizationMethod = 'EGDG';
 data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
