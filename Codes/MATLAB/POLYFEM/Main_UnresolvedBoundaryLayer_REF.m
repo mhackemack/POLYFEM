@@ -30,7 +30,7 @@ fedeg = [1];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
-dat_in.SnLevels = 4;
+dat_in.SnLevels = 8;
 dat_in.AzimuthalLevels = 1;
 dat_in.PolarLevels = 8;
 dat_in.PolarDimension = 1;
@@ -57,6 +57,7 @@ dat_in.refinementTolerance = 0.3;
 dat_in.projectSolution = 1;
 % ---
 sigt = [500];
+sr = [0.9,0.95,0.99,0.999,0.9999];
 dat_in.RHSFunc = {@ZeroTransportFunction};
 % Execute Problem Suite
 % ------------------------------------------------------------------------------
@@ -68,16 +69,19 @@ for k=1:length(fedeg)
         dat_in.SpatialMethod = sdm{s};
         % Loop through total cross sections
         for t=1:length(sigt)
-            dat_in.TotalXS = sigt(t);
-            data = load_user_input(dat_in, geom_in);
-            [data,geometry] = load_geometry_input(data, geom_in);
-            data.problem.Path = ['Transport/UnresolvedBoundaryLayer_REF/',geom_in.GeometryType];
-            data.problem.Name = sprintf('PGLC%d_sig%d_%s%d',dat_in.PolarLevels,sigt(t),sdm{s},fedeg(k));
-            % Run problem iteration
-            [data, geometry] = process_input_data(data, geometry);
-            data = cleanup_neutronics_input_data(data, geometry);
-            [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-            plot_solution(geometry,DoF,FE,sol.flux);
+            for cc=1:length(sr)
+                dat_in.TotalXS = sigt(t);
+                dat_in.c = sr(cc);
+                data = load_user_input(dat_in, geom_in);
+                [data,geometry] = load_geometry_input(data, geom_in);
+                data.problem.Path = ['Transport/UnresolvedBoundaryLayer_REF/',geom_in.GeometryType];
+                data.problem.Name = sprintf('PGLC%d_sig%d_c=%d_%s%d',dat_in.PolarLevels,sigt(t),dat_in.c,sdm{s},fedeg(k));
+                % Run problem iteration
+                [data, geometry] = process_input_data(data, geometry);
+                data = cleanup_neutronics_input_data(data, geometry);
+                [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+                plot_solution(geometry,DoF,FE,sol.flux);
+            end
         end
     end
 end

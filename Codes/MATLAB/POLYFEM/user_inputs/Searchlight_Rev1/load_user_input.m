@@ -38,6 +38,7 @@ data.Neutronics.Transport.SnLevels = 4;
 data.Neutronics.Transport.PolarLevels = 4;
 data.Neutronics.Transport.AzimuthalLevels = 4;
 data.Neutronics.Transport.QuadAngles  = [1,.4]/norm([1,.4]);  % Angles for manual set
+% data.Neutronics.Transport.QuadAngles  = [1,0]/norm([1,0]);  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];                  % Weights for manual set
 % Sweep Operations
 data.Neutronics.Transport.performSweeps = 0;

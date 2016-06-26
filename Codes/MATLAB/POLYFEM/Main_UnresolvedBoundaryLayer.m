@@ -6,12 +6,12 @@
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
 %   Year:           2016
-%   
-%   Description:    
-%   
+%
+%   Description:
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%   Note(s):        
+%   Note(s):
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Prepare Project Space
@@ -23,15 +23,15 @@ inp = 'Transport_UBL';
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
 % Being User Input Section
 % ------------------------------------------------------------------------------
-sdm = {'PWLD'};
+sdm = {'WACHSPRESS'};
 % sdm = {'WACHSPRESS','MV','PWLD'};
-fedeg = [2];
+fedeg = [1];
 dat_in.FEMLumping = false;
 % ---
 dat_in.QuadType = 'PGLC';
-dat_in.SnLevels = 4;
+dat_in.SnLevels = 8;
 dat_in.AzimuthalLevels = 1;
-dat_in.PolarLevels = 16;
+dat_in.PolarLevels = 8;
 dat_in.PolarDimension = 1;
 % ---
 geom_in.Dimension = 2;
@@ -58,6 +58,7 @@ dat_in.refinementTolerance = 0.3;
 dat_in.projectSolution = 1;
 % ---
 sigt = [500];
+sr = [0.85,0.9,0.95,0.99,0.999,0.9999];
 dat_in.RHSFunc = {@ZeroTransportFunction};
 % Execute Problem Suite
 % ------------------------------------------------------------------------------
@@ -69,16 +70,27 @@ for k=1:length(fedeg)
         dat_in.SpatialMethod = sdm{s};
         % Loop through total cross sections
         for t=1:length(sigt)
-            dat_in.TotalXS = sigt(t);
-            data = load_user_input(dat_in, geom_in);
-            [data,geometry] = load_geometry_input(data, geom_in);
-            data.problem.Path = ['Transport/UnresolvedBoundaryLayer/',geom_in.GeometryType];
-            data.problem.Name = sprintf('PGLC%d_Lx%d_nx%d_sig%d_%s%d',dat_in.PolarLevels,geom_in.Lx,geom_in.ncellx,sigt(t),sdm{s},fedeg(k));
-            % Run problem iteration
-            [data, geometry] = process_input_data(data, geometry);
-            data = cleanup_neutronics_input_data(data, geometry);
-            [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
-            plot_solution(geometry,DoF,FE,sol.flux);
+            for cc=1:length(sr)
+                dat_in.TotalXS = sigt(t);
+                dat_in.c = sr(cc);
+                data = load_user_input(dat_in, geom_in);
+                [data,geometry] = load_geometry_input(data, geom_in);
+                tc = sr(cc); tcbool = true;
+                while tcbool
+                    if mod(tc,1) ~=0
+                        tc = tc*10;
+                    else
+                        tcbool = false;
+                    end
+                end
+                data.problem.Path = ['Transport/UnresolvedBoundaryLayer/',geom_in.GeometryType];
+                data.problem.Name = sprintf('PGLC%d_Lx%d_nx%d_sig%d_c=%d_%s%d',dat_in.PolarLevels,geom_in.Lx,geom_in.ncellx,sigt(t),tc,sdm{s},fedeg(k));
+                % Run problem iteration
+                [data, geometry] = process_input_data(data, geometry);
+                data = cleanup_neutronics_input_data(data, geometry);
+                [data, sol, geometry, DoF, FE] = execute_problem(data, geometry);
+                plot_solution(geometry,DoF,FE,sol.flux);
+            end
         end
     end
 end

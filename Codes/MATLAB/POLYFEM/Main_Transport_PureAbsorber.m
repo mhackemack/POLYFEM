@@ -29,7 +29,7 @@ poly_run_bool = false;
 split_poly_run_bool = false;
 % ---
 geom_in.Dimension = 2;
-geom_in.GeometryType = 'tri';
+geom_in.GeometryType = 'cart';
 pnum = [16];
 % pnum = [4,16,64,256,1024,4096,16384];
 % geom_in.PolyNum = [4,16,64,256,1024,4096,16384,65536];
@@ -53,7 +53,7 @@ geom_in.ymax_val = 0;
 geom_in.zmin_val = 0;
 geom_in.zmax_val = 0;
 % ---
-sdm = {'PWLD'};
+sdm = {'LAGRANGE'};
 % sdm = {'PWLD','WACHSPRESS','MV','MAXENT'};
 fedeg = [2];
 dat_in.SpatialMethod = 'PWLD';
@@ -76,7 +76,7 @@ dat_in.AMRIrregularity = 1;
 dat_in.refinementTolerance = 0.0;
 dat_in.projectSolution = 0;
 % ---
-sigt = [100];
+sigt = [1];
 % sigt = [1,10,100,1000];
 dat_in.TotalXS = 1;
 dat_in.RHSFunc = {@ZeroTransportFunction};
