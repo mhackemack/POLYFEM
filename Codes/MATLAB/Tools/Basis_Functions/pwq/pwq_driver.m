@@ -201,10 +201,6 @@ B = [eye(4),BB;zeros(4),2*eye(4)];
 % Build Serendipity Functions
 % ------------------------------------------------------------------------------
 % First, consolidate repeating quadratic functions
-
-<<<<<<< HEAD
-
-=======
 % i,j ordering for i=1:4, j=1:4 is
 %      i     j     k     Mike's row index in A
 %      1     1     1       1
@@ -412,4 +408,3 @@ if plot_fem_sol
     figure(901);
     plot_basis_function(fem_sol_quad,X,Y,sides);
 end
->>>>>>> 094ed8cfcae4e7143e57674f608b12617823c47d
