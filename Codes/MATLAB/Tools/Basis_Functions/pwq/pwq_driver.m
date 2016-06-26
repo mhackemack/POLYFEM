@@ -158,3 +158,5 @@ B = [eye(4),BB;zeros(4),2*eye(4)];
 % Build Serendipity Functions
 % ------------------------------------------------------------------------------
 % First, consolidate repeating quadratic functions
+
+
