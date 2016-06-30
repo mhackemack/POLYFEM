@@ -28,6 +28,14 @@ if is_dsa
        a_type == glob.Accel_AGS_MTG
         dx = A\data.Acceleration.Residual{accel_id};
         data = update_DSA_solutions(data, accel_id, mesh, DoF, dx);
+    elseif a_type == glob.Accel_WGS_MJIA_DSA
+        grps = data.Acceleration.Info(accel_id).Groups; ngrps = length(grps);
+        % Loop through groups and perform 1G-DSA solves
+        for g=1:ngrps
+            
+        end
+        % Perform energy-collapsed DSA solve
+        
     elseif a_type == glob.Accel_Fission_DSA
         
     end
@@ -52,6 +60,7 @@ accel_disc = accel.DiscretizationType;
 if      accel_type == glob.Accel_WGS_DSA || ...
         accel_type == glob.Accel_AGS_TG  || ...
         accel_type == glob.Accel_AGS_MTG  || ...
+        accel_type == glob.Accel_WGS_MJIA_DSA || ...
         accel_type == glob.Accel_Fission_DSA
     is_dsa = true;
     % Switch between diffusion discretizations
@@ -73,6 +82,8 @@ elseif  accel_type == glob.Accel_WGS_TSA || ...
     elseif accel_disc == glob.Accel_TSA_CFEM
         a_handle = @exec_func_CFEM_TSA;
     end
+else
+    error('Cannot determine acceleration type.');
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data = update_DSA_solutions(data, accel_id, mesh, DoF, dx)

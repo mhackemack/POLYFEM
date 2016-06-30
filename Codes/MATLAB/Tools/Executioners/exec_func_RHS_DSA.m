@@ -21,6 +21,10 @@ if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG || ...
    a_type == glob.Accel_AGS_MTG
     res = get_dsa_scattering_residual_contribution(accel,data.XS(xsid),mesh,DoF,FE,phi,phi0);
     data.Acceleration.Residual{accel_id} = res;
+elseif a_type == glob.Accel_WGS_MJIA_DSA
+    % Calculate acceleration residuals
+    res = get_mjia_residual(accel,data.XS(xsid),mesh,DoF,FE,phi,phi0);
+    data.Acceleration.Residual{accel_id} = res;
 elseif a_type == glob.Accel_Fission_DSA
     
 elseif a_type == glob.Accel_AGS_TTG || a_type == glob.Accel_AGS_MTTG
@@ -47,6 +51,23 @@ for c=1:mesh.TotalCells
             sxs = XS.ScatteringXS(cmat,grp,ggrp,1);
             out(cdof) = out(cdof) + sxs*M*(x{ggrp,1}(cdof) - x0{ggrp,1}(cdof));
         end
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = get_mjia_residual(accel,XS,mesh,DoF,FE,x,x0)
+% Get some data
+grps = accel.Groups;
+ngrps = length(grps);
+ndof = DoF.TotalDoFs;
+% Allocate memory space
+out = zeros(ndof,1);
+% Loop through cells
+for c=1:mesh.TotalCells
+    cmat = mesh.MatID(c);
+    cdof = DoF.ConnectivityArray{c};
+    M = FE.CellMassMatrix{c};
+    for g=1:ngrps
+        
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

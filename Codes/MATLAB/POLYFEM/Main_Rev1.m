@@ -28,8 +28,7 @@ global glob
 glob = get_globals('Home');
 % Specify User-Specific Input Folder Location
 % ------------------------------------------------------------------------------
-% inp = 'Diffusion';
-inp = 'Transport_TG2DV0';
+inp = 'Transport_1D_MJIA';
 % Populate path with additional folders
 % ------------------------------------------------------------------------------
 addpath([glob.input_path,inp]); % This one must be last to properly switch input files
