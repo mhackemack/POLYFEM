@@ -12,7 +12,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function flux = exec_func_transport_sweep(ndat, mesh, DoF, FE, x, m, groups)
 % Process Input Space
-% -------------------
+% ------------------------------------------------------------------------------
 global glob
 dim = mesh.Dimension;
 ndof = DoF.TotalDoFs;
@@ -23,12 +23,12 @@ angNorm = ndat.Transport.AngQuadNorm;
 m2d = ndat.Transport.moment_to_discrete;
 Kn = ndat.Transport.MomentOrders(:,1) + 1;
 % Get Sweep Information
-% ---------------------
+% ------------------------------------------------------------------------------
 sweep = ndat.Transport.Sweeping;
 CellOrder = sweep.CellSweepOrder{m}; ncells = length(CellOrder);
 USFaces = sweep.UpstreamFaces{m};
 % Allocate Memory Space
-% ---------------------
+% ------------------------------------------------------------------------------
 flux = zeros(ndof, na, ng);
 txs = ndat.Transport.TotalXS;
 sxs = ndat.Transport.ScatteringXS;
@@ -53,6 +53,7 @@ for cc=1:ncells
     G = FE.CellGradientMatrix{c};
     A = zeros(ncnodes,ncnodes,na,ng); b = zeros(ncnodes,na,ng);
     % Loop through angles
+    % --------------------------------------------------------------------------
     for q=1:na
         tq = angs(q);
         adir = angdirs(tq,:);

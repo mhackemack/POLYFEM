@@ -156,9 +156,11 @@ end
 function [bout, gout] = get_LD_basis(x,xmean,dx)
 [nx,dim] = size(x); onx = ones(nx,1);
 ddr = xmean./dx;
-bout = [onx, 2*x./(onx*dx) - 2*onx*ddr];
+bout = [onx, x./(onx*dx) - onx*ddr];
+% bout = [onx, 2*x./(onx*dx) - 2*onx*ddr];
 gout = zeros(dim+1,dim,nx);
-gt = [zeros(1,dim);diag(2./dx)];
+gt = [zeros(1,dim);diag(1./dx)];
+% gt = [zeros(1,dim);diag(2./dx)];
 for q=1:nx
     gout(:,:,q) = gt;
 end
