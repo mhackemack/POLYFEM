@@ -81,7 +81,7 @@ for m=1:nm
     end
     JN_err{m} = err;
     JN_NSR(m) = JN_err{m}(end)/JN_err{m}(end-1);
-    % Jacobi + NO WGC (DSA + 1G DSA)
+    % Jacobi + WGC (DSA + 1G DSA)
     % --------------------------------------------------------------------------
     phi = zeros(ng,1);
     phi(fg,1) = fphi; phi0 = phi;

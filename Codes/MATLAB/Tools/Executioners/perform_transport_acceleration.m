@@ -24,18 +24,29 @@ if is_dsa
     % Get DSA system matrix if not set
     if isempty(A), A = a_handle(data,accel_id,xsid,mesh,DoF,FE); end
     % Compute error and apply correction based on DSA type
-    if a_type == glob.Accel_WGS_DSA || a_type == glob.Accel_AGS_TG || ...
-       a_type == glob.Accel_AGS_MTG
+    if a_type == glob.Accel_WGS_DSA
+        data = exec_func_RHS_DSA(data,accel_id,xsid,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+        dx = A\data.Acceleration.Residual{accel_id};
+        data = update_DSA_solutions(data, accel_id, mesh, DoF, dx);
+    elseif a_type == glob.Accel_AGS_TG ||  a_type == glob.Accel_AGS_MTG
+        data = exec_func_RHS_DSA(data,accel_id,xsid,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.AGSPhiOld);
         dx = A\data.Acceleration.Residual{accel_id};
         data = update_DSA_solutions(data, accel_id, mesh, DoF, dx);
     elseif a_type == glob.Accel_WGS_MJIA_DSA
         grps = data.Acceleration.Info(accel_id).Groups; ngrps = length(grps);
+        acids = data.Acceleration.Info(accel_id).GroupAccelIDs;
         % Loop through groups and perform 1G-DSA solves
         for g=1:ngrps
-            
+            gxsid = data.Acceleration.Info(acids(g)).XSID;
+            data = exec_func_RHS_DSA(data,acids(g),gxsid,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+            AA = a_handle(data,acids(g),gxsid,mesh,DoF,FE);
+            dx = AA\data.Acceleration.Residual{acids(g)};
+            data = update_DSA_solutions(data, acids(g), mesh, DoF, dx);
         end
         % Perform energy-collapsed DSA solve
-        
+        data = exec_func_RHS_DSA(data,accel_id,xsid,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+        dx = A\data.Acceleration.Residual{accel_id};
+        data = update_DSA_solutions(data, accel_id, mesh, DoF, dx);
     elseif a_type == glob.Accel_Fission_DSA
         
     end

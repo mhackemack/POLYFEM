@@ -21,7 +21,7 @@ all_groups = 1:data.Groups.NumberEnergyGroups;
 tot_moments = data.Quadrature(trans_qid).TotalFluxMoments;
 % Get Iteration Information and Function Handles
 % ------------------------------------------------------------------------------
-inv_func = get_solution_function_handle_Rev1(data);
+inv_func   = get_solution_function_handle_Rev1(data);
 ags_maxits = data.solver.AGSMaxIterations;
 wgs_maxits = data.solver.WGSMaxIterations;
 ags_rel_tol = data.solver.AGSRelativeTolerance;
@@ -40,7 +40,7 @@ ags_accel_id    = data.Acceleration.AGSAccelerationID;
 ActiveAccelID   = 0;
 ActiveAccelInfo = [];
 DSA_Matrix      = [];
-AGS_OldPhi      = data.Fluxes.Phi;
+data.Fluxes.AGSPhiOld = data.Fluxes.Phi;
 % Perform Scattering Kernel Convergence
 % ------------------------------------------------------------------------------
 gs_converged = false(num_gs, 1);
@@ -125,7 +125,7 @@ for m=1:ags_maxits
                         ActiveAccelInfo = data.Acceleration.Info(wid);
                     end
                     % Perform Acceleration Here
-                    data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
+%                     data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.PhiOld);
                     [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
                     data.Acceleration.Residual{ActiveAccelID} = [];
                 end
@@ -174,7 +174,7 @@ for m=1:ags_maxits
                 ActiveAccelInfo = data.Acceleration.Info(ags_accel_id);
             end
             % Perform Acceleration Here
-            data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,AGS_OldPhi);
+            data = exec_func_RHS_DSA(data,ActiveAccelID,ActiveAccelInfo.XSID,mesh,DoF,FE,data.Fluxes.Phi,data.Fluxes.AGSPhiOld);
             [data, DSA_Matrix] = perform_transport_acceleration(data,ActiveAccelID,mesh,DoF,FE,DSA_Matrix);
             data.Acceleration.Residual{ActiveAccelID} = [];
             msg = sprintf('    End AGS Acceleration.');
@@ -182,9 +182,9 @@ for m=1:ags_maxits
         end
     end
     % Perform error tolerance checks
-    [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,2);
-%     [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,inf);
-    [err_pw, norm_pw] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,AGS_OldPhi,1:data.Groups.NumberEnergyGroups,1,'pdt_pw');
+    [err_L2, norm_L2] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.AGSPhiOld,1:data.Groups.NumberEnergyGroups,1,2);
+%     [err_inf, norm_inf] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.AGSPhiOld,1:data.Groups.NumberEnergyGroups,1,inf);
+    [err_pw, norm_pw] = compute_flux_moment_differences(DoF,FE,data.Fluxes.Phi,data.Fluxes.AGSPhiOld,1:data.Groups.NumberEnergyGroups,1,'pdt_pw');
     if err_L2 / norm_L2 < ags_rel_tol, ags_rel_converged = true; else ags_rel_converged = false; end
     if err_pw < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
 %     if err_inf < ags_abs_tol, ags_abs_converged = true; else ags_abs_converged = false; end
@@ -195,7 +195,7 @@ for m=1:ags_maxits
         disp(msg);
     end
     % Update Solution Vectors
-    AGS_OldPhi = data.Fluxes.Phi;
+    data.Fluxes.AGSPhiOld = data.Fluxes.Phi;
     % Exit if convergence is met
     if ags_rel_converged && ags_abs_converged
         if data.IO.PrintIterationInfo
