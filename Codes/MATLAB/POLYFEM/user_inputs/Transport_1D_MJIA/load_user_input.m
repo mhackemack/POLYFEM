@@ -99,7 +99,7 @@ data.Acceleration.Info(1).IP_Constant = 4;
 data.Acceleration.Info(1).Groups = data.Groups.ThermalGroups;
 data.Acceleration.Info(1).Moments = 1;
 data.Acceleration.Info(1).XSID = 2;
-data = collapse_jacobi_xs(data,1,2,1);
+data = collapse_mjia_xs(data,1,2,1);
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
 data.solver.AGSMaxIterations = 1e0;
