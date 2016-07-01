@@ -85,6 +85,7 @@ ng = data.Groups.NumberEnergyGroups;
 data.XS(1).ExtSource = [get_PDT_AmBe_source();zeros(nm-1,ng)];
 % Acceleration Properties
 % ------------------------------------------------------------------------------
+% data.Acceleration.WGSAccelerationBool = false(data.Groups.NumberGroupSets,1);
 data.Acceleration.WGSAccelerationBool = [false(data.Groups.NumberGroupSets-1,1);1];
 data.Acceleration.AGSAccelerationBool = false;
 data.Acceleration.WGSAccelerationResidual = false(data.Groups.NumberGroupSets,1);
