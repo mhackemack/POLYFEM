@@ -156,6 +156,7 @@ end
 % Surface Matrices
 MM = cell(nf,1);
 G2 = cell(nf,1);
+F  = cell(nf, 1);
 for f=1:nf
     ffdd = f_dofs(f,:);
     bv = bvals_s{f};
@@ -175,7 +176,7 @@ end
 % Volume Matrices
 varargout{1} = {M, K, G};
 % Surface Matrices
-varargout{2} = {MM, G2};
+varargout{2} = {MM, G2, F};
 % Quadrature Structure - Volume
 varargout{3} = {qx_V, qw_V, bvals_v, bgrads_v};
 % Quadrature Structure - Surface

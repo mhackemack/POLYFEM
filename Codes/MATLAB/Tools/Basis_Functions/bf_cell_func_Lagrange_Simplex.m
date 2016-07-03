@@ -151,6 +151,7 @@ for d=1:dim
 end
 MM = cell(nf,1);
 G2 = cell(nf,1);
+F  = cell(nf, 1);
 % Stiffness Matrix
 if v_flags(2)
     for q=1:nq_V
@@ -187,7 +188,7 @@ end
 % Volume Matrices
 varargout{1} = {M, K, G};
 % Surface Matrices
-varargout{2} = {MM, G2};
+varargout{2} = {MM, G2, F};
 % Quadrature Structure - Volume
 varargout{3} = {qx_V, qw_V, bvals_v, bgrads_v};
 % Quadrature Structure - Surface

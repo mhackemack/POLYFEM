@@ -66,8 +66,10 @@ G = cell(dim, 1);
 for d=1:dim, G{d} = znv; end
 MM = cell(nf, 1);
 G2 = cell(nf, 1);
+F  = cell(nf, 1);
 for f=1:nf
     MM{f} = zeros(length(faces{f}));
+    F{f} = zeros(length(faces{f}));
     for d=1:dim, G2{f}{d} = znv; end
 end
 % Collect all Matrices and Quadratures
@@ -115,7 +117,7 @@ end
 % Volume Matrices
 varargout{1} = {M, K, G};
 % Surface Matrices
-varargout{2} = {MM, G2};
+varargout{2} = {MM, G2, F};
 % Quadrature Structures
 varargout{3} = {qx_v, qw_v, bmv, gmv};
 varargout{4} = {qx_s, qw_s, bms, gms};

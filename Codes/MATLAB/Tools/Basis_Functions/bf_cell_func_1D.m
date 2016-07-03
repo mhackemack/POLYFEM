@@ -68,10 +68,12 @@ if lump_bool, M = diag(sum(M)); end
 % ------------------------------------------------------------------------------
 MM = cell(nf,1);
 G2 = cell(nf,1);
+F  = cell(nf, 1);
 bvals_s  = get_1D_values(ord, xx, verts); 
 bgrads_s = get_1D_gradients(ord, xx, verts);
 for f=1:nf
     MM{f} = 1.0;
+    F{f}  = 1.0;
     G2{f}{1} = bgrads_s(f,:)'*bvals_s(f,:);
 end
 
@@ -80,7 +82,7 @@ end
 % Volume Matrices
 varargout{1} = {M, K, G};
 % Surface Matrices
-varargout{2} = {MM, G2};
+varargout{2} = {MM, G2, F};
 % Quadrature Structure - Volume
 varargout{3} = {qx, qw, bvals_v, bgrads_v};
 % Quadrature Structure - Surface

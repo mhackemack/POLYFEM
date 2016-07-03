@@ -24,7 +24,7 @@ data.Neutronics.StartingSolution = 'random';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LD';
+data.Neutronics.SpatialMethod = 'LAGRANGE';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -41,7 +41,7 @@ data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
-data.Neutronics.Transport.performSweeps = 0;
+data.Neutronics.Transport.performSweeps = 1;
 data.Neutronics.Transport.visualizeSweeping = 0;
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Neutronics.Transport.transportType = 'upwind';

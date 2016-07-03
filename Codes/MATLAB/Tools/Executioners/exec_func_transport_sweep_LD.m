@@ -16,17 +16,20 @@ function flux = exec_func_transport_sweep_LD(ndat, mesh, DoF, FE, x, m, groups)
 global glob
 dim = mesh.Dimension;
 ndof = DoF.TotalDoFs;
-nldof = FE.LDNumDoFs;
 ng = length(groups);
 angs = ndat.Transport.AngleSets{m}; na = length(angs);
 angdirs = ndat.Transport.AngularDirections;
 angNorm = ndat.Transport.AngQuadNorm;
 m2d = ndat.Transport.moment_to_discrete;
+Kn = ndat.Transport.MomentOrders(:,1) + 1;
 % Get Sweep Information
 % ------------------------------------------------------------------------------
 sweep = ndat.Transport.Sweeping;
 CellOrder = sweep.CellSweepOrder{m};
 USFaces = sweep.UpstreamFaces{m};
+USCells = sweep.UpstreamCells{m};
+DSFaces = sweep.DownstreamFaces{m};
+DSCells = sweep.DownstreamCells{m};
 % Allocate Memory Space
 % ------------------------------------------------------------------------------
 flux = zeros(ndof, na, ng);
@@ -85,6 +88,52 @@ for cc=1:ncells
                 end
             end
             b(:,q,g) = tvec;
+        end
+    end
+    % Loop through faces by streaming type
+    % --------------------------------------------------------------------------
+    % Loop through upstream faces
+    cfaces = USFaces{c};
+    for ff=1:length(cfaces);
+        f = cfaces(ff);
+        fid = mesh.FaceID(f);
+        fcells = mesh.FaceCells(f,:);
+        fnorm = mesh.FaceNormal(f,:)';
+        % Interior Faces
+        if fid == 0
+            if fcells(1) == c
+                fn2 = DoF.FaceCellNodes{f,2};
+            else
+                fn2 = DoF.FaceCellNodes{f,1};
+                fnorm = -1*fnorm;
+            end
+        % Boundary Faces
+        else
+            
+        end
+        % Loop through angles
+        for q=1:na
+            tq = angs(q);
+            adir = angdirs(tq,:);
+            
+            % Loop through energy groups
+            for g=1:ng
+                
+            end
+        end
+    end
+    % Loop through downstream faces
+    cfaces = DSFaces{c};
+    for ff=1:length(cfaces);
+        f = cfaces(ff);
+        fnorm = mesh.FaceNormal(f,:)';
+        M = FE.FaceMassMatrix{f,1};
+        % Loop through angles
+        for q=1:na
+            tq = angs(q);
+            adir = angdirs(tq,:);
+            MMM = adir*fnorm*M;
+            A(fn1,fn1,q,g) = A(fn1,fn1,q,g) + MMM;
         end
     end
     % Loop through angles/groups and calculate new angular fluxes
