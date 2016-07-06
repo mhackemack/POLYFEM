@@ -24,7 +24,8 @@ data.Neutronics.StartingSolution = 'random';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-data.Neutronics.SpatialMethod = 'LAGRANGE';
+% data.Neutronics.SpatialMethod = 'LAGRANGE';
+data.Neutronics.SpatialMethod = 'LD';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -33,7 +34,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'single';
+data.Neutronics.Transport.AngleAggregation = 'auto';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 2;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -91,7 +92,7 @@ data.solver.kyrlovSubspace = [];
 
 % Geometry Data
 % ------------------------------------------------------------------------------
-data.problem.Dimension = 1;
+data.problem.Dimension = 2;
 L = 10; ncells = 10;
 % gname = 'PolyMesh_SqDomain_L1_n4096';
 % gname = 'assembly_L10_4x4_R=0.6';
@@ -118,10 +119,10 @@ L = 10; ncells = 10;
 % geometry = GeneralGeometry(3, 'Delaunay', tri);
 
 x=linspace(0,1*L,ncells+1);
-% y=linspace(0,1*L,ncells+1);
+y=linspace(0,1*L,ncells+1);
 % z=linspace(0,L,ncells+1);
-geometry = CartesianGeometry(1,x);
-% geometry = CartesianGeometry(2,x,y);
+% geometry = CartesianGeometry(1,x);
+geometry = CartesianGeometry(2,x,y);
 % geometry = CartesianGeometry(3,x,y,z);
 
 % geometry.turn_2D_mesh_to_traps(.0001);

@@ -27,7 +27,11 @@ elseif strcmpi(ttype, 'transport')
         tt = data.Neutronics.Transport.transportType;
         if strcmpi(tt, 'upwind')
             if data.Neutronics.Transport.performSweeps
-                out = @exec_func_dfem_transport_sweep;
+                if strcmpi(data.Neutronics.SpatialMethod, 'ld')
+                    out = @exec_func_dfem_transport_sweep_LD;
+                else
+                    out = @exec_func_dfem_transport_sweep;
+                end
             else
                 out = @exec_func_dfem_transport_upwind;
             end

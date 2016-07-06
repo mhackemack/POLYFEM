@@ -32,6 +32,7 @@ classdef FEHandler < handle
         CellBasisGrads
         CellGradientMatrix
         CellMassMatrix
+        CellIntegralVector
         CellStiffnessMatrix
         CellFunctionMatrix
     end
@@ -257,6 +258,7 @@ classdef FEHandler < handle
                     obj.CellFunctionMatrix{c}  = MV{1}*ones(size(MV{1},1),1);
                     obj.CellStiffnessMatrix{c} = MV{2};
                     obj.CellGradientMatrix{c}  = MV{3};
+                    obj.CellIntegralVector{c}  = MV{4};
                     % Assign surface matrices
                     cfnodes = varargin{2}.CellFaceNodes{c};
                     for f=1:nfaces
@@ -601,6 +603,7 @@ classdef FEHandler < handle
         function allocate_memory_space(obj)
             % Allocate cell-wise memory
             obj.CellMassMatrix = cell(obj.TotalCells,1);
+            obj.CellIntegralVector = cell(obj.TotalCells,1);
             obj.CellStiffnessMatrix = cell(obj.TotalCells,1);
             obj.CellGradientMatrix  = cell(obj.TotalCells,1);
             obj.CellFunctionMatrix = cell(obj.TotalCells,1);
@@ -609,6 +612,7 @@ classdef FEHandler < handle
                 obj.FaceMassMatrix = cell(obj.TotalFaces,2);
                 obj.FaceConformingMassMatrix = cell(obj.TotalFaces,2);
                 obj.FaceFunctionMatrix = cell(obj.TotalFaces,2);
+                obj.FaceIntegralVector = cell(obj.TotalFaces,2);
             end
             if obj.surface_bools(2)
                 obj.FaceGradientMatrix = cell(obj.TotalFaces,2);

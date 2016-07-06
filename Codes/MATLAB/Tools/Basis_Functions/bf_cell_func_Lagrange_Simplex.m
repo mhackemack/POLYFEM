@@ -149,6 +149,7 @@ G  = cell(dim,1);
 for d=1:dim
     G{d} = zeros(ntot);
 end
+IV = [];
 MM = cell(nf,1);
 G2 = cell(nf,1);
 F  = cell(nf, 1);
@@ -186,7 +187,7 @@ end
 % Assign Output Arguments
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2, F};
 % Quadrature Structure - Volume

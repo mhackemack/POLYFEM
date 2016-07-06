@@ -131,6 +131,7 @@ G  = cell(dim,1);
 for d=1:dim
     G{d} = zeros(ntot);
 end
+IV = [];
 % Mass Matrix
 if v_flags(1)
     M = bvals_v'*(bvals_v.*(qw_V*zt));
@@ -174,7 +175,7 @@ end
 % Assign Output Arguments
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2, F};
 % Quadrature Structure - Volume

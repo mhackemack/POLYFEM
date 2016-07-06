@@ -123,6 +123,7 @@ end
 % --------------
 % Volume Matrices
 [M,K,G] = get_volume_matrices(dim, ord, dx, dy);
+IV = [];
 M = M(r_to_g,r_to_g);
 if lump_bool, M = diag(sum(M)); end
 K = K(r_to_g,r_to_g);
@@ -140,7 +141,7 @@ end
 % Assign Output Arguments
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2};
 % Quadrature Structure - Volume

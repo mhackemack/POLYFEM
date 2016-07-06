@@ -47,12 +47,12 @@ if ndat.Transport.visualizeSweeping
 end
 % Loop through Cells in Sweep Chunk
 % ------------------------------------------------------------------------------
-for cc=1:ncells
+for cc=1:mesh.TotalCells
     c = CellOrder(cc);
     cmat = mesh.MatID(c);
     cnodes = DoF.ConnectivityArray{c}; tcnodes = cnodes'; ncnodes = length(cnodes);
     M = FE.CellMassMatrix{c};
-    F = FE.CellFunctionMatrix{c};
+    F = FE.CellIntegralVector{c};
     G = FE.CellGradientMatrix{c};
     A = zeros(ncnodes,ncnodes,na,ng); b = zeros(ncnodes,na,ng);
     % Loop through angles
@@ -60,10 +60,12 @@ for cc=1:ncells
     for q=1:na
         tq = angs(q);
         adir = angdirs(tq,:);
+%         GG = cell_dot(dim, adir, G);
         GG = cell_dot(dim, adir, G)';
         % Loop through energy groups
         for g=1:ng
             grp = groups(g);
+%             A(:,:,q,g) = txs(cmat,grp)*M + GG;
             A(:,:,q,g) = txs(cmat,grp)*M - GG;
             if ndat.Transport.MMS
                 gfunc = ndat.Transport.ExtSource{g};
@@ -90,9 +92,8 @@ for cc=1:ncells
             b(:,q,g) = tvec;
         end
     end
-    % Loop through faces by streaming type
-    % --------------------------------------------------------------------------
     % Loop through upstream faces
+    % --------------------------------------------------------------------------
     cfaces = USFaces{c};
     for ff=1:length(cfaces);
         f = cfaces(ff);
@@ -102,38 +103,79 @@ for cc=1:ncells
         % Interior Faces
         if fid == 0
             if fcells(1) == c
-                fn2 = DoF.FaceCellNodes{f,2};
+%                 fn2 = DoF.FaceCellNodes{f,2};
+                invec = FE.FaceIntegralVector{f,1};
+                upvec = FE.FaceIntegralVector{f,2};
+                updof = DoF.FaceCellNodes{f,2};
             else
-                fn2 = DoF.FaceCellNodes{f,1};
+%                 fn2 = DoF.FaceCellNodes{f,1};
+                invec = FE.FaceIntegralVector{f,2};
+                upvec = FE.FaceIntegralVector{f,1};
+                updof = DoF.FaceCellNodes{f,1};
                 fnorm = -1*fnorm;
+            end
+            M = invec*upvec';
+            % Loop through angles
+            for q=1:na
+                tq = angs(q);
+                adir = angdirs(tq,:);
+                MMM = adir*fnorm*M;
+                % Loop through energy groups
+                for g=1:ng
+                    upflux = flux(updof,q,g);
+                    b(:,q,g) = b(:,q,g) - MMM*upflux;
+                end
             end
         % Boundary Faces
         else
-            
-        end
-        % Loop through angles
-        for q=1:na
-            tq = angs(q);
-            adir = angdirs(tq,:);
-            
-            % Loop through energy groups
-            for g=1:ng
-                
+            tflag = ndat.Transport.BCFlags(fid);
+            M = FE.FaceMassMatrix{f,1};
+            F = FE.FaceIntegralVector{f,1};
+            % Loop through angles
+            for q=1:na
+                tq = angs(q);
+                adir = angdirs(tq,:);
+                fdot = adir*fnorm;
+                for g=1:ng
+                    grp = groups(g);
+                    switch(tflag)
+                        case(glob.Vacuum)
+                            % do nothing
+                        case(glob.Reflecting)
+                            opp_dir = ndat.Transport.ReflectingBoundaryAngles{f}(tq);
+                            psi = ndat.Transport.ReflectingFluxes{f}{opp_dir}(:,g);
+                            MM = fdot*M;
+                            b(cnodes,q,g) = b(cnodes,q,g) - MM*psi;
+                        case(glob.IncidentIsotropic)
+                            val = ndat.Transport.BCVals{fid,grp}/angNorm;
+                            b(cnodes,q,g) = b(cnodes,q,g) - fdot*F*val;
+                    end
+                end
             end
         end
     end
     % Loop through downstream faces
+    % --------------------------------------------------------------------------
     cfaces = DSFaces{c};
     for ff=1:length(cfaces);
         f = cfaces(ff);
+        fcells = mesh.FaceCells(f,:);
         fnorm = mesh.FaceNormal(f,:)';
-        M = FE.FaceMassMatrix{f,1};
+        if fcells(1) == c
+            M = FE.FaceMassMatrix{f,1};
+        elseif fcells(2) == c
+            fnorm = -1*fnorm;
+            M = FE.FaceMassMatrix{f,2};
+        end
         % Loop through angles
         for q=1:na
             tq = angs(q);
             adir = angdirs(tq,:);
             MMM = adir*fnorm*M;
-            A(fn1,fn1,q,g) = A(fn1,fn1,q,g) + MMM;
+            % Loop through energy groups
+            for g=1:ng
+                A(:,:,q,g) = A(:,:,q,g) + MMM;
+            end
         end
     end
     % Loop through angles/groups and calculate new angular fluxes
@@ -149,3 +191,17 @@ for cc=1:ncells
         update_sweep_plot(mesh, c);
     end
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Function Listing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = cell_dot(dim, vec1, vec2)
+if dim == 1
+    out = vec1*vec2{1};
+elseif dim == 2
+    out = vec1(1)*vec2{1} + vec1(2)*vec2{2};
+else
+    out = vec1(1)*vec2{1} + vec1(2)*vec2{2} + vec1(3)*vec2{3};
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

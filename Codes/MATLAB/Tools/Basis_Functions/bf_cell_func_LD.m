@@ -52,6 +52,7 @@ M = zeros(dim+1);
 K = zeros(dim+1);
 G = cell(dim, 1);
 for d=1:dim, G{d} = zeros(dim+1); end
+IV = zeros(dim+1,1);
 MM = cell(nf, 1);
 G2 = cell(nf, 1);
 F  = cell(nf, 1);
@@ -69,10 +70,11 @@ end
 % Cell-Wise Values
 [qx_v, qw_v] = get_general_volume_quadrature(verts, faces, q_ord, true); nqx = length(qw_v);
 [bmv,gmv] = get_LD_basis(qx_v,xmean,dx);
-% mass matrix
+% mass matrix and integral vector
 for q=1:nqx
     bt = bmv(q,:);
     M = M + qw_v(q) * (bt'*bt);
+    IV = IV + qw_v(q)*bt';
 end
 % stiffness matrix
 if v_flags(2)
@@ -114,7 +116,7 @@ end
 % Set Output Structures
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2, F};
 % Quadrature Structures

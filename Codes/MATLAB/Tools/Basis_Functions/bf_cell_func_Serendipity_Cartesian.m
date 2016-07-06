@@ -25,7 +25,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varargout = bf_cell_func_Serendipity_Cartesian( varargin )
 % Collect Input/Output Arguments
-% ------------------------------
+% ------------------------------------------------------------------------------
 nout = nargout;
 nverts = varargin{1};
 verts = varargin{2}(1:nverts,:);
@@ -39,7 +39,7 @@ if nargin > 7
     if ~isempty(varargin{8}),q_ord = varargin{8};end
 end
 % Prepare Vertices and Dimensional Space
-% --------------------------------------
+% ------------------------------------------------------------------------------
 [mv,nv] = size(verts); 
 if nv > mv, verts = verts'; end
 [nv,dim] = size(verts);
@@ -62,11 +62,11 @@ end
 % Generate Basis Function Space
 % ------------------------------------------------------------------------------
 % Retrieve Reference Function Handles
-% -----------------------------------
+% ------------------------------------------------------------------------------
 ref_val_func = get_serendipity_function('vals', 2, dim);
 ref_grad_func = get_serendipity_function('grads', 2, dim);
 % Generate Reference Quadrature Spaces
-% ------------------------------------
+% ------------------------------------------------------------------------------
 ntot = get_num_dofs(dim, ord); zt = ones(1,ntot);
 f_dofs = get_face_dofs(dim, ord);
 if dim == 2
@@ -80,14 +80,14 @@ end
 [trqx_S, trqw_S] = get_surface_ref_quadrature(dim, rqx_S, rqw_S, ref_x);
 zs = ones(nq_S, 1);
 % Compute Jacobian
-% ----------------
+% ------------------------------------------------------------------------------
 [J,invJ] = evaluate_numerical_jacobian(dim, verts, rqx_V);
 JS = cell(nf,1); invJS = cell(nf,1);
 for f=1:nf
     [JS{f},invJS{f}] = evaluate_numerical_jacobian(dim, verts, trqx_S{f});
 end
 % Compute Real Space Quadrature and Basis Values/Gradients
-% --------------------------------------------------------
+% ------------------------------------------------------------------------------
 % Volume
 qx_V = zeros(nq_V, dim); qw_V = rqw_V*svol;
 bvals_v = ref_val_func(ord, rqx_V);
@@ -120,7 +120,7 @@ for f=1:nf
     end
 end
 % Build Matrices
-% --------------
+% ------------------------------------------------------------------------------
 % Volume Matrices
 M = [];
 K  = zeros(ntot);
@@ -128,6 +128,7 @@ G  = cell(dim,1);
 for d=1:dim
     G{d} = zeros(ntot);
 end
+IV = [];
 % Mass Matrix
 if v_flags(1)
     M = bvals_v'*(bvals_v.*(qw_V*zt));
@@ -168,7 +169,7 @@ end
 % Assign Output Arguments
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2};
 % Quadrature Structure - Volume

@@ -147,6 +147,7 @@ G  = cell(dim,1);
 for d=1:dim
     G{d} = zeros(ntot);
 end
+IV = [];
 MM = cell(nf,1);
 G2 = cell(nf,1);
 % Stiffness Matrix
@@ -183,7 +184,7 @@ end
 % Assign Output Arguments
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2};
 % Quadrature Structure - Volume

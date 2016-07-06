@@ -63,6 +63,8 @@ K = bgrads_v'*(bgrads_v.*(qw*zt));
 G{1} = (bgrads_v'*(bvals_v.*(qw*zt)))';
 % Apply Mass Matrix Lumping
 if lump_bool, M = diag(sum(M)); end
+% Integral Vector
+IV = [];
 
 % Construct Surface Matrix Space
 % ------------------------------------------------------------------------------
@@ -80,7 +82,7 @@ end
 % Process Output Structures
 % ------------------------------------------------------------------------------
 % Volume Matrices
-varargout{1} = {M, K, G};
+varargout{1} = {M, K, G, IV};
 % Surface Matrices
 varargout{2} = {MM, G2, F};
 % Quadrature Structure - Volume

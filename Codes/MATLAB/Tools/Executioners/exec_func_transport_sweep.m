@@ -87,9 +87,8 @@ for cc=1:ncells
             b(:,q,g) = tvec;
         end
     end
-    % Loop through faces by streaming type
-    % --------------------------------------------------------------------------
     % Loop through upstream faces
+    % --------------------------------------------------------------------------
     cfaces = USFaces{c};
     for ff=1:length(cfaces);
         f = cfaces(ff);
@@ -135,7 +134,6 @@ for cc=1:ncells
             for q=1:na
                 tq = angs(q);
                 adir = angdirs(tq,:);
-%                 fdot = adir*fnorm;
                 MM = adir*fnorm*M;
                 % Loop through energy groups
                 for g=1:ng
