@@ -33,7 +33,7 @@
 \section{Introduction}
 \label{sec::Introduction}
 
-In this document, we derive 
+In this document, we derive higher-order basis functions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,8 +45,29 @@ In this document, we derive
 \subsection{Linear Basis Functions on the Reference Triangle}
 \label{sec::triref_linear}
 
+For this work, we choose the lagrange shape functions for triangles. The values and gradient equations for the linear basis functions on the reference triangle are given by
 
+\begin{equation}
+\label{eq::reftri_quad_basis_vals}
+\begin{aligned}
+b_1(x,y) \, =& \, (1-x-y) \\
+b_2(x,y) \, =& \, x \\
+b_3(x,y) \, =& \, y
+\end{aligned}
+\end{equation}
 
+\noindent and
+
+\begin{equation}
+\label{eq::reftri_quad_basis_grads}
+\begin{aligned}
+\vec{\nabla}& b_1(x,y) \, = \, \left[ -1 , -1   \right] \\
+\vec{\nabla}& b_2(x,y) \, = \, \left[ -1, 0   \right] \\
+\vec{\nabla}& b_3(x,y) \, = \, \left[ 0, -1   \right] 
+\end{aligned}
+\end{equation}
+
+\noindent respectively.
 
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -62,19 +83,35 @@ In this document, we derive
 \label{fig::ref_triangle}
 \end{figure}
 
-For this work, we choose the standard quadratic shape functions for triangles. The value and gradient equations for the basis functions on the reference triangle are given in Eq. (\ref{eq::basis_vals}).
+For this work, we choose the lagrange shape functions for triangles. The values and gradient equations for the quadratic basis functions on the reference triangle are given by
 
 \begin{equation}
-	\begin{aligned}
-		b_1(s,t) \, =& \, (1-s-t) (1-2s-2t),  &\vec{\nabla}& b_1(s,t) \, = \, \left( 4(s+t)-1 , 4(s+t)-1   \right) \\
-		b_2(s,t) \, =& \, 2s(s-1/2),             &\vec{\nabla}& b_2(s,t) \, = \, \left( 4s-1, 0   \right) \\
-		b_3(s,t) \, =& \, 2t(t-1/2),              &\vec{\nabla}& b_3(s,t) \, = \, \left( 0, 4t-1   \right) \\
-		b_4(s,t) \, =& \, 4s (1-s-t),             &\vec{\nabla}& b_4(s,t) \, = \, \left( 4-8s, -4s   \right) \\
-		b_5(s,t) \, =& \, 4st,                       &\vec{\nabla}& b_5(s,t) \, = \, \left( 4t, 4s   \right) \\
-		b_6(s,t) \, =& \, 4t (1-s-t),             &\vec{\nabla}& b_6(s,t) \, = \, \left( -4t, 4-8t   \right) 
-	\end{aligned}
-\label{eq::basis_vals}
+\label{eq::reftri_quad_basis_vals}
+\begin{aligned}
+b_1(x,y) \, =& \, (1-x-y) (1-2x-2y) \\
+b_2(x,y) \, =& \, 2x(x-1/2) \\
+b_3(x,y) \, =& \, 2y(y-1/2) \\
+b_4(x,y) \, =& \, 4x (1-s-y) \\
+b_5(x,y) \, =& \, 4xy\\
+b_6(x,y) \, =& \, 4y (1-x-y)
+\end{aligned}
 \end{equation}
+
+\noindent and
+
+\begin{equation}
+\label{eq::reftri_quad_basis_grads}
+\begin{aligned}
+\vec{\nabla}& b_1(x,y) \, = \, \left[ 4(x+y)-1 , 4(x+y)-1   \right] \\
+\vec{\nabla}& b_2(x,y) \, = \, \left[ 4x-1, 0   \right] \\
+\vec{\nabla}& b_3(x,y) \, = \, \left[ 0, 4y-1   \right] \\
+\vec{\nabla}& b_4(x,y) \, = \, \left[ 4-8x, -4x   \right] \\
+\vec{\nabla}& b_5(x,y) \, = \, \left[ 4y, 4x   \right] \\
+\vec{\nabla}& b_6(x,y) \, = \, \left[ -4y, 4-8y   \right] 
+\end{aligned}
+\end{equation}
+
+\noindent respectively.
 
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
@@ -104,9 +141,6 @@ For this work, we choose the standard quadratic shape functions for triangles. T
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{References}
-\label{sec::references}
-
 \bibliographystyle{ans}
 \bibliography{references}
 
