@@ -4,7 +4,7 @@
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2014
+%   Year:           2016
 %   
 %   Description:    
 %   
@@ -26,7 +26,7 @@ print_heading(now, date);
 [data, ~] = load_user_input();
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BF_names = {'PWLD'};
+BF_names = {'WACHSPRESS'};
 % BF_names = {'PWLD','WACHSPRESS','MV','MAXENT'};
 data.problem.Dimension = 2;
 print_err_bool = true;
@@ -50,7 +50,7 @@ data.problem.saveVTKSolution = 0;
 %         data.problem.Name = sprintf('cart_%s_k2',now_name);
 %         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
 %         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         df = ye - sol.flux{:};
 %         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
 %     end
 % end
@@ -75,7 +75,7 @@ data.problem.saveVTKSolution = 0;
 %         data.problem.Name = sprintf('tri_%s_k2',now_name);
 %         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
 %         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         df = ye - sol.flux{:};
 %         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
 %     end
 % end
@@ -96,7 +96,7 @@ data.problem.saveVTKSolution = 0;
 %         data.problem.Name = sprintf('shes_quad_%s_k2',now_name);
 %         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
 %         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         df = ye - sol.flux{:};
 %         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
 %     end
 % end
@@ -117,7 +117,7 @@ data.problem.saveVTKSolution = 0;
 %         data.problem.Name = sprintf('shes_poly_%s_k2',now_name);
 %         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
 %         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         df = ye - sol.flux{:};
 %         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
 %     end
 % end
@@ -138,7 +138,7 @@ for b=1:length(BF_names)
         data.problem.Name = sprintf('smooth_poly_%s_k2',now_name);
         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-        df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+        df = ye - sol.flux{:};
         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
     end
 end
@@ -159,7 +159,7 @@ end
 %         data.problem.Name = sprintf('z_quad_%s_k2',now_name);
 %         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
 %         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         df = ye - sol.flux{:};
 %         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
 %     end
 % end
@@ -180,7 +180,7 @@ end
 %         data.problem.Name = sprintf('z_poly_%s_k2',now_name);
 %         outname = ['outputs/',data.problem.Path,'/','ERROR_',data.problem.Name];
 %         ye = ExactSol_QuadSolution(DoF.NodeLocations);
-%         df = ye - sol.flux{:}; df(abs(df)>1e-12) = 0;
+%         df = ye - sol.flux{:};
 %         write_output_to_vtk_rev2(outname,data,geometry,DoF,df,'flux');
 %     end
 % end

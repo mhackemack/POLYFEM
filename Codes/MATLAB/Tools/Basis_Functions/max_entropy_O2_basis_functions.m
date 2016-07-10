@@ -4,7 +4,7 @@
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2014
+%   Year:           2016
 %
 %   Description:    MATLAB script to produce the basis function and gradient
 %                   values using the Maximum Entropy Methodology.

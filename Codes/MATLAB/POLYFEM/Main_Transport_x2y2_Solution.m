@@ -4,7 +4,7 @@
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2014
+%   Year:           2016
 %   
 %   Description:    
 %   
@@ -26,7 +26,7 @@ print_heading(now, date);
 [data, ~] = load_user_input();
 % Begin user input section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-BF_names = {'MAXENT'};
+BF_names = {'WACHSPRESS'};
 % BF_names = {'PWLD','WACHSPRESS','MV','MAXENT'};
 data.problem.Dimension = 2;
 print_err_bool = false;

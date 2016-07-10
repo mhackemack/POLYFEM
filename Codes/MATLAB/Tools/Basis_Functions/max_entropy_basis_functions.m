@@ -4,7 +4,7 @@
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2015
+%   Year:           2016
 %
 %   Description:    MATLAB function to produce the basis function values and
 %                   gradients for the linear case.
@@ -39,9 +39,9 @@ elseif order == 2
 %         [bout, gout] = max_entropy_O2_basis_functions(verts, qx, faces, order, nverts);
 %     end
     if ~grad_bool
-        bout = barycentric_serendipity_Rev2(verts, qx, faces, @max_entropy_O1_basis_functions);
+        bout = barycentric_serendipity_Rev3(verts, qx, faces, @max_entropy_O1_basis_functions);
     else
-        [bout, gout] = barycentric_serendipity_Rev2(verts, qx, faces, @max_entropy_O1_basis_functions);
+        [bout, gout] = barycentric_serendipity_Rev3(verts, qx, faces, @max_entropy_O1_basis_functions);
     end
 end
 % Set Output Arguments

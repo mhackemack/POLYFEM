@@ -4,7 +4,7 @@
 %
 %   Author:         Michael W. Hackemack
 %   Institution:    Texas A&M University
-%   Year:           2015
+%   Year:           2016
 %
 %   Description:    MATLAB function to produce the basis function values and
 %                   gradients for the linear case.
