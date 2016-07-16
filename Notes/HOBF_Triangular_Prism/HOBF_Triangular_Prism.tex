@@ -10,7 +10,7 @@
 %\usepackage[parfill]{parskip}
 \usepackage{graphicx}
 \usepackage{amsmath}
-\usepackage{mathtools}
+%\usepackage{mathtools}
 \usepackage{booktabs}
 \usepackage{enumerate}
 \usepackage{listings}
@@ -91,7 +91,7 @@ For this work, we choose the lagrange shape functions for triangles. The values 
 b_1(x,y) \, =& \, (1-x-y) (1-2x-2y) \\
 b_2(x,y) \, =& \, 2x(x-1/2) \\
 b_3(x,y) \, =& \, 2y(y-1/2) \\
-b_4(x,y) \, =& \, 4x (1-s-y) \\
+b_4(x,y) \, =& \, 4x (1-x-y) \\
 b_5(x,y) \, =& \, 4xy\\
 b_6(x,y) \, =& \, 4y (1-x-y)
 \end{aligned}
@@ -118,10 +118,30 @@ b_6(x,y) \, =& \, 4y (1-x-y)
 \subsection{Cubic Basis Functions on the Reference Triangle}
 \label{sec::triref_cubic}
 
+For this work, we choose the lagrange shape functions for triangles. The values and gradient equations for the cubic basis functions on the reference triangle are given by
+
+\begin{equation}
+\label{eq::reftri_cubic_basis_vals}
+\begin{aligned}
+b_1(x,y) \, =& \, (1-x-y) (1/3-x-y) (2/3-x-y)\\
+b_2(x,y) \, =& \, 2x(x-1/2) \\
+b_3(x,y) \, =& \, 2y(y-1/2) \\
+b_4(x,y) \, =& \, 4x (1-x-y) \\
+b_5(x,y) \, =& \, 4xy\\
+b_6(x,y) \, =& \, 4y (1-x-y) \\
+b_7(x,y) \, =& \, 4y (1-x-y) \\
+b_8(x,y) \, =& \, 4y (1-x-y) \\
+b_9(x,y) \, =& \, 4y (1-x-y) \\
+b_{10}(x,y) \, =& \, 4y (1-x-y) 
+\end{aligned}
+\end{equation}
+
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 \subsection{Quartic Basis Functions on the Reference Triangle}
 \label{sec::triref_quartic}
+
+For this work, we choose the lagrange shape functions for triangles.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
