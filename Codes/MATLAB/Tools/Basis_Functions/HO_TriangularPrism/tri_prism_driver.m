@@ -22,7 +22,6 @@ qz = eval_nodes(:,3);
 % ------------------------------------------------------------------------------
 tri_ref_verts = [0,0;1,0;0,1];
 prism_ref_verts = [tri_ref_verts,zeros(3,1);tri_ref_verts,ones(3,1)];
-
 % Check linear space
 % ------------------------------------------------------------------------------
 prism_nodes = get_prism_ref_nodes(1);
@@ -112,6 +111,20 @@ fprintf('      c-constraint = %s!\n',pass_fail_string(1-sum(quartic_vals,2)))
 fprintf('      x-constraint = %s!\n',pass_fail_string(qx-quartic_vals*pnx))
 fprintf('      y-constraint = %s!\n',pass_fail_string(qy-quartic_vals*pny))
 fprintf('      z-constraint = %s!\n',pass_fail_string(qz-quartic_vals*pnz))
+fprintf('     xx-constraint = %s!\n',pass_fail_string(qx.*qx-quartic_vals*(pnx.*pnx)))
+fprintf('     yy-constraint = %s!\n',pass_fail_string(qy.*qy-quartic_vals*(pny.*pny)))
+fprintf('     zz-constraint = %s!\n',pass_fail_string(qz.*qz-quartic_vals*(pnz.*pnz)))
+fprintf('    xxx-constraint = %s!\n',pass_fail_string(qx.*qx.*qx-quartic_vals*(pnx.*pnx.*pnx)))
+fprintf('    yyy-constraint = %s!\n',pass_fail_string(qy.*qy.*qy-quartic_vals*(pny.*pny.*pny)))
+fprintf('    zzz-constraint = %s!\n',pass_fail_string(qz.*qz.*qz-quartic_vals*(pnz.*pnz.*pnz)))
+fprintf('   xxxx-constraint = %s!\n',pass_fail_string(qx.*qx.*qx.*qx-quartic_vals*(pnx.*pnx.*pnx.*pnx)))
+fprintf('   yyyy-constraint = %s!\n',pass_fail_string(qy.*qy.*qy.*qy-quartic_vals*(pny.*pny.*pny.*pny)))
+fprintf('   zzzz-constraint = %s!\n',pass_fail_string(qz.*qz.*qz.*qz-quartic_vals*(pnz.*pnz.*pnz.*pnz)))
+% Analytical and Numerical Mass Matrix Integration
+% ------------------------------------------------------------------------------
+prism_verts = [1.2,2.3,1.25;3.4,4.5,1.25;5.6,6.7,1.25;...
+               1.2,2.3,3.64;3.4,4.5,3.64;5.6,6.7,3.64];
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Auxiliary Functions
@@ -246,7 +259,23 @@ elseif deg == 3
                                                                                                                 -(27*t*(t - 1/3))/2, - (27*t*(s + t - 1))/2 - (27*(t - 1/3)*(s + t - 1))/2 - (27*t*(t - 1/3))/2;...
                                                                                       (27*t*(s + t - 1))/2 + (27*t*(s + t - 2/3))/2, (27*t*(s + t - 1))/2 + (27*t*(s + t - 2/3))/2 + (27*(s + t - 1)*(s + t - 2/3))/2;...
                                                                                                         - 27*t*(s + t - 1) - 27*s*t, - 27*s*(s + t - 1) - 27*s*t];
-       
+elseif deg == 4
+    s = xx(:,1); t = xx(:,2);
+    out = [ (32*(s + t - 1/2)*(s + t - 1/4)*(s + t - 3/4))/3 + ((32*s)/3 + (32*t)/3 - 32/3)*(s + t - 1/2)*(s + t - 1/4) + ((32*s)/3 + (32*t)/3 - 32/3)*(s + t - 1/2)*(s + t - 3/4) + ((32*s)/3 + (32*t)/3 - 32/3)*(s + t - 1/4)*(s + t - 3/4), (32*(s + t - 1/2)*(s + t - 1/4)*(s + t - 3/4))/3 + ((32*s)/3 + (32*t)/3 - 32/3)*(s + t - 1/2)*(s + t - 1/4) + ((32*s)/3 + (32*t)/3 - 32/3)*(s + t - 1/2)*(s + t - 3/4) + ((32*s)/3 + (32*t)/3 - 32/3)*(s + t - 1/4)*(s + t - 3/4);...
+                                                                                                 (32*s*(s - 1/2)*(s - 1/4))/3 + (32*s*(s - 1/2)*(s - 3/4))/3 + (32*s*(s - 1/4)*(s - 3/4))/3 + (32*(s - 1/2)*(s - 1/4)*(s - 3/4))/3,                                                                                                                                                                                                                                 0;...
+                                                                                                                                                                                                                                 0,                                                                                                 (32*t*(t - 1/2)*(t - 1/4))/3 + (32*t*(t - 1/2)*(t - 3/4))/3 + (32*t*(t - 1/4)*(t - 3/4))/3 + (32*(t - 1/2)*(t - 1/4)*(t - 3/4))/3;...
+                                                             - (128*(s + t - 1)*(s + t - 1/2)*(s + t - 3/4))/3 - (128*s*(s + t - 1)*(s + t - 1/2))/3 - (128*s*(s + t - 1)*(s + t - 3/4))/3 - (128*s*(s + t - 1/2)*(s + t - 3/4))/3,                                                                                                               - (128*s*(s + t - 1)*(s + t - 1/2))/3 - (128*s*(s + t - 1)*(s + t - 3/4))/3 - (128*s*(s + t - 1/2)*(s + t - 3/4))/3;...
+                                                                                               64*s*(s + t - 1)*(s + t - 3/4) + 64*(s - 1/4)*(s + t - 1)*(s + t - 3/4) + 64*s*(s - 1/4)*(s + t - 1) + 64*s*(s - 1/4)*(s + t - 3/4),                                                                                                                                                                         64*s*(s - 1/4)*(s + t - 1) + 64*s*(s - 1/4)*(s + t - 3/4);...
+                                                                                     - (128*(s - 1/2)*(s - 1/4)*(s + t - 1))/3 - (128*s*(s - 1/2)*(s - 1/4))/3 - (128*s*(s - 1/2)*(s + t - 1))/3 - (128*s*(s - 1/4)*(s + t - 1))/3,                                                                                                                                                                                                    -(128*s*(s - 1/2)*(s - 1/4))/3;...
+                                                                                                                                                     (128*s*t*(s - 1/2))/3 + (128*s*t*(s - 1/4))/3 + (128*t*(s - 1/2)*(s - 1/4))/3,                                                                                                                                                                                                     (128*s*(s - 1/2)*(s - 1/4))/3;...
+                                                                                                                                                                                       64*s*t*(t - 1/4) + 64*t*(s - 1/4)*(t - 1/4),                                                                                                                                                                                       64*s*t*(s - 1/4) + 64*s*(s - 1/4)*(t - 1/4);...
+                                                                                                                                                                                                     (128*t*(t - 1/2)*(t - 1/4))/3,                                                                                                                                                     (128*s*t*(t - 1/2))/3 + (128*s*t*(t - 1/4))/3 + (128*s*(t - 1/2)*(t - 1/4))/3;...
+                                                                                                                                                                                                    -(128*t*(t - 1/2)*(t - 1/4))/3,                                                                                     - (128*(t - 1/2)*(t - 1/4)*(s + t - 1))/3 - (128*t*(t - 1/2)*(t - 1/4))/3 - (128*t*(t - 1/2)*(s + t - 1))/3 - (128*t*(t - 1/4)*(s + t - 1))/3;...
+                                                                                                                                                                         64*t*(t - 1/4)*(s + t - 1) + 64*t*(t - 1/4)*(s + t - 3/4),                                                                                               64*t*(s + t - 1)*(s + t - 3/4) + 64*(t - 1/4)*(s + t - 1)*(s + t - 3/4) + 64*t*(t - 1/4)*(s + t - 1) + 64*t*(t - 1/4)*(s + t - 3/4);...
+                                                                                                               - (128*t*(s + t - 1)*(s + t - 1/2))/3 - (128*t*(s + t - 1)*(s + t - 3/4))/3 - (128*t*(s + t - 1/2)*(s + t - 3/4))/3,                                                             - (128*(s + t - 1)*(s + t - 1/2)*(s + t - 3/4))/3 - (128*t*(s + t - 1)*(s + t - 1/2))/3 - (128*t*(s + t - 1)*(s + t - 3/4))/3 - (128*t*(s + t - 1/2)*(s + t - 3/4))/3;...
+                                                                                                                                                     128*t*(s + t - 1)*(s + t - 3/4) + 128*s*t*(s + t - 1) + 128*s*t*(s + t - 3/4),                                                                                                                                                     128*s*(s + t - 1)*(s + t - 3/4) + 128*s*t*(s + t - 1) + 128*s*t*(s + t - 3/4);...
+                                                                                                                                                           - 128*s*t*(s - 1/4) - 128*s*t*(s + t - 1) - 128*t*(s - 1/4)*(s + t - 1),                                                                                                                                                                                 - 128*s*t*(s - 1/4) - 128*s*(s - 1/4)*(s + t - 1);...
+                                                                                                                                                                                 - 128*s*t*(t - 1/4) - 128*t*(t - 1/4)*(s + t - 1),                                                                                                                                                           - 128*s*t*(t - 1/4) - 128*s*t*(s + t - 1) - 128*s*(t - 1/4)*(s + t - 1)];
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function out = get_1D_values(ord, v, x)
@@ -278,5 +307,74 @@ if norm(x) < 1e-12
     out = 'PASSED';
 else
     out = 'FAILED';
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [qx, qw] = get_ref_tri_prism_quad(deg)
+[zx, zw] = lgwt(deg+3,0,1);
+[tx, tw] = TriGaussPoints(deg+3);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = global_prism_nodes(deg, x)
+tri_v = x(1:3,1:2);
+z_v   = x([1,4],3);
+tri_nodes = global_tri_nodes(deg,tri_v); n = size(tri_nodes,1);
+z_nodes = linspace(z_v(1),z_v(2),deg+1);
+out = [];
+for i=1:(deg+1)
+    t = [tri_nodes,z_nodes(i)*ones(n,1)];
+    out = [out;t];
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function out = global_tri_nodes(deg,x)
+if deg == 1
+    out = x;
+elseif deg == 2
+    out = zeros(6,2);
+    out(1:3,:) = x;
+    % first face
+    dx = x(2,:) - x(1,:);
+    out(4,:) = x(1,:) + .5*dx;
+    % second face
+    dx = x(3,:) - x(2,:);
+    out(5,:) = x(2,:) + .5*dx;
+    % third face
+    dx = x(1,:) - x(3,:);
+    out(6,:) = x(3,:) + .5*dx;
+elseif deg == 3
+    out = zeros(10,2);
+    out(1:3,:) = x;
+    % first face
+    dx = x(2,:) - x(1,:);
+    out(4,:) = x(1,:) + 1/3*dx;
+    out(5,:) = x(1,:) + 2/3*dx;
+    % second face
+    dx = x(3,:) - x(2,:);
+    out(6,:) = x(2,:) + 1/3*dx;
+    out(7,:) = x(2,:) + 2/3*dx;
+    % third face
+    dx = x(1,:) - x(3,:);
+    out(8,:) = x(3,:) + 1/3*dx;
+    out(9,:) = x(3,:) + 2/3*dx;
+    % interior nodes
+    out(10,:) = mean(out([4,7],:));
+elseif deg == 4
+    out = zeros(15,2);
+    out(1:3,:) = x;
+    % first face
+    dx = x(2,:) - x(1,:);
+    out(4,:) = x(1,:) + 1/4*dx;
+    out(5,:) = x(1,:) + 2/4*dx;
+    out(6,:) = x(1,:) + 3/4*dx;
+    % second face
+    dx = x(3,:) - x(2,:);
+    out(7,:) = x(2,:) + 1/4*dx;
+    out(8,:) = x(2,:) + 2/4*dx;
+    out(9,:) = x(2,:) + 3/4*dx;
+    % third face
+    dx = x(1,:) - x(3,:);
+    out(10,:) = x(3,:) + 1/4*dx;
+    out(11,:) = x(3,:) + 2/4*dx;
+    out(12,:) = x(3,:) + 3/4*dx;
+    % interior nodes
+    
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
