@@ -186,14 +186,14 @@ for f=1:mesh.TotalFaces
         matids = mesh.MatID(fcells(1));
         h = mesh.OrthogonalProjection(f,1);
         M = FE.FaceMassMatrix{f,1};
-        G = FE.FaceGradientMatrix{f,1};
-        G = cell_dot(dim,fnorm,G);
+%         G = FE.FaceGradientMatrix{f,1};
+%         G = cell_dot(dim,fnorm,G);
         fcnodes = DoF.FaceCellNodes{f,1};
-        cnodes = DoF.ConnectivityArray{fcells(1)};
+%         cnodes = DoF.ConnectivityArray{fcells(1)};
         % Apply boundary terms
         for g=1:ndat.numberEnergyGroups
             gfnodes = fcnodes + (g-1)*ndg;
-            gcnodes =  cnodes + (g-1)*ndg;
+%             gcnodes =  cnodes + (g-1)*ndg;
             D = ndat.Diffusion.DiffXS(matids,g);
             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
             if     (ndat.Transport.BCFlags(fflag) == glob.Vacuum || ...
@@ -202,7 +202,7 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
 %                 L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
 %                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
-                L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + 0.5*M;
+                L(gfnodes,gfnodes) = L(gfnodes,gfnodes) + kp*M;
 %                 L(gcnodes,gcnodes) = L(gcnodes,gcnodes) - 0.5*D*(G + G');
             end
         end
@@ -324,14 +324,14 @@ for f=1:mesh.TotalFaces
         G = FE.FaceGradientMatrix{f,1};
         G = cell_dot(dim,fnorm,G);
         fcnodes = DoF.FaceCellNodes{f,1};
-        cnodes = DoF.ConnectivityArray{fcells(1)};
+%         cnodes = DoF.ConnectivityArray{fcells(1)};
         fonesnodes = ones(length(fcnodes),1);
-        conesnodes = ones(length(cnodes),1);
+%         conesnodes = ones(length(cnodes),1);
         % Apply boundary terms
         for g=1:ndat.numberEnergyGroups
             gfnodes = fcnodes + (g-1)*ndg;
-            gcnodes =  cnodes + (g-1)*ndg;
-            crows = conesnodes*gcnodes; ccols = (conesnodes*gcnodes)';
+%             gcnodes =  cnodes + (g-1)*ndg;
+%             crows = conesnodes*gcnodes; ccols = (conesnodes*gcnodes)';
             frows = fonesnodes*gfnodes; fcols = (fonesnodes*gfnodes)';
             D = ndat.Diffusion.DiffXS(matids,g);
             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
@@ -342,7 +342,8 @@ for f=1:mesh.TotalFaces
 %                 tfmat = kp*M; tcmat = -D*(G + G');
 %                 I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tfmat(:)];
 %                 I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
-                tcmat = -0.5*D*(G + G'); tfmat = 0.5*M;
+%                 tcmat = -0.5*D*(G + G');
+                tfmat = kp*M;
 %                 I = [I;crows(:)]; J = [J;ccols(:)]; TMAT = [TMAT;tcmat(:)];
                 I = [I;frows(:)]; J = [J;fcols(:)]; TMAT = [TMAT;tfmat(:)];
             end
@@ -441,14 +442,14 @@ for f=1:mesh.TotalFaces
         matids = mesh.MatID(fcells(1));
         h = mesh.OrthogonalProjection(f,1);
         M = FE.FaceMassMatrix{f,1};
-        G = FE.FaceGradientMatrix{f,1};
-        G = cell_dot(dim,fnorm,G);
+%         G = FE.FaceGradientMatrix{f,1};
+%         G = cell_dot(dim,fnorm,G);
         fcnodes = DoF.FaceCellNodes{f,1};
-        cnodes = DoF.ConnectivityArray{fcells(1)};
+%         cnodes = DoF.ConnectivityArray{fcells(1)};
         % Apply boundary terms
         for g=1:ndat.numberEnergyGroups
             gfnodes = fcnodes + (g-1)*ndg;
-            gcnodes =  cnodes + (g-1)*ndg;
+%             gcnodes =  cnodes + (g-1)*ndg;
             D = ndat.Diffusion.DiffXS(matids,g);
             kp = get_penalty_coefficient(C_IP, DoF.Degree, D, h, fflag);
             if     (ndat.Transport.BCFlags(fflag) == glob.Vacuum || ...
@@ -456,7 +457,7 @@ for f=1:mesh.TotalFaces
                     ndat.Transport.BCFlags(fflag) == glob.IncidentCurrent || ...
                     ndat.Transport.BCFlags(fflag) == glob.IncidentBeam)
                 out(gfnodes) = out(gfnodes) + kp*M*x(gfnodes);
-                out(gcnodes) = out(gcnodes) - 0.5*D*(G + G')*x(gcnodes);
+%                 out(gcnodes) = out(gcnodes) - 0.5*D*(G + G')*x(gcnodes);
             end
         end
     end
@@ -466,10 +467,13 @@ function out = get_penalty_coefficient(C,p,D,h,eflag)
 c = C*(1+p)*p;
 if eflag == 0
     out = c/2*(D(1)/h(1) + D(2)/h(2));
+    out = max(out, 0.25);
 else
     out = c*D/h;
+    if out < 0.25, out = 0.25; end
+    if out > 0.5,  out = 0.5; end
 end
-out = max(out, 0.25);
+% out = max(out, 0.25);
 % THIS IS A HACK FOR TESTING!!!
 % out = 0.5;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

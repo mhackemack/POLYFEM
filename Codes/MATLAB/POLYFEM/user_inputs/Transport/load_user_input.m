@@ -24,8 +24,8 @@ data.Neutronics.StartingSolution = 'random';
 data.Neutronics.StartingSolutionFunction{1,1} = @asymptotic_limit_func;
 data.Neutronics.transportMethod = 'Transport';
 data.Neutronics.FEMType = 'DFEM';
-% data.Neutronics.SpatialMethod = 'LAGRANGE';
-data.Neutronics.SpatialMethod = 'LD';
+data.Neutronics.SpatialMethod = 'LAGRANGE';
+% data.Neutronics.SpatialMethod = 'LD';
 data.Neutronics.FEMLumping = false;
 data.Neutronics.FEMDegree = 1;
 data.Neutronics.numberEnergyGroups = 1;
@@ -34,7 +34,7 @@ data.Neutronics.numberEnergyGroups = 1;
 % ------------------------------------------------------------------------------
 % Flux/Angle Properties
 data.Neutronics.Transport.PnOrder = 0;
-data.Neutronics.Transport.AngleAggregation = 'auto';
+data.Neutronics.Transport.AngleAggregation = 'all';
 data.Neutronics.Transport.QuadType = 'LS';
 data.Neutronics.Transport.SnLevels = 2;
 data.Neutronics.Transport.AzimuthalLevels = 4;
@@ -42,7 +42,7 @@ data.Neutronics.Transport.PolarLevels = 2;
 data.Neutronics.Transport.QuadAngles  = [1,1];  % Angles for manual set
 data.Neutronics.Transport.QuadWeights = [1];  % Weights for manual set
 % Sweep Operations
-data.Neutronics.Transport.performSweeps = 1;
+data.Neutronics.Transport.performSweeps = 0;
 data.Neutronics.Transport.visualizeSweeping = 0;
 % Tranpsort Type Properties - most of this only applies to hybrid transport
 data.Neutronics.Transport.transportType = 'upwind';
@@ -51,7 +51,7 @@ data.Neutronics.Transport.FluxStabilization = 2.0;
 data.Neutronics.Transport.CurrentStabilization = 1.0;
 % Physical Properties
 % ep = 1e-5;
-txs = 1e0; c = 0.0;
+txs = 20; c = 0.9999;
 data.Neutronics.Transport.ScatteringXS = zeros(1,1,1,1);
 % data.Neutronics.Transport.TotalXS = 1/ep;
 % data.Neutronics.Transport.AbsorbXS = ep;
@@ -63,7 +63,7 @@ data.Neutronics.Transport.FissionXS = [0.0];
 data.Neutronics.Transport.NuBar = [0.0];
 data.Neutronics.Transport.FissSpec = [0.0];
 % data.Neutronics.Transport.ExtSource = ep;
-data.Neutronics.Transport.ExtSource = [1.0];
+data.Neutronics.Transport.ExtSource = [0.0];
 % Boundary Conditions
 % data.Neutronics.Transport.BCFlags = [glob.Vacuum,glob.IncidentIsotropic];
 % data.Neutronics.Transport.BCVals  = {0.0;2.0};
@@ -74,8 +74,8 @@ data.Neutronics.Transport.BCVals  = {0.0};
 
 % DSA Properties
 % ------------------------------------------------------------------------------
-data.Neutronics.Transport.performDSA = 0;
-data.Neutronics.Transport.DSAType = 'M4S';
+data.Neutronics.Transport.performDSA = 1;
+data.Neutronics.Transport.DSAType = 'MIP';
 data.Neutronics.Transport.DSASolveMethod = 'direct';
 data.Neutronics.Transport.DSAPreconditioner = 'jacobi';
 data.Neutronics.Transport.DSATolerance = 1e-4;
@@ -84,8 +84,8 @@ data.Neutronics.IP_Constant = 4;
 
 % Solver Input Parameters
 % ------------------------------------------------------------------------------
-data.solver.absoluteTolerance = 1e-8;
-data.solver.relativeTolerance = 1e-8;
+data.solver.absoluteTolerance = 1e-40;
+data.solver.relativeTolerance = 1e-40;
 data.solver.maxIterations = 1000;
 data.solver.performNKA = 0;
 data.solver.kyrlovSubspace = [];
@@ -93,7 +93,7 @@ data.solver.kyrlovSubspace = [];
 % Geometry Data
 % ------------------------------------------------------------------------------
 data.problem.Dimension = 2;
-L = 10; ncells = 10;
+L = 1; ncells = 40;
 % gname = 'PolyMesh_SqDomain_L1_n4096';
 % gname = 'assembly_L10_4x4_R=0.6';
 % gname = 'misha_quad_L1_n4';
